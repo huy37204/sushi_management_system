@@ -11,6 +11,10 @@ app.get("/", (req, res) => {
   res.render("home", { activePage: "home" });
 });
 
+app.get("/branch-home", (req, res) => {
+  res.render("branch_home");
+});
+
 app.get("/dat-ban", (req, res) => {
   res.render("table_booking", { activePage: "table_booking" });
 });

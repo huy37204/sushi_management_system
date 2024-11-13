@@ -13,10 +13,11 @@
       href="https://fonts.googleapis.com/css2?family=Akaya+Kanadaka&family=Birthstone&family=Lavishly+Yours&family=Lobster&family=Molle&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
       rel="stylesheet"
     />
+    <style></style>
   </head>
 
   <body>
-    <%- include('partials/header.ejs') %>
+    <%- include('./partials/header') %>
     <!-- Background  -->
     <div class="w-[100%] h-screen flex">
       <img
@@ -24,15 +25,13 @@
         alt=""
         class="absolute w-[100%] h-[100vh] overflow-hidden opacity-90 object-cover object-top"
       />
-      <div class="mx-auto mt-[13%] font-bold z-10 text-[#ffffff]">
+      <div class="mx-auto mt-[13%] font-bold z-30 text-[#ffffff]">
         <div
-          class="mb-8 text-center birthstone-regular text-[70px] opacity-0 slide-in-left font-semibold"
+          class="mb-8 text-center birthstone-regular font-semibold slide-in-left"
         >
           Dola Restaurant
         </div>
-        <div class="mb-8 text-center text-[22px] opacity-0 slide-in-right">
-          Món ăn đa dạng
-        </div>
+        <div class="mb-8 text-center slide-in-right">Món ăn đa dạng</div>
         <button
           class="bg-[#D69C52] hover:bg-[#a17231] text-white block mx-auto mt-[10px] py-[6px] px-5 rounded-md font-medium slide-in-up"
           onclick="window.location.href='dat-ban'"
@@ -128,6 +127,22 @@
           .forEach((el) => {
             observer.observe(el);
           });
+      });
+
+      // Lắng nghe sự kiện cuộn trang
+      window.addEventListener("scroll", function () {
+        const scrollUpBtn = document.getElementById("scrollUpBtn");
+        const navbar = document.getElementById("navbar");
+        const navbarHeight = navbar ? navbar.offsetHeight : 0; // Chiều cao của navbar nếu có
+
+        // Kiểm tra nếu trang cuộn xuống qua navbar
+        if (window.scrollY > navbarHeight) {
+          scrollUpBtn.classList.remove("opacity-0", "pointer-events-none"); // Hiển thị nút cuộn lên
+          scrollUpBtn.classList.add("opacity-100", "pointer-events-auto"); // Kích hoạt sự kiện click
+        } else {
+          scrollUpBtn.classList.add("opacity-0", "pointer-events-none"); // Ẩn nút cuộn lên
+          scrollUpBtn.classList.remove("opacity-100", "pointer-events-auto");
+        }
       });
     </script>
     <script
