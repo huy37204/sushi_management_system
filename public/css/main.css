@@ -1,0 +1,29 @@
+html {
+  scroll-behavior: smooth;
+}
+.birthstone-regular {
+  font-family: "Birthstone", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Dropdown menu mặc định bị ẩn */
+.dropdown-menu {
+  visibility: hidden; /* Ban đầu ẩn */
+  opacity: 0; /* Ban đầu không nhìn thấy */
+  margin-top: 20px; /* Ban đầu đặt margin-top là 20px */
+  transition: visibility 0s 0.3s, opacity 1.3s ease, margin-top 0.7s ease;
+}
+
+/* Hiển thị dropdown menu khi hover vào dropdown */
+.dropdown:hover .dropdown-menu {
+  visibility: visible; /* Khi hover, menu sẽ hiển thị */
+  opacity: 1; /* Khi menu hiển thị, opacity trở thành 1 */
+  margin-top: 0; /* Khi hover, margin-top sẽ về 0 */
+  transition: visibility 0s 0s, opacity 1.3s ease, margin-top 0.7s ease; /* Đảm bảo menu hiển thị ngay lập tức */
+}
+
+/* Các style khác */
+.dropdown {
+  font-size: 16px;
+}

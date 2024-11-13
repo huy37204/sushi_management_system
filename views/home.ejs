@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cửa hàng - Dola Sushi - Sushi Restaurant</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/output.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Akaya+Kanadaka&family=Birthstone&family=Lavishly+Yours&family=Lobster&family=Molle&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <%- include('partials/header.ejs') %>
+    <!-- Background  -->
+    <div class="w-[100%] h-screen flex">
+      <img
+        src="https://sushiworld.com.vn/wp-content/uploads/2023/11/c.jpg"
+        alt=""
+        class="absolute w-[100%] h-[100vh] overflow-hidden opacity-90 object-cover object-top"
+      />
+      <div class="mx-auto mt-[13%] font-bold z-10 text-[#ffffff]">
+        <div
+          class="mb-8 text-center birthstone-regular text-[70px] opacity-0 slide-in-left font-semibold"
+        >
+          Dola Restaurant
+        </div>
+        <div class="mb-8 text-center text-[22px] opacity-0 slide-in-right">
+          Món ăn đa dạng
+        </div>
+        <button
+          class="bg-[#D69C52] hover:bg-[#a17231] text-white block mx-auto mt-[10px] py-[6px] px-5 rounded-md font-medium slide-in-up"
+          onclick="window.location.href='dat-ban'"
+        >
+          ĐẶT BÀN NGAY
+        </button>
+      </div>
+    </div>
+    <div
+      id="about-us"
+      class="w-full flex bg-[#10302C] pt-[139px] px-[281px] h-[80vh]"
+    >
+      <div class="w-[50%]">
+        <div class="text-[#CA9C52] italic text-[17px] font-medium">
+          Về Chúng Tôi
+        </div>
+        <div class="birthstone-regular text-white text-[60px]">
+          Dola Restaurant
+        </div>
+        <div class="text-white leading-9">
+          Hệ thống nhà hàng Sushi gồm 15 chi nhánh trải rộng ở một số thành phố
+          (Hồ Chí Minh, Hà Nội, Đà Nẵng...). Nhà hàng chúng tôi luôn luôn đặt
+          khách hàng lên hàng đầu, tận tâm phục vụ, mang lại cho khách hàng
+          những trãi nghiệm tuyệt với nhất. Các món ăn với công thức độc quyền
+          sẽ mang lại hương vị mới mẻ cho thực khách. Dola Restaurant xin chân
+          thành cảm ơn.
+        </div>
+      </div>
+      <div class="w-[50%] ml-[50px]">
+        <!-- Row1 -->
+        <div class="flex mb-2">
+          <div class="mr-2">
+            <img
+              src="https://img.freepik.com/premium-photo/shrimp-tempura-black-plate-with-vegetables-dipping-sauce_45583-1667.jpg"
+              alt=""
+              class="rounded-[5%] rounded-tl-[40%] h-[220px] w-[325px]"
+            />
+          </div>
+          <div class="flex items-end">
+            <img
+              src="https://img.freepik.com/premium-photo/delicious-nigiri-sushi-black-background_123635-89.jpg"
+              alt=""
+              class="h-[181px] w-[268px] rounded-[5%] rounded-tr-[40%] object-cover"
+            />
+          </div>
+        </div>
+        <!-- Row2 -->
+        <div class="flex pl-[55px] ml-[12px]">
+          <div class="mr-2">
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYDFIXQDTRbNY4hnSK3vLGql4QZ3G_TWPI6Q&s"
+              alt=""
+              class="rounded-[5%] rounded-bl-[40%] h-[181px] w-[268px] object-cover"
+            />
+          </div>
+          <div>
+            <img
+              src="https://img.freepik.com/premium-photo/appetizing-sushi-roll-with-fish-caviar-black-background-with-reflection-menu-restaurant_130040-476.jpg"
+              alt=""
+              class="rounded-[5%] rounded-br-[40%] h-[220px] w-[325px] object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <%- include('partials/footer.ejs') %>
+    <%-include('partials/float_button.ejs') %>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const observerOptions = {
+          threshold: 0.3, // Hiển thị khi 30% phần tử đã vào viewport
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("show");
+            }
+          });
+        }, observerOptions);
+
+        // Thêm lớp "show" ngay khi tải trang để kích hoạt hiệu ứng cho các phần tử
+        document
+          .querySelectorAll(".slide-in-left, .slide-in-right, .slide-in-up")
+          .forEach((el) => {
+            el.classList.add("show");
+          });
+
+        // Sau đó, tiếp tục quan sát các phần tử để bắt đầu hiệu ứng khi chúng vào viewport
+        document
+          .querySelectorAll(".slide-in-left, .slide-in-right, .slide-in-up")
+          .forEach((el) => {
+            observer.observe(el);
+          });
+      });
+    </script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+  </body>
+</html>
