@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/branch_home.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/output.css" />
+
+    <title>Quản lý nhân viên</title>
+  </head>
+  <body class="text-gray-800 font-inter">
+    <!--sidenav -->
+    <%- include('./partials/branch_side_nav') %>
+    <!-- end sidenav -->
+
+    <main
+      class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-gray-200 min-h-screen transition-all main"
+    >
+      <!-- navbar -->
+      <%- include('./partials/branch_navbar') %>
+      <!-- end navbar -->
+
+      <!-- Content -->
+      <div class="text-[30px] font-semibold text-[#374151] mx-10 mt-10">
+        Employee List
+      </div>
+      <div class="flex mx-10">
+        <div
+          class="mt-4 w-[100%] flex space-x-10"
+          style="justify-content: center"
+        >
+          <div class="w-[30%]">
+            <div
+              class="flex items-center px-5 py-6 bg-white rounded-md shadow-sm"
+            >
+              <div class="p-3 bg-indigo-600 bg-opacity-75 rounded-full">
+                <svg
+                  class="w-8 h-8 text-white"
+                  viewBox="0 0 28 30"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M18.2 9.08889C18.2 11.5373 16.3196 13.5222 14 13.5222C11.6804 13.5222 9.79999 11.5373 9.79999 9.08889C9.79999 6.64043 11.6804 4.65556 14 4.65556C16.3196 4.65556 18.2 6.64043 18.2 9.08889Z"
+                    fill="currentColor"
+                  ></path>
+                  <path
+                    d="M25.2 12.0444C25.2 13.6768 23.9464 15 22.4 15C20.8536 15 19.6 13.6768 19.6 12.0444C19.6 10.4121 20.8536 9.08889 22.4 9.08889C23.9464 9.08889 25.2 10.4121 25.2 12.0444Z"
+                    fill="currentColor"
+                  ></path>
+                  <path
+                    d="M19.6 22.3889C19.6 19.1243 17.0927 16.4778 14 16.4778C10.9072 16.4778 8.39999 19.1243 8.39999 22.3889V26.8222H19.6V22.3889Z"
+                    fill="currentColor"
+                  ></path>
+                  <path
+                    d="M8.39999 12.0444C8.39999 13.6768 7.14639 15 5.59999 15C4.05359 15 2.79999 13.6768 2.79999 12.0444C2.79999 10.4121 4.05359 9.08889 5.59999 9.08889C7.14639 9.08889 8.39999 10.4121 8.39999 12.0444Z"
+                    fill="currentColor"
+                  ></path>
+                  <path
+                    d="M22.4 26.8222V22.3889C22.4 20.8312 22.0195 19.3671 21.351 18.0949C21.6863 18.0039 22.0378 17.9556 22.4 17.9556C24.7197 17.9556 26.6 19.9404 26.6 22.3889V26.8222H22.4Z"
+                    fill="currentColor"
+                  ></path>
+                  <path
+                    d="M6.64896 18.0949C5.98058 19.3671 5.59999 20.8312 5.59999 22.3889V26.8222H1.39999V22.3889C1.39999 19.9404 3.2804 17.9556 5.59999 17.9556C5.96219 17.9556 6.31367 18.0039 6.64896 18.0949Z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              </div>
+
+              <div class="mx-5">
+                <h4 class="text-2xl font-semibold text-gray-700">200</h4>
+                <div class="text-gray-500">Nhân viên</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="w-[30%]">
+            <div
+              class="flex items-center px-5 py-6 bg-white rounded-md shadow-sm"
+            >
+              <div class="p-3 bg-orange-600 bg-opacity-75 rounded-full">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="{1.5}"
+                  stroke="currentColor"
+                  className="size-6"
+                  class="w-8 h-8 text-white"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"
+                  />
+                </svg>
+              </div>
+
+              <div class="mx-5">
+                <h4 class="text-2xl font-semibold text-gray-700">12</h4>
+                <div class="text-gray-500">Bộ phận</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col mt-2 mx-10">
+        <div
+          class="py-2 -my-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+        >
+          <div
+            class="inline-block min-w-full overflow-hidden align-middle border-b border-gray-200 shadow sm:rounded-lg"
+          >
+            <table class="min-w-full">
+              <thead>
+                <tr>
+                  <th
+                    class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                  >
+                    Name
+                  </th>
+                  <th
+                    class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-center text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                    colspan="3"
+                  >
+                    ĐIỂM PHỤC VỤ
+                  </th>
+                  <th
+                    class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                  >
+                    Status
+                  </th>
+                  <th
+                    class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                  >
+                    Bộ phận
+                  </th>
+                  <th
+                    class="px-6 py-3 border-b border-gray-200 bg-gray-50"
+                  ></th>
+                </tr>
+              </thead>
+
+              <tbody class="bg-white">
+                <% for (let i = 0; i < 10; i++) { %>
+                <tr class="relative">
+                  <td
+                    class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 w-[20%]"
+                  >
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 w-10 h-10">
+                        <img
+                          class="w-10 h-10 rounded-full"
+                          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                          alt=""
+                        />
+                      </div>
+                      <div class="ml-4">
+                        <div
+                          class="text-sm font-medium leading-5 text-gray-900"
+                        >
+                          John Doe
+                        </div>
+                        <div class="text-sm leading-5 text-gray-500">
+                          09dsa23a@
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td
+                    class="px-6 py-4 whitespace-no-wrap border-b border-gray-200"
+                  >
+                    <div class="text-center text-sm leading-5 text-gray-900">
+                      Điểm phục vụ trong ngày
+                    </div>
+                    <div class="text-center text-sm leading-5 text-gray-500">
+                      4.7
+                    </div>
+                  </td>
+                  <td
+                    class="px-6 py-4 whitespace-no-wrap border-b border-gray-200"
+                  >
+                    <div class="text-center text-sm leading-5 text-gray-900">
+                      Điểm phục vụ trong tháng
+                    </div>
+                    <div class="text-center text-sm leading-5 text-gray-500">
+                      23.4
+                    </div>
+                  </td>
+                  <td
+                    class="px-6 py-4 whitespace-no-wrap border-b border-gray-200"
+                  >
+                    <div class="text-center text-sm leading-5 text-gray-900">
+                      Điểm phục vụ trong năm
+                    </div>
+                    <div class="text-center text-sm leading-5 text-gray-500">
+                      105.2
+                    </div>
+                  </td>
+
+                  <td
+                    class="px-6 py-4 whitespace-no-wrap border-b border-gray-200"
+                  >
+                    <span
+                      class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full"
+                      >Active</span
+                    >
+                  </td>
+
+                  <td
+                    class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200"
+                  >
+                    Phục vụ bàn
+                  </td>
+
+                  <td
+                    class="px-6 py-4 text-sm font-medium leading-5 whitespace-no-wrap border-b border-gray-200"
+                  >
+                    <!-- SVG Icon -->
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="h-[16px] w-[16px] cursor-pointer"
+                      onclick="toggleDropdown(this)"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                      />
+                    </svg>
+
+                    <!-- Dropdown Menu -->
+                    <div
+                      class="dropdown-content hidden absolute left-0 top-full mt-2 w-full bg-white shadow-lg rounded-lg border border-gray-200 p-6 text-sm text-gray-700 z-10"
+                    >
+                      <div class="grid grid-cols-3 gap-6">
+                        <div><strong>Ngày sinh:</strong> 01/01/1990</div>
+                        <div><strong>Giới tính:</strong> Nam</div>
+                        <div><strong>Lương:</strong> $5000</div>
+                        <div><strong>Ngày vào làm:</strong> 01/06/2020</div>
+                        <div><strong>Ngày nghỉ việc:</strong> 01/06/2025</div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- End Content -->
+    </main>
+
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      // start: Sidebar
+      const sidebarToggle = document.querySelector(".sidebar-toggle");
+      const sidebarOverlay = document.querySelector(".sidebar-overlay");
+      const sidebarMenu = document.querySelector(".sidebar-menu");
+      const main = document.querySelector(".main");
+      sidebarToggle.addEventListener("click", function (e) {
+        e.preventDefault();
+        main.classList.toggle("active");
+        sidebarOverlay.classList.toggle("hidden");
+        sidebarMenu.classList.toggle("-translate-x-full");
+      });
+      sidebarOverlay.addEventListener("click", function (e) {
+        e.preventDefault();
+        main.classList.add("active");
+        sidebarOverlay.classList.add("hidden");
+        sidebarMenu.classList.add("-translate-x-full");
+      });
+      document
+        .querySelectorAll(".sidebar-dropdown-toggle")
+        .forEach(function (item) {
+          item.addEventListener("click", function (e) {
+            e.preventDefault();
+            const parent = item.closest(".group");
+            if (parent.classList.contains("selected")) {
+              parent.classList.remove("selected");
+            } else {
+              document
+                .querySelectorAll(".sidebar-dropdown-toggle")
+                .forEach(function (i) {
+                  i.closest(".group").classList.remove("selected");
+                });
+              parent.classList.add("selected");
+            }
+          });
+        });
+      // end: Sidebar
+
+      // start: Popper
+      const popperInstance = {};
+      document.querySelectorAll(".dropdown").forEach(function (item, index) {
+        const popperId = "popper-" + index;
+        const toggle = item.querySelector(".dropdown-toggle");
+        const menu = item.querySelector(".dropdown-menu");
+        menu.dataset.popperId = popperId;
+        popperInstance[popperId] = Popper.createPopper(toggle, menu, {
+          modifiers: [
+            {
+              name: "offset",
+              options: {
+                offset: [0, 8],
+              },
+            },
+            {
+              name: "preventOverflow",
+              options: {
+                padding: 24,
+              },
+            },
+          ],
+          placement: "bottom-end",
+        });
+      });
+      document.addEventListener("click", function (e) {
+        const toggle = e.target.closest(".dropdown-toggle");
+        const menu = e.target.closest(".dropdown-menu");
+        if (toggle) {
+          const menuEl = toggle
+            .closest(".dropdown")
+            .querySelector(".dropdown-menu");
+          const popperId = menuEl.dataset.popperId;
+          if (menuEl.classList.contains("hidden")) {
+            hideDropdown();
+            menuEl.classList.remove("hidden");
+            showPopper(popperId);
+          } else {
+            menuEl.classList.add("hidden");
+            hidePopper(popperId);
+          }
+        } else if (!menu) {
+          hideDropdown();
+        }
+      });
+
+      function hideDropdown() {
+        document.querySelectorAll(".dropdown-menu").forEach(function (item) {
+          item.classList.add("hidden");
+        });
+      }
+      function showPopper(popperId) {
+        popperInstance[popperId].setOptions(function (options) {
+          return {
+            ...options,
+            modifiers: [
+              ...options.modifiers,
+              { name: "eventListeners", enabled: true },
+            ],
+          };
+        });
+        popperInstance[popperId].update();
+      }
+      function hidePopper(popperId) {
+        popperInstance[popperId].setOptions(function (options) {
+          return {
+            ...options,
+            modifiers: [
+              ...options.modifiers,
+              { name: "eventListeners", enabled: false },
+            ],
+          };
+        });
+      }
+      // end: Popper
+
+      // start: Tab
+      document.querySelectorAll("[data-tab]").forEach(function (item) {
+        item.addEventListener("click", function (e) {
+          e.preventDefault();
+          const tab = item.dataset.tab;
+          const page = item.dataset.tabPage;
+          const target = document.querySelector(
+            '[data-tab-for="' + tab + '"][data-page="' + page + '"]'
+          );
+          document
+            .querySelectorAll('[data-tab="' + tab + '"]')
+            .forEach(function (i) {
+              i.classList.remove("active");
+            });
+          document
+            .querySelectorAll('[data-tab-for="' + tab + '"]')
+            .forEach(function (i) {
+              i.classList.add("hidden");
+            });
+          item.classList.add("active");
+          target.classList.remove("hidden");
+        });
+      });
+      // end: Tab
+
+      //start: Toggle-dropdown
+      function toggleDropdown(icon) {
+        const dropdown = icon.closest("td").querySelector(".dropdown-content");
+        // Toggle visibility of the dropdown
+        dropdown.classList.toggle("hidden");
+      }
+      //end: Toggle-dropdown
+    </script>
+  </body>
+</html>

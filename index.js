@@ -15,6 +15,10 @@ app.get("/branch-home", (req, res) => {
   res.render("branch_home");
 });
 
+app.get("/branch-employee-list", (req, res) => {
+  res.render("branch_employee_list");
+});
+
 app.get("/dat-ban", (req, res) => {
   res.render("table_booking", { activePage: "table_booking" });
 });
