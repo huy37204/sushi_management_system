@@ -46,3 +46,5 @@ app.get("/menu", (req, res) => {
 app.listen(port, () => {
   console.log(`Project dang chay o port ${port}`);
 });
+
+console.log("a");
