@@ -34,7 +34,8 @@
     />
   </head>
   <body class="bg-[#143B36]">
-    <%- include('partials/header.ejs') %> <%-include('partials/page_flow.ejs')%>
+    <%- include('../partials/customer/header.ejs') %>
+    <%-include('../partials/customer/page_flow.ejs')%>
     <!-- Tabble booking-->
     <div
       class="relative flex h-[80vh] overflow-hidden my-8 items-center justify-center"
@@ -174,8 +175,8 @@
         </div>
       </div>
     </div>
-    <%- include('partials/footer.ejs') %>
-    <%-include('partials/float_button.ejs') %>
+    <%- include('../partials/customer/footer.ejs') %>
+    <%-include('../partials/customer/float_button.ejs') %>
     <script>
       // Hàm để thêm tùy chọn từ 0 đến 100 vào dropdown
       function populateSelectOptions(selectId) {
