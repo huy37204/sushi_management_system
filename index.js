@@ -19,6 +19,22 @@ app.get("/branch-employee-list", (req, res) => {
   res.render("branch_employee_list");
 });
 
+app.get("/branch-employee-search", (req, res) => {
+  res.render("branch_employee_search");
+});
+
+app.get("/branch-order-form", (req, res) => {
+  res.render("branch_order_form");
+});
+
+app.get("/branch-invoice", (req, res) => {
+  res.render("branch_invoice");
+});
+
+app.get("/branch-customer-card", (req, res) => {
+  res.render("branch_customer_card");
+});
+
 app.get("/dat-ban", (req, res) => {
   res.render("table_booking", { activePage: "table_booking" });
 });
