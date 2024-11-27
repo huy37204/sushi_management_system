@@ -35,6 +35,14 @@ app.get("/branch-customer-card", (req, res) => {
   res.render("branch/branch_customer_card");
 });
 
+app.get("/company-home", (req, res) => {
+  res.render("company/company_home");
+});
+
+app.get("/company-food-revenue", (req, res) => {
+  res.render("company/company_food_revenue");
+});
+
 app.get("/dat-ban", (req, res) => {
   res.render("customer/table_booking", { activePage: "table_booking" });
 });
