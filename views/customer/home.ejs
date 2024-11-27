@@ -40,10 +40,7 @@
         </button>
       </div>
     </div>
-    <div
-      id="about-us"
-      class="w-full flex bg-[#10302C] pt-[139px] px-[281px] h-[80vh]"
-    >
+    <div id="about-us" class="w-full flex bg-[#10302C] px-[11%] py-[5%]">
       <div class="w-[50%]">
         <div class="text-[#CA9C52] italic text-[17px] font-medium">
           Về Chúng Tôi
@@ -60,41 +57,39 @@
           thành cảm ơn.
         </div>
       </div>
-      <div class="w-[50%] ml-[50px]">
-        <!-- Row1 -->
-        <div class="flex mb-2">
-          <div class="mr-2">
-            <img
-              src="https://img.freepik.com/premium-photo/shrimp-tempura-black-plate-with-vegetables-dipping-sauce_45583-1667.jpg"
-              alt=""
-              class="rounded-[5%] rounded-tl-[40%] h-[220px] w-[325px]"
-            />
-          </div>
-          <div class="flex items-end">
-            <img
-              src="https://img.freepik.com/premium-photo/delicious-nigiri-sushi-black-background_123635-89.jpg"
-              alt=""
-              class="h-[181px] w-[268px] rounded-[5%] rounded-tr-[40%] object-cover"
-            />
-          </div>
+      <div class="w-[60%] h-[60vh] ml-[10%]">
+        <img src="/imgs/4-dish.png" alt="4 dish image" />
+      </div>
+    </div>
+    <div class="w-full bg-[#143B36] pt-[139px] px-[11%] py-10">
+      <!-- Tiêu đề -->
+      <div class="container mx-auto py-10">
+        <!-- Tiêu đề -->
+        <h1 class="text-center text-white text-4xl font-bold mb-6">
+          Thực đơn của chúng tôi
+        </h1>
+
+        <!-- Tabs -->
+        <div class="flex justify-center space-x-4 mb-8">
+          <button
+            class="tab-btn px-6 py-2 border rounded-lg text-white hover:bg-[#D69C52]"
+            onclick="showCategory('all')"
+          >
+            Tất cả
+          </button>
+          <% Object.keys(menuData).forEach(category=> { %>
+          <button
+            class="tab-btn px-6 py-2 border rounded-lg text-white hover:bg-[#D69C52]"
+            onclick="showCategory('<%= category %>')"
+          >
+            <%= category==="appetizers" ? "Khai vị" : category==="mainCourses" ?
+            "Món chính" : category==="soups" ? "Canh - Tiềm - Súp" : category %>
+          </button>
+          <% }); %>
         </div>
-        <!-- Row2 -->
-        <div class="flex pl-[55px] ml-[12px]">
-          <div class="mr-2">
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYDFIXQDTRbNY4hnSK3vLGql4QZ3G_TWPI6Q&s"
-              alt=""
-              class="rounded-[5%] rounded-bl-[40%] h-[181px] w-[268px] object-cover"
-            />
-          </div>
-          <div>
-            <img
-              src="https://img.freepik.com/premium-photo/appetizing-sushi-roll-with-fish-caviar-black-background-with-reflection-menu-restaurant_130040-476.jpg"
-              alt=""
-              class="rounded-[5%] rounded-br-[40%] h-[220px] w-[325px] object-cover"
-            />
-          </div>
-        </div>
+
+        <!-- Danh sách món ăn -->
+        <%- include('../components/selectDish.ejs') %>
       </div>
     </div>
     <%- include('../partials/customer/footer.ejs') %>
