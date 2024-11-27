@@ -22,8 +22,8 @@
   </head>
 
   <body class="bg-[#143B36]">
-    <%- include('../partials/customer/header.ejs') %>
-    <%-include('../partials/customer/page_flow.ejs')%>
+    <%- include('../partials/customer/header.ejs') %> <%-
+    include('../partials/customer/page_flow.ejs') %>
     <div class="flex pt-20 space-x-4 bg-cover bg-center">
       <!-- Sidebar -->
       <aside class="w-1/4">
@@ -100,110 +100,11 @@
         <!-- Products -->
         <div class="grid grid-cols-3 gap-4">
           <!-- Product Card -->
-          <div class="bg-white text-black rounded-lg overflow-hidden shadow-md">
-            <div class="relative">
-              <img
-                src="https://bizweb.dktcdn.net/thumb/1024x1024/100/469/097/products/untitled1-1.jpg?v=1667882668260"
-                alt="Salad"
-                class="w-full h-40 object-cover"
-              />
-              <span
-                class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded"
-                >-3%</span
-              >
-            </div>
-            <div class="p-4">
-              <h3 class="text-lg font-semibold">Salad rau mùa sốt</h3>
-              <div class="flex items-center justify-between mt-2">
-                <span class="text-red-500 font-bold">68.000đ</span>
-                <span class="line-through text-gray-500">70.000đ</span>
-              </div>
-              <button
-                class="w-full mt-4 bg-[#D69C52] text-white py-2 rounded-lg"
-              >
-                Xem chi tiết
-              </button>
-            </div>
-          </div>
-          <div class="bg-white text-black rounded-lg overflow-hidden shadow-md">
-            <div class="relative">
-              <img
-                src="https://bizweb.dktcdn.net/thumb/1024x1024/100/469/097/products/untitled1-1.jpg?v=1667882668260"
-                alt="Salad"
-                class="w-full h-40 object-cover"
-              />
-              <span
-                class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded"
-                >-3%</span
-              >
-            </div>
-            <div class="p-4">
-              <h3 class="text-lg font-semibold">Salad rau mùa sốt</h3>
-              <div class="flex items-center justify-between mt-2">
-                <span class="text-red-500 font-bold">68.000đ</span>
-                <span class="line-through text-gray-500">70.000đ</span>
-              </div>
-              <button
-                class="w-full mt-4 bg-[#D69C52] text-white py-2 rounded-lg"
-              >
-                Xem chi tiết
-              </button>
-            </div>
-          </div>
-          <div class="bg-white text-black rounded-lg overflow-hidden shadow-md">
-            <div class="relative">
-              <img
-                src="https://bizweb.dktcdn.net/thumb/1024x1024/100/469/097/products/untitled1-1.jpg?v=1667882668260"
-                alt="Salad"
-                class="w-full h-40 object-cover"
-              />
-              <span
-                class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded"
-                >-3%</span
-              >
-            </div>
-            <div class="p-4">
-              <h3 class="text-lg font-semibold">Salad rau mùa sốt</h3>
-              <div class="flex items-center justify-between mt-2">
-                <span class="text-red-500 font-bold">68.000đ</span>
-                <span class="line-through text-gray-500">70.000đ</span>
-              </div>
-              <button
-                class="w-full mt-4 bg-[#D69C52] text-white py-2 rounded-lg"
-              >
-                Xem chi tiết
-              </button>
-            </div>
-          </div>
-          <div class="bg-white text-black rounded-lg overflow-hidden shadow-md">
-            <div class="relative">
-              <img
-                src="https://bizweb.dktcdn.net/thumb/1024x1024/100/469/097/products/untitled1-1.jpg?v=1667882668260"
-                alt="Salad"
-                class="w-full h-40 object-cover"
-              />
-              <span
-                class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded"
-                >-3%</span
-              >
-            </div>
-            <div class="p-4">
-              <h3 class="text-lg font-semibold">Salad rau mùa sốt</h3>
-              <div class="flex items-center justify-between mt-2">
-                <span class="text-red-500 font-bold">68.000đ</span>
-                <span class="line-through text-gray-500">70.000đ</span>
-              </div>
-              <button
-                class="w-full mt-4 bg-[#D69C52] text-white py-2 rounded-lg"
-              >
-                Xem chi tiết
-              </button>
-            </div>
-          </div>
+          <%- include('../components/selectDish.ejs') %>
         </div>
       </main>
     </div>
-    <%- include('../partials/customer/footer.ejs') %>
-    <%-include('../partials/customer/float_button.ejs') %>
+    <%- include('../partials/customer/footer.ejs') %> <%-
+    include('../partials/customer/float_button.ejs') %>
   </body>
 </html>
