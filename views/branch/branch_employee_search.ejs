@@ -26,14 +26,14 @@
   </head>
   <body class="text-gray-800 font-inter">
     <!--sidenav -->
-    <%- include('./partials/branch_side_nav') %>
+    <%- include('../partials/branch/branch_side_nav') %>
     <!-- end sidenav -->
 
     <main
       class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-gray-200 min-h-screen transition-all main"
     >
       <!-- Navbar -->
-      <%- include('./partials/branch_navbar') %>
+      <%- include('../partials/branch/branch_navbar') %>
       <!-- End Navbar -->
 
       <!-- Content -->
@@ -137,34 +137,34 @@
             Kết quả tìm kiếm
           </h2>
 
-          <table class="min-w-full bg-white border border-gray-300">
+          <table
+            class="min-w-full bg-white border border-gray-300 rounded-lg shadow-lg"
+          >
             <thead>
-              <tr class="bg-gray-100">
+              <tr class="bg-gray-200">
                 <th
-                  class="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b"
+                  class="px-4 py-3 text-center text-sm font-semibold text-gray-700 uppercase border-b"
                 >
                   Mã nhân viên
                 </th>
                 <th
-                  class="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b"
+                  class="px-4 py-3 text-center text-sm font-semibold text-gray-700 uppercase border-b"
                 >
                   Họ và tên
                 </th>
                 <th
-                  class="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b"
+                  class="px-4 py-3 text-center text-sm font-semibold text-gray-700 uppercase border-b"
                 >
                   Bộ phận
                 </th>
                 <th
-                  class="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b"
+                  class="px-4 py-3 text-center text-sm font-semibold text-gray-700 uppercase border-b"
                 >
-                  Lương cuối dd/mm/yyyy
+                  Điểm phục vụ cuối dd/mm/yyyy
                 </th>
               </tr>
             </thead>
-            <tbody id="resultsTable">
-              <!-- Dynamic Results Will Be Rendered Here -->
-            </tbody>
+            <tbody id="resultsTable" class="bg-white"></tbody>
           </table>
         </div>
       </div>
@@ -194,13 +194,13 @@
               id: "EMP001",
               name: "John Doe",
               department: "IT",
-              salary: "$3000",
+              salary: "33.33",
             },
             {
               id: "EMP002",
               name: "Jane Smith",
               department: "HR",
-              salary: "$2500",
+              salary: "33.33",
             },
           ];
 
@@ -211,11 +211,11 @@
           // Render search results
           results.forEach((result) => {
             const row = `
-                        <tr>
-                            <td class="px-4 py-2 border-b">${result.id}</td>
-                            <td class="px-4 py-2 border-b">${result.name}</td>
-                            <td class="px-4 py-2 border-b">${result.department}</td>
-                            <td class="px-4 py-2 border-b">${result.salary}</td>
+                        <tr class="hover:bg-gray-100">
+                            <td class="px-4 py-3 text-center text-sm text-gray-600 border-b">${result.id}</td>
+                            <td class="px-4 py-3 text-center text-sm text-gray-600 border-b">${result.name}</td>
+                            <td class="px-4 py-3 text-center text-sm text-gray-600 border-b">${result.department}</td>
+                            <td class="px-4 py-3 text-center text-sm text-gray-600 border-b">${result.salary}</td>
                         </tr>
                     `;
             resultsTable.innerHTML += row;

@@ -18,25 +18,53 @@
       href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="css/branch_home.css" />
+    <link rel="stylesheet" href="css/company_home.css" />
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <title>Quản lý chi nhánh</title>
+    <title>Quản lý công ty</title>
   </head>
   <body class="text-gray-800 font-inter">
     <!--sidenav -->
-    <%- include('./partials/branch_side_nav') %>
+    <%- include('../partials/company/company_side_nav') %>
     <!-- end sidenav -->
 
     <main
       class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-gray-200 min-h-screen transition-all main"
     >
       <!-- navbar -->
-      <%- include('./partials/branch_navbar') %>
+      <%- include('../partials/company/company_navbar') %>
       <!-- end navbar -->
 
       <!-- Content -->
       <div class="p-6">
+        <div class="p-4 max-w-sm mx-auto">
+          <label
+            for="branch-select"
+            class="block text-gray-700 font-medium mb-2 text-center"
+            >Chọn Chi Nhánh</label
+          >
+          <select
+            id="branch-select"
+            class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#f84525] focus:border-[#f84525] text-gray-700"
+          >
+            <option value="" disabled selected>- Chọn chi nhánh -</option>
+            <option value="hanoi">Chi nhánh Hà Nội</option>
+            <option value="tphcm">Chi nhánh TP. Hồ Chí Minh</option>
+            <option value="danang">Chi nhánh Đà Nẵng</option>
+            <option value="haiphong">Chi nhánh Hải Phòng</option>
+            <option value="cantho">Chi nhánh Cần Thơ</option>
+            <option value="nhatrang">Chi nhánh Nha Trang</option>
+            <option value="hue">Chi nhánh Huế</option>
+            <option value="quangninh">Chi nhánh Quảng Ninh</option>
+            <option value="binhduong">Chi nhánh Bình Dương</option>
+            <option value="dongnai">Chi nhánh Đồng Nai</option>
+            <option value="thainguyen">Chi nhánh Thái Nguyên</option>
+            <option value="vinh">Chi nhánh Vinh</option>
+            <option value="bienhoa">Chi nhánh Biên Hòa</option>
+            <option value="dalat">Chi nhánh Đà Lạt</option>
+            <option value="quangnam">Chi nhánh Quảng Nam</option>
+          </select>
+        </div>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <div
             class="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md lg:col-span-2"
@@ -342,222 +370,6 @@
                       >
                     </td>
                     <td class="border-b border-b-gray-50 text-center">
-                      <span
-                        class="inline-block p-1 rounded bg-emerald-500/10 text-emerald-500 font-medium text-[12px] leading-none"
-                        >Pending</span
-                      >
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <div class="flex items-center">
-                        <img
-                          src="https://placehold.co/32x32"
-                          alt=""
-                          class="w-8 h-8 rounded object-cover block"
-                        />
-                        <a
-                          href="#"
-                          class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate"
-                          >Create landing page</a
-                        >
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span class="text-[13px] font-medium text-rose-500"
-                        >-$235</span
-                      >
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span
-                        class="inline-block p-1 rounded bg-rose-500/10 text-rose-500 font-medium text-[12px] leading-none"
-                        >Withdrawn</span
-                      >
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <div class="flex items-center">
-                        <img
-                          src="https://placehold.co/32x32"
-                          alt=""
-                          class="w-8 h-8 rounded object-cover block"
-                        />
-                        <a
-                          href="#"
-                          class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate"
-                          >Create landing page</a
-                        >
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span class="text-[13px] font-medium text-emerald-500"
-                        >+$235</span
-                      >
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span
-                        class="inline-block p-1 rounded bg-emerald-500/10 text-emerald-500 font-medium text-[12px] leading-none"
-                        >Pending</span
-                      >
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <div class="flex items-center">
-                        <img
-                          src="https://placehold.co/32x32"
-                          alt=""
-                          class="w-8 h-8 rounded object-cover block"
-                        />
-                        <a
-                          href="#"
-                          class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate"
-                          >Create landing page</a
-                        >
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span class="text-[13px] font-medium text-rose-500"
-                        >-$235</span
-                      >
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span
-                        class="inline-block p-1 rounded bg-rose-500/10 text-rose-500 font-medium text-[12px] leading-none"
-                        >Withdrawn</span
-                      >
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <div class="flex items-center">
-                        <img
-                          src="https://placehold.co/32x32"
-                          alt=""
-                          class="w-8 h-8 rounded object-cover block"
-                        />
-                        <a
-                          href="#"
-                          class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate"
-                          >Create landing page</a
-                        >
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span class="text-[13px] font-medium text-emerald-500"
-                        >+$235</span
-                      >
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span
-                        class="inline-block p-1 rounded bg-emerald-500/10 text-emerald-500 font-medium text-[12px] leading-none"
-                        >Pending</span
-                      >
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <div class="flex items-center">
-                        <img
-                          src="https://placehold.co/32x32"
-                          alt=""
-                          class="w-8 h-8 rounded object-cover block"
-                        />
-                        <a
-                          href="#"
-                          class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate"
-                          >Create landing page</a
-                        >
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span class="text-[13px] font-medium text-rose-500"
-                        >-$235</span
-                      >
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span
-                        class="inline-block p-1 rounded bg-rose-500/10 text-rose-500 font-medium text-[12px] leading-none"
-                        >Withdrawn</span
-                      >
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <div class="flex items-center">
-                        <img
-                          src="https://placehold.co/32x32"
-                          alt=""
-                          class="w-8 h-8 rounded object-cover block"
-                        />
-                        <a
-                          href="#"
-                          class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate"
-                          >Create landing page</a
-                        >
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span class="text-[13px] font-medium text-emerald-500"
-                        >+$235</span
-                      >
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span
-                        class="inline-block p-1 rounded bg-emerald-500/10 text-emerald-500 font-medium text-[12px] leading-none"
-                        >Pending</span
-                      >
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <div class="flex items-center">
-                        <img
-                          src="https://placehold.co/32x32"
-                          alt=""
-                          class="w-8 h-8 rounded object-cover block"
-                        />
-                        <a
-                          href="#"
-                          class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate"
-                          >Create landing page</a
-                        >
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span class="text-[13px] font-medium text-rose-500"
-                        >-$235</span
-                      >
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span
-                        class="inline-block p-1 rounded bg-rose-500/10 text-rose-500 font-medium text-[12px] leading-none"
-                        >Withdrawn</span
-                      >
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <div class="flex items-center">
-                        <img
-                          src="https://placehold.co/32x32"
-                          alt=""
-                          class="w-8 h-8 rounded object-cover block"
-                        />
-                        <a
-                          href="#"
-                          class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate"
-                          >Create landing page</a
-                        >
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span class="text-[13px] font-medium text-emerald-500"
-                        >+$235</span
-                      >
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
                       <span
                         class="inline-block p-1 rounded bg-emerald-500/10 text-emerald-500 font-medium text-[12px] leading-none"
                         >Pending</span

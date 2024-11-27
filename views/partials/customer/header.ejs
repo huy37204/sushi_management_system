@@ -17,7 +17,7 @@
   <body>
     <nav
       id="navbar"
-      class="<%= activePage === 'home' ? 'absolute' : 'relative' %> text-white flex items-center font-bold w-[100%] z-20"
+      class="<%= activePage === 'home' ? 'absolute' : 'relative' %> text-white flex items-center font-bold w-[100%] z-40"
     >
       <div class="absolute inset-0 bg-[#143B36] opacity-70"></div>
       <div id="logo" class="z-10">
@@ -49,7 +49,7 @@
 
           <!-- Dropdown menu -->
           <div
-            class="fixed left-[15%] bg-black rounded-lg z-20 border-2 border-[#f8b358] dropdown-menu w-[70%]"
+            class="fixed left-[15%] bg-black rounded-lg border-2 border-[#f8b358] dropdown-menu w-[70%]"
           >
             <div class="flex flex-wrap ml-7 pt-4 pb-2 text-[18px] w-[100%]">
               <div id="item1" class="w-[20%] mb-[40px]">
@@ -119,11 +119,13 @@
           class="pt-2"
           style="font-size: 22px; font-weight: bold"
         ></ion-icon>
-        <ion-icon
-          name="cart-outline"
-          class="pt-2"
-          style="font-size: 22px; font-weight: bold"
-        ></ion-icon>
+        <a href="/cart">
+          <ion-icon
+            name="cart-outline"
+            class="pt-2"
+            style="font-size: 22px; font-weight: bold"
+          ></ion-icon>
+        </a>
         <ion-icon
           name="person-outline"
           class="pt-2"
