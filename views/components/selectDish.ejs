@@ -21,73 +21,54 @@
 </head>
 
 <body>
-    <div class="bg-white text-black rounded-lg overflow-hidden shadow-md">
-        <div class="relative">
-            <img src="https://bizweb.dktcdn.net/thumb/1024x1024/100/469/097/products/untitled1-1.jpg?v=1667882668260"
-                alt="Salad" class="w-full h-40 object-cover" />
-            <span class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded">-3%</span>
-        </div>
-        <div class="p-4">
-            <h3 class="text-lg font-semibold">Salad rau mùa sốt</h3>
-            <div class="flex items-center justify-between mt-2">
-                <span class="text-red-500 font-bold">68.000đ</span>
-                <span class="line-through text-gray-500">70.000đ</span>
+    <div id="menu-items">
+        <!-- Hiển thị tất cả món ăn mặc định -->
+        <div class="menu-category all">
+            <div class="grid grid-cols-4 gap-6">
+                <% Object.keys(menuData).forEach(category=> { %>
+                    <% menuData[category].forEach(dish=> { %>
+                        <div class="dish-card border rounded-lg p-4 text-center bg-white">
+                            <img src="<%= dish.imageUrl %>" alt="<%= dish.name %>"
+                                class="w-full h-40 object-cover rounded-md mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                                <%= dish.name %>
+                            </h3>
+                            <p class="text-red-500 text-lg font-bold">
+                                <%= dish.price.toLocaleString('vi-VN') %>đ
+                            </p>
+                            <p class="text-gray-500 text-sm line-through">
+                                <%= dish.originalPrice.toLocaleString('vi-VN') %>đ
+                            </p>
+                            <button class="bg-[#D69C52] text-white px-4 py-2 rounded-lg mt-2">Xem chi tiết</button>
+                        </div>
+                        <% }); %>
+                            <% }); %>
             </div>
-            <button class="w-full mt-4 bg-[#D69C52] text-white py-2 rounded-lg">
-                Xem chi tiết
-            </button>
         </div>
-    </div>
-    <div class="bg-white text-black rounded-lg overflow-hidden shadow-md">
-        <div class="relative">
-            <img src="https://bizweb.dktcdn.net/thumb/1024x1024/100/469/097/products/untitled1-1.jpg?v=1667882668260"
-                alt="Salad" class="w-full h-40 object-cover" />
-            <span class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded">-3%</span>
-        </div>
-        <div class="p-4">
-            <h3 class="text-lg font-semibold">Salad rau mùa sốt</h3>
-            <div class="flex items-center justify-between mt-2">
-                <span class="text-red-500 font-bold">68.000đ</span>
-                <span class="line-through text-gray-500">70.000đ</span>
+
+        <!-- Các danh mục riêng -->
+        <% Object.keys(menuData).forEach(category=> { %>
+            <div class="menu-category <%= category %>" style="display: none;">
+                <div class="grid grid-cols-4 gap-6">
+                    <% menuData[category].forEach(dish=> { %>
+                        <div class="dish-card border rounded-lg p-4 text-center bg-white">
+                            <img src="<%= dish.imageUrl %>" alt="<%= dish.name %>"
+                                class="w-full h-40 object-cover rounded-md mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                                <%= dish.name %>
+                            </h3>
+                            <p class="text-red-500 text-lg font-bold">
+                                <%= dish.price.toLocaleString('vi-VN') %>đ
+                            </p>
+                            <p class="text-gray-500 text-sm line-through">
+                                <%= dish.originalPrice.toLocaleString('vi-VN') %>đ
+                            </p>
+                            <button class="bg-[#D69C52] text-white px-4 py-2 rounded-lg mt-2">Xem chi tiết</button>
+                        </div>
+                        <% }); %>
+                </div>
             </div>
-            <button class="w-full mt-4 bg-[#D69C52] text-white py-2 rounded-lg">
-                Xem chi tiết
-            </button>
-        </div>
-    </div>
-    <div class="bg-white text-black rounded-lg overflow-hidden shadow-md">
-        <div class="relative">
-            <img src="https://bizweb.dktcdn.net/thumb/1024x1024/100/469/097/products/untitled1-1.jpg?v=1667882668260"
-                alt="Salad" class="w-full h-40 object-cover" />
-            <span class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded">-3%</span>
-        </div>
-        <div class="p-4">
-            <h3 class="text-lg font-semibold">Salad rau mùa sốt</h3>
-            <div class="flex items-center justify-between mt-2">
-                <span class="text-red-500 font-bold">68.000đ</span>
-                <span class="line-through text-gray-500">70.000đ</span>
-            </div>
-            <button class="w-full mt-4 bg-[#D69C52] text-white py-2 rounded-lg">
-                Xem chi tiết
-            </button>
-        </div>
-    </div>
-    <div class="bg-white text-black rounded-lg overflow-hidden shadow-md">
-        <div class="relative">
-            <img src="https://bizweb.dktcdn.net/thumb/1024x1024/100/469/097/products/untitled1-1.jpg?v=1667882668260"
-                alt="Salad" class="w-full h-40 object-cover" />
-            <span class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded">-3%</span>
-        </div>
-        <div class="p-4">
-            <h3 class="text-lg font-semibold">Salad rau mùa sốt</h3>
-            <div class="flex items-center justify-between mt-2">
-                <span class="text-red-500 font-bold">68.000đ</span>
-                <span class="line-through text-gray-500">70.000đ</span>
-            </div>
-            <button class="w-full mt-4 bg-[#D69C52] text-white py-2 rounded-lg">
-                Xem chi tiết
-            </button>
-        </div>
+            <% }); %>
     </div>
 </body>
 
