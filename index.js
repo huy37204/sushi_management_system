@@ -10,6 +10,9 @@ app.use(express.static("public"));
 app.get("/", (req, res) => {
   res.render("home", { activePage: "home" });
 });
+app.get("/signin", (req, res) => {
+  res.render("signin", { activePage: "signin" });
+});
 
 app.get("/branch-home", (req, res) => {
   res.render("branch_home");
@@ -26,7 +29,9 @@ app.get("/dat-ban", (req, res) => {
 app.get("/menu", (req, res) => {
   res.render("menu", { activePage: "menu" });
 });
-
+app.get("/cart", (req, res) => {
+  res.render("cart", { activePage: "cart" });
+});
 app.listen(port, () => {
   console.log(`Project dang chay o port ${port}`);
 });

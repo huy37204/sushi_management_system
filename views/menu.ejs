@@ -1,208 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cửa hàng - Dola Sushi - Sushi Restaurant</title>
-    <link rel="stylesheet" href="css/main.css" />
-    <link rel="stylesheet" href="css/output.css" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Akaya+Kanadaka&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
-      rel="stylesheet"
-    />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cửa hàng - Dola Sushi - Sushi Restaurant</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/output.css" />
 
-  <body class="bg-[#143B36]">
-    <%- include('partials/header.ejs') %> <%-include('partials/page_flow.ejs')%>
-    <div class="flex pt-20 space-x-4 bg-cover bg-center">
-      <!-- Sidebar -->
-      <aside class="w-1/4">
-        <div class="h-1/3 border-yellow-600 border-4 rounded mb-4">
-          <div
-            class="text-xl font-semibold mb-4 text-[#fbfbfb] bg-[#D69C52] py-2 rounded-lg"
-          >
-            <h2>DANH MỤC SẢN PHẨM</h2>
-          </div>
-          <ul>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]"
-                >Món chính</a
-              >
-            </li>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]"
-                >Khai vị</a
-              >
-            </li>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]">Menu</a>
-            </li>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]"
-                >Sashimi combo</a
-              >
-            </li>
-          </ul>
-        </div>
-        <div class="h-1/3 border-yellow-600 border-4 rounded mb-4">
-          <div
-            class="text-xl font-semibold mb-4 text-[#fbfbfb] bg-[#D69C52] rounded-lg py-2 space-y-4"
-          >
-            <h2>DANH MỤC SẢN PHẨM</h2>
-          </div>
-          <ul>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]"
-                >Món chính</a
-              >
-            </li>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]"
-                >Khai vị</a
-              >
-            </li>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]">Menu</a>
-            </li>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]"
-                >Sashimi combo</a
-              >
-            </li>
-          </ul>
-        </div>
-      </aside>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Akaya+Kanadaka&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    rel="stylesheet" />
+</head>
 
-      <!-- Main Content -->
-      <main class="w-3/4">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-2xl font-semibold text-[#D69C52]">TẤT CẢ MÓN ĂN</h2>
-          <div class="flex items-center bg-[#D69C52] px-4 py-2 rounded-lg">
-            <label class="text-[#fbfbfb] mr-2">Sắp xếp theo:</label>
-            <select class="bg-[#D69C52] px-4 py-2 rounded-lg text-[#ffffff]">
-              <option class="bg-slate-200" value="option1">Tùy chọn 1</option>
-              <option class="bg-slate-200" value="option2">Tùy chọn 2</option>
-              <option class="bg-slate-200" value="option3">Tùy chọn 3</option>
-            </select>
+<body class="bg-[#143B36]">
+  <%- include('partials/header.ejs') %>
+    <%- include('partials/page_flow.ejs') %>
+      <div class="flex pt-20 space-x-4 bg-cover bg-center">
+        <!-- Sidebar -->
+        <aside class="w-1/4">
+          <div class="h-1/3 border-yellow-600 border-4 rounded mb-4">
+            <div class="text-xl font-semibold mb-4 text-[#fbfbfb] bg-[#D69C52] py-2 rounded-lg">
+              <h2>DANH MỤC SẢN PHẨM</h2>
+            </div>
+            <ul>
+              <li>
+                <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]">Món chính</a>
+              </li>
+              <li>
+                <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]">Khai vị</a>
+              </li>
+              <li>
+                <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]">Menu</a>
+              </li>
+              <li>
+                <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]">Sashimi combo</a>
+              </li>
+            </ul>
           </div>
-        </div>
+          <div class="h-1/3 border-yellow-600 border-4 rounded mb-4">
+            <div class="text-xl font-semibold mb-4 text-[#fbfbfb] bg-[#D69C52] rounded-lg py-2 space-y-4">
+              <h2>DANH MỤC SẢN PHẨM</h2>
+            </div>
+            <ul>
+              <li>
+                <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]">Món chính</a>
+              </li>
+              <li>
+                <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]">Khai vị</a>
+              </li>
+              <li>
+                <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]">Menu</a>
+              </li>
+              <li>
+                <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]">Sashimi combo</a>
+              </li>
+            </ul>
+          </div>
+        </aside>
 
-        <!-- Products -->
-        <div class="grid grid-cols-3 gap-4">
-          <!-- Product Card -->
-          <div class="bg-white text-black rounded-lg overflow-hidden shadow-md">
-            <div class="relative">
-              <img
-                src="https://bizweb.dktcdn.net/thumb/1024x1024/100/469/097/products/untitled1-1.jpg?v=1667882668260"
-                alt="Salad"
-                class="w-full h-40 object-cover"
-              />
-              <span
-                class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded"
-                >-3%</span
-              >
-            </div>
-            <div class="p-4">
-              <h3 class="text-lg font-semibold">Salad rau mùa sốt</h3>
-              <div class="flex items-center justify-between mt-2">
-                <span class="text-red-500 font-bold">68.000đ</span>
-                <span class="line-through text-gray-500">70.000đ</span>
-              </div>
-              <button
-                class="w-full mt-4 bg-[#D69C52] text-white py-2 rounded-lg"
-              >
-                Xem chi tiết
-              </button>
+        <!-- Main Content -->
+        <main class="w-3/4">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-semibold text-[#D69C52]">TẤT CẢ MÓN ĂN</h2>
+            <div class="flex items-center bg-[#D69C52] px-4 py-2 rounded-lg">
+              <label class="text-[#fbfbfb] mr-2">Sắp xếp theo:</label>
+              <select class="bg-[#D69C52] px-4 py-2 rounded-lg text-[#ffffff]">
+                <option class="bg-slate-200" value="option1">Tùy chọn 1</option>
+                <option class="bg-slate-200" value="option2">Tùy chọn 2</option>
+                <option class="bg-slate-200" value="option3">Tùy chọn 3</option>
+              </select>
             </div>
           </div>
-          <div class="bg-white text-black rounded-lg overflow-hidden shadow-md">
-            <div class="relative">
-              <img
-                src="https://bizweb.dktcdn.net/thumb/1024x1024/100/469/097/products/untitled1-1.jpg?v=1667882668260"
-                alt="Salad"
-                class="w-full h-40 object-cover"
-              />
-              <span
-                class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded"
-                >-3%</span
-              >
-            </div>
-            <div class="p-4">
-              <h3 class="text-lg font-semibold">Salad rau mùa sốt</h3>
-              <div class="flex items-center justify-between mt-2">
-                <span class="text-red-500 font-bold">68.000đ</span>
-                <span class="line-through text-gray-500">70.000đ</span>
-              </div>
-              <button
-                class="w-full mt-4 bg-[#D69C52] text-white py-2 rounded-lg"
-              >
-                Xem chi tiết
-              </button>
-            </div>
+
+          <!-- Products -->
+          <div class="grid grid-cols-3 gap-4">
+            <!-- Product Card -->
+            <%- include('components/selectDish.ejs') %>
           </div>
-          <div class="bg-white text-black rounded-lg overflow-hidden shadow-md">
-            <div class="relative">
-              <img
-                src="https://bizweb.dktcdn.net/thumb/1024x1024/100/469/097/products/untitled1-1.jpg?v=1667882668260"
-                alt="Salad"
-                class="w-full h-40 object-cover"
-              />
-              <span
-                class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded"
-                >-3%</span
-              >
-            </div>
-            <div class="p-4">
-              <h3 class="text-lg font-semibold">Salad rau mùa sốt</h3>
-              <div class="flex items-center justify-between mt-2">
-                <span class="text-red-500 font-bold">68.000đ</span>
-                <span class="line-through text-gray-500">70.000đ</span>
-              </div>
-              <button
-                class="w-full mt-4 bg-[#D69C52] text-white py-2 rounded-lg"
-              >
-                Xem chi tiết
-              </button>
-            </div>
-          </div>
-          <div class="bg-white text-black rounded-lg overflow-hidden shadow-md">
-            <div class="relative">
-              <img
-                src="https://bizweb.dktcdn.net/thumb/1024x1024/100/469/097/products/untitled1-1.jpg?v=1667882668260"
-                alt="Salad"
-                class="w-full h-40 object-cover"
-              />
-              <span
-                class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded"
-                >-3%</span
-              >
-            </div>
-            <div class="p-4">
-              <h3 class="text-lg font-semibold">Salad rau mùa sốt</h3>
-              <div class="flex items-center justify-between mt-2">
-                <span class="text-red-500 font-bold">68.000đ</span>
-                <span class="line-through text-gray-500">70.000đ</span>
-              </div>
-              <button
-                class="w-full mt-4 bg-[#D69C52] text-white py-2 rounded-lg"
-              >
-                Xem chi tiết
-              </button>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
-    <%- include('partials/footer.ejs') %>
-    <%-include('partials/float_button.ejs') %>
-  </body>
+        </main>
+      </div>
+      <%- include('partials/footer.ejs') %>
+        <%- include('partials/float_button.ejs') %>
+</body>
+
 </html>
