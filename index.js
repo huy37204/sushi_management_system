@@ -46,6 +46,22 @@ app.get("/company-food-revenue", (req, res) => {
   res.render("company/company_food_revenue");
 });
 
+app.get("/company-resource", (req, res) => {
+  res.render("company/company_resource");
+});
+
+app.get("/company-resource/transfer", (req, res) => {
+  res.render("company/company_resource_transfer");
+});
+
+app.get("/company-resource/update", (req, res) => {
+  res.render("company/company_resource_update");
+});
+
+app.get("/company-update-salary", (req, res) => {
+  res.render("company/company_update_salary");
+});
+
 app.get("/dat-ban", (req, res) => {
   res.render("customer/table_booking", { activePage: "table_booking" });
 });

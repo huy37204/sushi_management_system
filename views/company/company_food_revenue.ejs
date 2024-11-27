@@ -44,9 +44,9 @@
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-md">
-          <form id="filterForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <form id="filterForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Chọn ngày bắt đầu -->
-            <div>
+            <div class="col-span-1">
               <label
                 for="startDate"
                 class="block text-sm font-medium text-gray-700"
@@ -55,11 +55,12 @@
               <input
                 type="date"
                 id="startDate"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                class="mt-1 p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border-2"
               />
             </div>
+
             <!-- Chọn ngày kết thúc -->
-            <div>
+            <div class="col-span-1">
               <label
                 for="endDate"
                 class="block text-sm font-medium text-gray-700"
@@ -68,27 +69,12 @@
               <input
                 type="date"
                 id="endDate"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                class="mt-1 p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border-2"
               />
             </div>
-            <!-- Chọn chi nhánh -->
-            <div>
-              <label
-                for="branch"
-                class="block text-sm font-medium text-gray-700"
-                >Chi nhánh</label
-              >
-              <select
-                id="branch"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              >
-                <option value="all">Tất cả</option>
-                <option value="branch1">Chi nhánh 1</option>
-                <option value="branch2">Chi nhánh 2</option>
-              </select>
-            </div>
+
             <!-- Chọn khu vực -->
-            <div>
+            <div class="col-span-1 md:col-span-3">
               <label
                 for="region"
                 class="block text-sm font-medium text-gray-700"
@@ -96,13 +82,31 @@
               >
               <select
                 id="region"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
               >
                 <option value="all">Tất cả</option>
                 <option value="region1">Khu vực 1</option>
                 <option value="region2">Khu vực 2</option>
               </select>
             </div>
+
+            <!-- Chọn chi nhánh -->
+            <div class="col-span-1 md:col-span-3">
+              <label
+                for="branch"
+                class="block text-sm font-medium text-gray-700"
+                >Chi nhánh</label
+              >
+              <select
+                id="branch"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+              >
+                <option value="all">Tất cả</option>
+                <option value="branch1">Chi nhánh 1</option>
+                <option value="branch2">Chi nhánh 2</option>
+              </select>
+            </div>
+
             <!-- Nút Lọc -->
             <div class="col-span-1 md:col-span-3">
               <button
