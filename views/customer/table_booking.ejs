@@ -33,9 +33,10 @@
       crossorigin="anonymous"
     />
   </head>
+
   <body class="bg-[#143B36]">
-    <%- include('../partials/customer/header.ejs') %>
-    <%-include('../partials/customer/page_flow.ejs')%>
+    <%- include('../partials/customer/header.ejs') %> <%-
+    include('../partials/customer/page_flow.ejs') %>
     <!-- Tabble booking-->
     <div
       class="relative flex h-[80vh] overflow-hidden my-8 items-center justify-center"
@@ -168,15 +169,16 @@
         <div class="flex mt-10">
           <button
             class="mx-auto bg-[#D69C52] hover:bg-[#a17231] text-white py-[6px] px-5 rounded-md -translate-y-1 font-medium transition-colors duration-300 w-[100%]"
-            onclick="window.location.href='table_booking.html'"
+            onclick="window.location.href='dat-ban/dat-truoc'"
           >
             Đặt bàn ngay
           </button>
         </div>
       </div>
     </div>
-    <%- include('../partials/customer/footer.ejs') %>
-    <%-include('../partials/customer/float_button.ejs') %>
+
+    <%- include('../partials/customer/footer.ejs') %> <%-
+    include('../partials/customer/float_button.ejs') %>
     <script>
       // Hàm để thêm tùy chọn từ 0 đến 100 vào dropdown
       function populateSelectOptions(selectId) {
