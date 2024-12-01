@@ -2,7 +2,12 @@
 module.exports = {
   mode: "jit",
   darkMode: "class",
-  content: ["./views/**/*.ejs"],
+  content: [
+    "./src/*.{html,js,css}",
+    "./src/views/**/*.ejs",
+    "./public/js/**/*.js",
+    "./node_modules/flowbite/**/*.js",
+  ],
   theme: {
     extend: {
       colors: {
