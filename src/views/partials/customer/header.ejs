@@ -31,7 +31,7 @@
       <div class="z-10 space-x-7">
         <a
           href="/"
-          class="<%= activePage === 'home' ? 'text-[#D69C52]' : 'text-white'%> hover:text-[#D69C52]"
+          class="<%= activePage === 'home' ? 'text-[#D69C52]' : 'text-white' %> hover:text-[#D69C52]"
           >Trang chủ</a
         >
         <a href="#about-us" class="hover:text-[#D69C52]">Giới thiệu</a>
@@ -40,79 +40,43 @@
         <div class="relative inline-block dropdown">
           <a
             href="/menu"
-            class="flex items-center dropdown-toggle <%= activePage === 'menu' ? 'text-[#D69C52]' : 'text-white'%> hover:text-[#D69C52] h-[75px]"
+            class="flex items-center dropdown-toggle <%= activePage === 'menu' ? 'text-[#D69C52]' : 'text-white' %> hover:text-[#D69C52] h-[75px]"
           >
             Menu&nbsp;
             <ion-icon name="caret-down-outline"></ion-icon>
           </a>
 
           <!-- Dropdown menu -->
-          <div
-            class="fixed left-[15%] bg-black rounded-lg border-2 border-[#f8b358] dropdown-menu w-[70%]"
-          >
-            <div class="flex flex-wrap ml-7 pt-4 pb-2 text-[18px] w-[100%]">
-              <div id="item1" class="w-[20%] mb-[40px]">
-                <div class="text-[#f5bd74] mb-3">Khai vị</div>
-                <div class="pb-2 font-medium">
-                  <div>Trứng hấp</div>
-                  <div>Súp miso</div>
-                  <div>Súp chay</div>
-                  <div>Trứng cá hồi</div>
+          <a href="/menu">
+            <div
+              class="fixed left-[15%] bg-black rounded-lg border-2 border-[#f8b358] dropdown-menu w-[70%]"
+            >
+              <div class="flex flex-wrap ml-7 pt-4 pb-2 text-[18px] w-[100%]">
+                <% menuDropDownData.forEach(category => { %>
+                <div class="w-[20%] mb-[40px]">
+                  <div class="text-[#f5bd74]">
+                    <%= category.CATEGORY_NAME %>
+                  </div>
+                  <div class="pb-2 font-medium">
+                    <% category.DISHES.split(', ').forEach(dish => { %>
+                    <div><%= dish %></div>
+                    <% }); %>
+                  </div>
                 </div>
+                <% }); %>
               </div>
-              <div id="item2" class="w-[20%] mb-[40px]">
-                <div class="text-[#f5bd74] mb-3">Sashimi combo</div>
-                <div class="pb-2 font-medium">
-                  <div>Sashimi tổng hợp</div>
-                  <div>Sashimi cá hồi đặc biệt</div>
-                </div>
-              </div>
-              <div id="item3" class="w-[20%] mb-[40px]">
-                <div class="text-[#f5bd74] mb-3">Nigiri</div>
-                <div class="pb-2 font-medium">
-                  <div>Cá ngừ</div>
-                  <div>Cá hồi</div>
-                  <div>Lườn cá hồi nướng sốt</div>
-                </div>
-              </div>
-              <div id="item4" class="w-[20%] mb-[40px]">
-                <div class="text-[#f5bd74] mb-3">Tempura</div>
-                <div class="pb-2 font-medium">
-                  <div>Trứng hấp</div>
-                  <div>Súp miso</div>
-                  <div>Súp chay</div>
-                  <div>Trứng cá hồi</div>
-                </div>
-              </div>
-              <div id="item5" class="w-[20%] mb-[40px]">
-                <div class="text-[#f5bd74] mb-3">Udon</div>
-                <div class="pb-2 font-medium">
-                  <div>Trứng hấp</div>
-                  <div>Súp miso</div>
-                  <div>Súp chay</div>
-                  <div>Trứng cá hồi</div>
-                </div>
-              </div>
-              <div id="item6" class="w-[20%] mb-[40px]">
-                <div class="text-[#f5bd74] mb-3">Hotpot</div>
-                <div class="pb-2 font-medium">
-                  <div>Trứng hấp</div>
-                  <div>Súp miso</div>
-                  <div>Súp chay</div>
-                  <div>Trứng cá hồi</div>
-                </div>
-              </div>
+              <div class="block text-center">XEM THÊM...</div>
             </div>
-          </div>
+          </a>
         </div>
 
         <a
           href=""
-          class="hover:text-[#D69C52] <%= activePage === 'contact' ? 'text-[#D69C52]' : 'text-white'%>"
+          class="hover:text-[#D69C52] <%= activePage === 'contact' ? 'text-[#D69C52]' : 'text-white' %>"
           >Liên hệ</a
         >
       </div>
-      <div class="z-10 ml-auto mr-[10%] space-x-[15px]">
+      <div class="z-10 ml-auto mr-[10%] space-x-[15px] h-full items-center">
         <ion-icon
           name="search-outline"
           class="pt-2"
@@ -125,11 +89,34 @@
             style="font-size: 22px; font-weight: bold"
           ></ion-icon>
         </a>
-        <ion-icon
-          name="person-outline"
-          class="pt-2"
-          style="font-size: 22px; font-weight: bold"
-        ></ion-icon>
+        <div class="relative inline-block profile cursor-pointer">
+          <ion-icon
+            name="person-outline"
+            class="pt-2"
+            style="font-size: 22px; font-weight: bold"
+          ></ion-icon>
+
+          <!-- Person dropdown content -->
+          <div
+            class="absolute right-0 hidden bg-white shadow-md rounded-lg mt-2 w-48 text-center"
+          >
+            <% if (user) { %>
+            <p class="py-2 text-black"><%= user.name %></p>
+            <!-- Hiển thị tên người dùng -->
+            <a
+              href="/logout"
+              class="block py-2 px-4 text-black hover:bg-gray-200"
+              >Đăng xuất</a
+            >
+            <% } else { %>
+            <a
+              href="/login"
+              class="block py-2 px-4 text-black hover:bg-gray-200"
+              >Đăng nhập</a
+            >
+            <% } %>
+          </div>
+        </div>
         <ion-icon
           name="location-outline"
           class="pt-2"
@@ -152,5 +139,22 @@
       nomodule
       src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
     ></script>
+    <script>
+      // Hiển thị dropdown khi click vào person-outline và tắt khi click lại
+      const personDropdown = document.querySelector(".profile");
+      const dropdownMenu = personDropdown.querySelector(".absolute");
+
+      personDropdown.addEventListener("click", function () {
+        // Kiểm tra và chuyển đổi trạng thái `hidden`
+        dropdownMenu.classList.toggle("hidden");
+      });
+
+      // Tùy chọn (không bắt buộc): Đóng menu khi click ra ngoài
+      document.addEventListener("click", function (event) {
+        if (!personDropdown.contains(event.target)) {
+          dropdownMenu.classList.add("hidden");
+        }
+      });
+    </script>
   </body>
 </html>

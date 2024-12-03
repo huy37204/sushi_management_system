@@ -436,7 +436,7 @@
 
           case "month": // Select theo tháng
             const selectedYearForMonth = document.getElementById(
-              "select-year-for-month"
+              "select-year-for-month",
             ).value;
             labels = generateMonths();
             labelTitle = `Năm ${selectedYearForMonth}`;
@@ -446,7 +446,7 @@
 
           case "quarter": // Select theo quý
             const selectedYearForQuarter = document.getElementById(
-              "select-year-for-quarter"
+              "select-year-for-quarter",
             ).value;
             labels = [
               "1st Quarter",
@@ -490,7 +490,7 @@
         for (let i = 0; i < n; i++) {
           date.setDate(i + 1); // Set day within the month
           data.push(
-            date.toLocaleString("en-US", { month: "short", day: "numeric" })
+            date.toLocaleString("en-US", { month: "short", day: "numeric" }),
           );
         }
         return data;
@@ -535,7 +535,7 @@
       initChart(
         generateNDays(30, new Date().getMonth() + 1),
         new Date().getMonth() + 1,
-        new Date().getFullYear()
+        new Date().getFullYear(),
       );
       // end: Chart
 

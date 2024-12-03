@@ -1,6 +1,7 @@
 import { PATH } from "../../config/path.js";
 import express from "express";
 import { verifyRole } from "../../middlewares/authMiddlewares.js";
+import { getMenuDropDownItem } from "../../controllers/menuController/menuDropdownController.js";
 const menuData = {
   appetizers: [
     {
@@ -52,32 +53,105 @@ const menuData = {
 const customerRouter = express.Router();
 const customerRole = "Khách hàng";
 customerRouter.get("/", verifyRole(customerRole), async (req, res) => {
-  res.render("customer/home", {
-    activePage: "home",
-    menuData, // Lấy danh sách kết quả
-  });
+  try {
+    // Lấy dữ liệu menu từ controller
+    const menuDropDownData = await getMenuDropDownItem();
+    // Render view và truyền dữ liệu menu vào
+    res.render("customer/home", {
+      activePage: "home",
+      menuData, // Truyền danh sách menu vào view
+      user: req.user || null,
+      menuDropDownData,
+    });
+  } catch (err) {
+    console.error("Lỗi khi lấy dữ liệu menu:", err);
+    res.status(500).send("Lỗi khi lấy dữ liệu menu");
+  }
 });
 customerRouter.get(
   PATH.CUSTOMER.TABLE_BOOKING,
   verifyRole(customerRole),
-  (req, res) => {
-    res.render("customer/table_booking", { activePage: "table_booking" });
-  }
+  async (req, res) => {
+    try {
+      // Lấy dữ liệu menu từ controller
+      const menuDropDownData = await getMenuDropDownItem();
+
+      // Render view và truyền dữ liệu menu vào
+      res.render("customer/table_booking", {
+        activePage: "table-booking",
+        user: req.user || null,
+        menuDropDownData,
+      });
+    } catch (err) {
+      console.error("Lỗi khi lấy dữ liệu menu:", err);
+      res.status(500).send("Lỗi khi lấy dữ liệu menu");
+    }
+  },
 );
 
-customerRouter.get(PATH.CUSTOMER.MENU, verifyRole(customerRole), (req, res) => {
-  res.render("customer/menu", { activePage: "menu", menuData });
-});
+customerRouter.get(
+  PATH.CUSTOMER.MENU,
+  verifyRole(customerRole),
+  async (req, res) => {
+    try {
+      // Lấy dữ liệu menu từ controller
+      const menuDropDownData = await getMenuDropDownItem();
+
+      // Render view và truyền dữ liệu menu vào
+      res.render("customer/menu", {
+        activePage: "menu",
+        user: req.user || null,
+        menuData,
+        menuDropDownData,
+      });
+    } catch (err) {
+      console.error("Lỗi khi lấy dữ liệu menu:", err);
+      res.status(500).send("Lỗi khi lấy dữ liệu menu");
+    }
+  },
+);
 
 customerRouter.get(
   PATH.CUSTOMER.TABLE_BOOKING_PREORDER,
   verifyRole(customerRole),
-  (req, res) => {
-    res.render("customer/order_menu", { activePage: "order_menu", menuData });
-  }
+  async (req, res) => {
+    try {
+      // Lấy dữ liệu menu từ controller
+      const menuDropDownData = await getMenuDropDownItem();
+
+      // Render view và truyền dữ liệu menu vào
+      res.render("customer/order_menu", {
+        activePage: "table-booking-preorder",
+        user: req.user || null,
+        menuData,
+        menuDropDownData,
+      });
+    } catch (err) {
+      console.error("Lỗi khi lấy dữ liệu menu:", err);
+      res.status(500).send("Lỗi khi lấy dữ liệu menu");
+    }
+  },
 );
 
-customerRouter.get(PATH.CUSTOMER.CART, verifyRole(customerRole), (req, res) => {
-  res.render("customer/cart", { activePage: "cart" });
-});
+customerRouter.get(
+  PATH.CUSTOMER.CART,
+  verifyRole(customerRole),
+  async (req, res) => {
+    try {
+      // Lấy dữ liệu menu từ controller
+      const menuDropDownData = await getMenuDropDownItem();
+
+      // Render view và truyền dữ liệu menu vào
+      res.render("customer/cart", {
+        activePage: "cart",
+        user: req.user || null,
+        menuDropDownData,
+      });
+    } catch (err) {
+      console.error("Lỗi khi lấy dữ liệu menu:", err);
+      res.status(500).send("Lỗi khi lấy dữ liệu menu");
+    }
+  },
+);
+
 export default customerRouter;

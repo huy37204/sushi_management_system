@@ -179,7 +179,7 @@
           const filteredInvoices = invoices.filter(
             (invoice) =>
               (!customerId || invoice.customerId === customerId) &&
-              (!invoiceDate || invoice.date === invoiceDate)
+              (!invoiceDate || invoice.date === invoiceDate),
           );
 
           // Hiển thị danh sách hóa đơn
@@ -195,7 +195,7 @@
       <td class="border px-4 py-2">${invoice.customerId}</td>
       <td class="border px-4 py-2">
         <button class="text-blue-500 hover:underline" onclick="viewDetails(${JSON.stringify(
-          invoice.orders
+          invoice.orders,
         ).replace(/"/g, "&quot;")})">Xem chi tiết</button>
       </td>
     `;

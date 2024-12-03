@@ -9,7 +9,7 @@ employeeRouter.get(
   verifyRole(["Thu ngân", "Lễ tân"]),
   (req, res) => {
     res.render("employee/employee_home");
-  }
+  },
 );
 
 export default employeeRouter;

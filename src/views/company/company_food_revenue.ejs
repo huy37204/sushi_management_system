@@ -274,7 +274,7 @@
             startDate,
             endDate,
             branch,
-            region
+            region,
           );
 
           // Log dữ liệu đã lọc
@@ -284,17 +284,17 @@
           updateChart(
             ctxRevenue,
             filteredData.revenueData,
-            filteredData.labels
+            filteredData.labels,
           );
           updateChart(
             ctxBestSelling,
             filteredData.bestSellingData,
-            filteredData.bestSellingLabels
+            filteredData.bestSellingLabels,
           );
           updateChart(
             ctxLeastSelling,
             filteredData.leastSellingData,
-            filteredData.leastSellingLabels
+            filteredData.leastSellingLabels,
           );
         });
 

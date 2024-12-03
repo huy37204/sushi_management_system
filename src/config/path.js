@@ -27,6 +27,6 @@ export const PATH = {
   },
   AUTHENTICATION: {
     LOGIN: "/login",
-    REGISTER: "register",
+    REGISTER: "/register",
   },
 };

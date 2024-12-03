@@ -152,7 +152,8 @@
         </ul>
       </div>
     </div>
-    <%- include('../partials/customer/footer.ejs') %> <%-
+    <%- include('../partials/customer/footer.ejs') %>
+    <%-
     include('../partials/customer/float_button.ejs') %>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
@@ -169,7 +170,7 @@
 
           // Lấy giá trị đơn giá (chuyển đổi từ text sang số)
           const unitPrice = parseInt(
-            unitPriceElement.textContent.replace(/\D/g, "")
+            unitPriceElement.textContent.replace(/\D/g, ""),
           );
 
           // Hàm cập nhật số lượng và tính thành tiền
@@ -186,7 +187,7 @@
           minusBtn.addEventListener("click", () => {
             quantityInput.value = Math.max(
               1,
-              parseInt(quantityInput.value) - 1
+              parseInt(quantityInput.value) - 1,
             ); // Giảm số lượng, tối thiểu là 1
             updateTotal();
           });
@@ -205,7 +206,7 @@
         const updateGrandTotal = () => {
           let grandTotal = 0;
           const totalElements = document.querySelectorAll(
-            "tbody tr td:nth-child(4)"
+            "tbody tr td:nth-child(4)",
           );
           totalElements.forEach((totalElement) => {
             grandTotal +=

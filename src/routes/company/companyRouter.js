@@ -13,7 +13,7 @@ companyRouter.get(
   verifyRole(companyRole),
   (req, res) => {
     res.render("company/company_resource");
-  }
+  },
 );
 
 companyRouter.get(
@@ -21,7 +21,7 @@ companyRouter.get(
   verifyRole(companyRole),
   (req, res) => {
     res.render("company/company_resource_transfer");
-  }
+  },
 );
 
 companyRouter.get(
@@ -29,7 +29,7 @@ companyRouter.get(
   verifyRole(companyRole),
   (req, res) => {
     res.render("company/company_resource_update");
-  }
+  },
 );
 
 companyRouter.get(
@@ -37,7 +37,7 @@ companyRouter.get(
   verifyRole(companyRole),
   (req, res) => {
     res.render("company/company_update_salary");
-  }
+  },
 );
 
 companyRouter.get(
@@ -45,7 +45,7 @@ companyRouter.get(
   verifyRole(companyRole),
   (req, res) => {
     res.render("company/company_food_revenue");
-  }
+  },
 );
 
 export default companyRouter;

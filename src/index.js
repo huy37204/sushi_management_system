@@ -23,8 +23,10 @@ app.use(
     secret: process.env.SECRET_KEY, // Lấy SECRET_KEY từ .env
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }, // secure: true chỉ dùng khi sử dụng HTTPS
-  })
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    }, // secure: true chỉ dùng khi sử dụng HTTPS
+  }),
 );
 
 const connectToDatabase = async () => {
@@ -43,6 +45,11 @@ connectToDatabase();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware để gán user từ session vào req
+app.use((req, res, next) => {
+  req.user = req.session.user || null;
+  next();
+});
 app.use(router);
 
 app.listen(port, () => {
