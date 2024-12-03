@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/output.css" />
+  </head>
+
+  <body>
+    <!-- Flow div -->
+    <div
+      class="bg-[#071513] flex text-white px-[15%] py-3 space-x-2 opacity-90"
+    >
+      <a href="/" class="hover:text-[#D68B31] hover:cursor-pointer"
+        >Trang chủ</a
+      >
+      <div class="pt-[3px]">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </div>
+      <div class="text-[#D68B31]">
+        <% if (activePage==='menu' ) { %> <%= 'Tất cả sản phẩm' %> <% } else if
+        (activePage==='table_booking' ) { %> <%= 'Đặt bàn' %> <% } else if
+        (activePage==='cart' ) { %> <%= 'Giỏ hàng' %> <% } %>
+      </div>
+    </div>
+  </body>
+</html>

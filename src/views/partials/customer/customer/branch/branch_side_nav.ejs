@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SideNav</title>
+    <link rel="stylesheet" href="css/branch_home.css" />
+  </head>
+  <body>
+    <div
+      class="fixed left-0 top-0 w-64 h-full bg-[#f8f4f3] p-4 z-50 sidebar-menu transition-transform"
+    >
+      <a
+        href="/branch"
+        class="flex items-center pb-4 border-b border-b-gray-800"
+      >
+        <h2 class="font-bold text-2xl">
+          CẤP
+          <span class="bg-[#f84525] text-white px-2 rounded-md">CHI NHÁNH</span>
+        </h2>
+      </a>
+      <ul class="mt-4">
+        <span class="text-gray-400 font-bold">ADMIN</span>
+        <li class="mb-1 group">
+          <a
+            href="/branch"
+            class="flex font-semibold items-center py-2 px-4 text-gray-900 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100"
+          >
+            <i class="ri-home-2-line mr-3 text-lg"></i>
+            <span class="text-sm">Dashboard</span>
+          </a>
+        </li>
+        <li class="mb-1 group">
+          <a
+            href=""
+            class="flex font-semibold items-center py-2 px-4 text-gray-900 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100 sidebar-dropdown-toggle"
+          >
+            <i class="bx bx-user mr-3 text-lg"></i>
+            <span class="text-sm">Nhân viên</span>
+            <i
+              class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"
+            ></i>
+          </a>
+          <ul class="pl-7 mt-2 hidden group-[.selected]:block">
+            <li class="mb-4">
+              <a
+                href="/branch/employee-list"
+                class="text-gray-900 text-sm flex items-center hover:text-[#f84525] before:contents-[''] before:w-1 before:h-1 before:rounded-full before:bg-gray-300 before:mr-3"
+                >Danh sách nhân viên</a
+              >
+            </li>
+            <li class="mb-4">
+              <a
+                href="/branch/employee-search"
+                class="text-gray-900 text-sm flex items-center hover:text-[#f84525] before:contents-[''] before:w-1 before:h-1 before:rounded-full before:bg-gray-300 before:mr-3"
+                >Điểm phục vụ</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="mb-1 group">
+          <a
+            href="/branch/order-form"
+            class="flex font-semibold items-center py-2 px-4 text-gray-900 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100"
+          >
+            <i class="ri-restaurant-2-line mr-3 text-lg"></i>
+            <span class="text-sm">Phiếu đặt món</span>
+          </a>
+        </li>
+        <li class="mb-1 group">
+          <a
+            href="/branch/invoice"
+            class="flex font-semibold items-center py-2 px-4 text-gray-900 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100"
+          >
+            <i class="ri-bill-line mr-3 text-lg"></i>
+            <span class="text-sm">Hoá đơn</span>
+          </a>
+        </li>
+        <li class="mb-1 group">
+          <a
+            href="/branch/customer-card"
+            class="flex font-semibold items-center py-2 px-4 text-gray-900 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100"
+          >
+            <i class="ri-bank-card-line mr-3 text-lg"></i>
+            <span class="text-sm">Thẻ khách hàng</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div
+      class="fixed top-0 left-0 w-full h-full bg-black/50 z-40 md:hidden sidebar-overlay"
+    ></div>
+  </body>
+</html>
