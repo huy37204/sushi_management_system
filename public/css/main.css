@@ -12,7 +12,10 @@ html {
   visibility: hidden; /* Ban đầu ẩn */
   opacity: 0; /* Ban đầu không nhìn thấy */
   margin-top: 20px; /* Ban đầu đặt margin-top là 20px */
-  transition: visibility 0s 0.3s, opacity 1.3s ease, margin-top 0.7s ease;
+  transition:
+    visibility 0s 0.3s,
+    opacity 1.3s ease,
+    margin-top 0.7s ease;
 }
 
 /* Hiển thị dropdown menu khi hover vào dropdown */
@@ -20,7 +23,10 @@ html {
   visibility: visible; /* Khi hover, menu sẽ hiển thị */
   opacity: 1; /* Khi menu hiển thị, opacity trở thành 1 */
   margin-top: 0; /* Khi hover, margin-top sẽ về 0 */
-  transition: visibility 0s 0s, opacity 1.3s ease, margin-top 0.7s ease; /* Đảm bảo menu hiển thị ngay lập tức */
+  transition:
+    visibility 0s 0s,
+    opacity 1.3s ease,
+    margin-top 0.7s ease; /* Đảm bảo menu hiển thị ngay lập tức */
 }
 
 /* Các style khác */
@@ -33,7 +39,9 @@ html {
 .slide-in-right,
 .slide-in-up {
   opacity: 0;
-  transition: transform 1s ease-out, opacity 1s ease-out;
+  transition:
+    transform 1s ease-out,
+    opacity 1s ease-out;
 }
 
 /* Chữ slide từ trái */
@@ -68,7 +76,9 @@ html {
 
 /* Sau khi hiệu ứng slide hoàn tất, thay đổi font-size */
 .slide-in-left.show {
-  transition: transform 1s ease-out, opacity 1s ease-out,
+  transition:
+    transform 1s ease-out,
+    opacity 1s ease-out,
     font-size 0.2s ease-in 1s;
   /* Thêm delay 1s cho font-size */
   font-size: 70px;
@@ -76,7 +86,9 @@ html {
 }
 
 .slide-in-right.show {
-  transition: transform 1s ease-out, opacity 1s ease-out,
+  transition:
+    transform 1s ease-out,
+    opacity 1s ease-out,
     font-size 0.2s ease-in 1s;
   /* Thêm delay 1s cho font-size */
   font-size: 22px;
@@ -84,7 +96,10 @@ html {
 }
 
 .slide-in-up.show {
-  transition: transform 1s ease-out, opacity 1s ease-out, color 0.3s ease,
+  transition:
+    transform 1s ease-out,
+    opacity 1s ease-out,
+    color 0.3s ease,
     font-size 0.2s ease-in 1s;
   /* Thêm delay 1s cho font-size */
   font-size: 16px;
