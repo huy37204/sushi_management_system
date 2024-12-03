@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cửa hàng - Dola Sushi - Sushi Restaurant</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/output.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Akaya+Kanadaka&family=Birthstone&family=Lavishly+Yours&family=Lobster&family=Molle&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+      rel="stylesheet"
+    />
+    <style></style>
+  </head>
+
+  <body>
+    <%- include('../partials/customer/header') %>
+    <!-- Background  -->
+    <div class="w-[100%] h-screen flex">
+      <img
+        src="https://sushiworld.com.vn/wp-content/uploads/2023/11/c.jpg"
+        alt=""
+        class="absolute w-[100%] h-[100vh] overflow-hidden opacity-90 object-cover object-top"
+      />
+      <div class="mx-auto mt-[13%] font-bold z-30 text-[#ffffff]">
+        <div
+          class="mb-8 text-center birthstone-regular font-semibold slide-in-left"
+        >
+          Dola Restaurant
+        </div>
+        <div class="mb-8 text-center slide-in-right">Món ăn đa dạng</div>
+        <button
+          class="bg-[#D69C52] hover:bg-[#a17231] text-white block mx-auto mt-[10px] py-[6px] px-5 rounded-md font-medium slide-in-up"
+          onclick="window.location.href='table-booking'"
+        >
+          ĐẶT BÀN NGAY
+        </button>
+      </div>
+    </div>
+    <div id="about-us" class="w-full flex bg-[#10302C] px-[11%] py-[5%]">
+      <div class="w-[50%]">
+        <div class="text-[#CA9C52] italic text-[17px] font-medium">
+          Về Chúng Tôi
+        </div>
+        <div class="birthstone-regular text-white text-[60px]">
+          Dola Restaurant
+        </div>
+        <div class="text-white leading-9">
+          Hệ thống nhà hàng Sushi gồm 15 chi nhánh trải rộng ở một số thành phố
+          (Hồ Chí Minh, Hà Nội, Đà Nẵng...). Nhà hàng chúng tôi luôn luôn đặt
+          khách hàng lên hàng đầu, tận tâm phục vụ, mang lại cho khách hàng
+          những trãi nghiệm tuyệt với nhất. Các món ăn với công thức độc quyền
+          sẽ mang lại hương vị mới mẻ cho thực khách. Dola Restaurant xin chân
+          thành cảm ơn.
+        </div>
+      </div>
+      <div class="w-[60%] h-[60vh] ml-[10%]">
+        <img src="/imgs/4-dish.png" alt="4 dish image" />
+      </div>
+    </div>
+    <div class="w-full bg-[#143B36] pt-[139px] px-[11%] py-10">
+      <!-- Tiêu đề -->
+      <div class="container mx-auto py-10">
+        <!-- Tiêu đề -->
+        <h1 class="text-center text-white text-4xl font-bold mb-6">
+          Thực đơn của chúng tôi
+        </h1>
+
+        <!-- Tabs -->
+        <div class="flex justify-center space-x-4 mb-8">
+          <button
+            class="tab-btn px-6 py-2 border rounded-lg text-white hover:bg-[#D69C52]"
+            onclick="showCategory('all')"
+          >
+            Tất cả
+          </button>
+          <% Object.keys(menuData).forEach(category=> { %>
+          <button
+            class="tab-btn px-6 py-2 border rounded-lg text-white hover:bg-[#D69C52]"
+            onclick="showCategory('<%= category %>')"
+          >
+            <%= category==="appetizers" ? "Khai vị" : category==="mainCourses" ?
+            "Món chính" : category==="soups" ? "Canh - Tiềm - Súp" : category %>
+          </button>
+          <% }); %>
+        </div>
+
+        <!-- Danh sách món ăn -->
+        <%- include('../components/selectDish.ejs') %>
+      </div>
+    </div>
+    <%- include('../partials/customer/footer.ejs') %>
+    <%-include('../partials/customer/float_button.ejs') %>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const observerOptions = {
+          threshold: 0.3, // Hiển thị khi 30% phần tử đã vào viewport
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("show");
+            }
+          });
+        }, observerOptions);
+
+        // Thêm lớp "show" ngay khi tải trang để kích hoạt hiệu ứng cho các phần tử
+        document
+          .querySelectorAll(".slide-in-left, .slide-in-right, .slide-in-up")
+          .forEach((el) => {
+            el.classList.add("show");
+          });
+
+        // Sau đó, tiếp tục quan sát các phần tử để bắt đầu hiệu ứng khi chúng vào viewport
+        document
+          .querySelectorAll(".slide-in-left, .slide-in-right, .slide-in-up")
+          .forEach((el) => {
+            observer.observe(el);
+          });
+      });
+
+      // Lắng nghe sự kiện cuộn trang
+      window.addEventListener("scroll", function () {
+        const scrollUpBtn = document.getElementById("scrollUpBtn");
+        const navbar = document.getElementById("navbar");
+        const navbarHeight = navbar ? navbar.offsetHeight : 0; // Chiều cao của navbar nếu có
+
+        // Kiểm tra nếu trang cuộn xuống qua navbar
+        if (window.scrollY > navbarHeight) {
+          scrollUpBtn.classList.remove("opacity-0", "pointer-events-none"); // Hiển thị nút cuộn lên
+          scrollUpBtn.classList.add("opacity-100", "pointer-events-auto"); // Kích hoạt sự kiện click
+        } else {
+          scrollUpBtn.classList.add("opacity-0", "pointer-events-none"); // Ẩn nút cuộn lên
+          scrollUpBtn.classList.remove("opacity-100", "pointer-events-auto");
+        }
+      });
+    </script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const observerOptions = {
+          threshold: 0.3, // Hiển thị khi 30% phần tử đã vào viewport
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("show");
+            }
+          });
+        }, observerOptions);
+
+        // Thêm lớp "show" ngay khi tải trang để kích hoạt hiệu ứng cho các phần tử
+        document
+          .querySelectorAll(".slide-in-left, .slide-in-right, .slide-in-up")
+          .forEach((el) => {
+            el.classList.add("show");
+          });
+
+        // Sau đó, tiếp tục quan sát các phần tử để bắt đầu hiệu ứng khi chúng vào viewport
+        document
+          .querySelectorAll(".slide-in-left, .slide-in-right, .slide-in-up")
+          .forEach((el) => {
+            observer.observe(el);
+          });
+      });
+
+      // Lắng nghe sự kiện cuộn trang
+      window.addEventListener("scroll", function () {
+        const scrollUpBtn = document.getElementById("scrollUpBtn");
+        const navbar = document.getElementById("navbar");
+        const navbarHeight = navbar ? navbar.offsetHeight : 0; // Chiều cao của navbar nếu có
+
+        // Kiểm tra nếu trang cuộn xuống qua navbar
+        if (window.scrollY > navbarHeight) {
+          scrollUpBtn.classList.remove("opacity-0", "pointer-events-none"); // Hiển thị nút cuộn lên
+          scrollUpBtn.classList.add("opacity-100", "pointer-events-auto"); // Kích hoạt sự kiện click
+        } else {
+          scrollUpBtn.classList.add("opacity-0", "pointer-events-none"); // Ẩn nút cuộn lên
+          scrollUpBtn.classList.remove("opacity-100", "pointer-events-auto");
+        }
+      });
+      function showCategory(category) {
+        document.querySelectorAll(".menu-category").forEach((cat) => {
+          cat.style.display = "none"; // Ẩn tất cả danh mục
+        });
+        document.querySelector(`.${category}`).style.display = "block"; // Hiển thị danh mục được chọn
+      }
+
+      // Hiển thị mặc định danh mục "Tất cả" khi tải trang
+      document.addEventListener("DOMContentLoaded", () => {
+        showCategory("all");
+      });
+    </script>
+  </body>
+</html>

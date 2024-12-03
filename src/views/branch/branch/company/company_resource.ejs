@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/branch_home.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/output.css" />
+
+    <title>Quản lý doanh thu món ăn</title>
+  </head>
+  <body class="text-gray-800 font-inter">
+    <!--sidenav -->
+    <%- include('../partials/company/company_side_nav') %>
+    <!-- end sidenav -->
+
+    <main
+      class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-gray-200 min-h-screen transition-all main"
+    >
+      <!-- Navbar -->
+      <%- include('../partials/company/company_navbar') %>
+      <!-- End Navbar -->
+
+      <!-- Content -->
+      <div class="mx-10 mt-10">
+        <!-- Title -->
+        <div class="text-[30px] font-semibold text-[#374151] mb-5">
+          Quản lý nhân viên
+        </div>
+        <div class="flex space-x-10">
+          <div class="w-[30%]">
+            <label for="branch-select">Khu vực</label>
+            <div class="mt-2">
+              <select
+                name="branch-select"
+                id="branch-select"
+                class="p-2 w-full"
+              >
+                <option value="default">-Chọn khu vực-</option>
+                <option value="HCM">Hồ Chí Minh</option>
+              </select>
+            </div>
+          </div>
+          <div class="w-[30%]">
+            <label for="branch-select">Chi nhánh</label>
+            <div class="mt-2">
+              <select
+                name="branch-select"
+                id="branch-select"
+                class="p-2 w-full"
+              >
+                <option value="default">-Chọn chi nhánh-</option>
+                <option value="NVC-HCM">
+                  45/6, Nguyễn Văn Cừ, Quận 5, Thành phố Hồ Chí Minh
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-auto">
+            <button
+              type="submit"
+              class="bg-[#219BE5] hover:bg-[#47b1f3] rounded-md py-2 px-4 text-white font-bold"
+            >
+              Tìm kiếm
+            </button>
+          </div>
+        </div>
+        <div class="flex flex-col mt-2">
+          <div
+            class="py-2 -my-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+          >
+            <div
+              class="inline-block min-w-full overflow-hidden align-middle border-b border-gray-200 shadow sm:rounded-lg"
+            >
+              <table class="min-w-full">
+                <thead>
+                  <tr>
+                    <th
+                      class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                    >
+                      Name
+                    </th>
+
+                    <th
+                      class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                    >
+                      Status
+                    </th>
+                    <th
+                      class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-gray-500 uppercase border-b border-gray-200 bg-gray-50 text-center"
+                    >
+                      <select
+                        id="departmentFilter"
+                        class="p-1 border border-black rounded-md text-sm text-center"
+                      >
+                        <option value="">Tất cả</option>
+                        <option value="bếp">Bếp</option>
+                        <option value="lễ tân">Lễ tân</option>
+                        <option value="phục vụ bàn">Phục vụ bàn</option>
+                        <option value="thu ngân">Thu ngân</option>
+                        <option value="quản lý chi nhánh">
+                          Quản lý chi nhánh
+                        </option>
+                      </select>
+                    </th>
+                    <th
+                      colspan="3"
+                      class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                    >
+                      <div class="relative">
+                        <label for="searchInput">Tìm kiếm</label>
+                        <input
+                          id="searchInput"
+                          type="text"
+                          placeholder="Nhập tên, mã nhân viên..."
+                          class="p-2 pl-3 pr-10 w-[80%] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                        <i
+                          class="ri-search-line absolute top-1/2 transform -translate-y-1/2 right-[15%] text-gray-400"
+                        ></i>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody class="bg-white" id="employeeTable">
+                  <% for (let i = 0; i < 10; i++) { %>
+                  <tr
+                    data-name="John Doe"
+                    data-id="09dsa23a@"
+                    data-department="phục vụ bàn"
+                    class="relative text-center"
+                  >
+                    <td
+                      class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 w-[20%]"
+                    >
+                      <div class="flex items-center">
+                        <div class="flex-shrink-0 w-10 h-10">
+                          <img
+                            class="w-10 h-10 rounded-full"
+                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                            alt=""
+                          />
+                        </div>
+                        <div class="ml-4">
+                          <div
+                            class="text-sm font-medium leading-5 text-gray-900"
+                          >
+                            John Doe
+                          </div>
+                          <div class="text-sm leading-5 text-gray-500">
+                            09dsa23a@
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td
+                      class="px-6 py-4 whitespace-no-wrap border-b border-gray-200"
+                    >
+                      <span
+                        class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full"
+                        >Active</span
+                      >
+                    </td>
+                    <td
+                      class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200"
+                    >
+                      Phục vụ bàn
+                    </td>
+                    <td
+                      class="px-6 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 text-blue-500"
+                    >
+                      <a href="/company-resource/transfer">Chuyển chi nhánh</a>
+                    </td>
+
+                    <td
+                      class="px-6 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 text-purple-400"
+                    >
+                      <a href="/company-resource/update">Cập nhật</a>
+                    </td>
+
+                    <td
+                      class="px-6 py-4 text-sm font-medium leading-5 whitespace-no-wrap border-b border-gray-200"
+                    >
+                      <!-- SVG Icon -->
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="h-[16px] w-[16px] cursor-pointer"
+                        onclick="toggleDropdown(this)"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                        />
+                      </svg>
+
+                      <!-- Dropdown Menu -->
+                      <div
+                        class="dropdown-content hidden absolute left-0 top-full mt-2 w-full bg-white shadow-lg rounded-lg border border-gray-200 p-6 text-sm text-gray-700 z-10"
+                      >
+                        <div class="grid grid-cols-3 gap-6 text-left">
+                          <div><strong>Ngày sinh:</strong> 01/01/1990</div>
+                          <div><strong>Giới tính:</strong> Nam</div>
+                          <div><strong>Lương:</strong> $5000</div>
+                          <div><strong>Ngày vào làm:</strong> 01/06/2020</div>
+                          <div><strong>Ngày nghỉ việc:</strong> 01/06/2025</div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- End Content -->
+    </main>
+
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/popper.js"></script>
+    <script>
+      //start: Toggle-dropdown
+      function toggleDropdown(icon) {
+        const dropdown = icon.closest("td").querySelector(".dropdown-content");
+        // Toggle visibility of the dropdown
+        dropdown.classList.toggle("hidden");
+      }
+      //end: Toggle-dropdown
+      document
+        .getElementById("departmentFilter")
+        .addEventListener("change", function () {
+          const selectedDepartment = this.value.toLowerCase();
+          const rows = document.querySelectorAll("#employeeTable tr");
+
+          rows.forEach((row) => {
+            const department = row.getAttribute("data-department");
+
+            if (!selectedDepartment || department === selectedDepartment) {
+              row.style.display = ""; // Hiện dòng
+            } else {
+              row.style.display = "none"; // Ẩn dòng
+            }
+          });
+        });
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", function () {
+          const searchValue = this.value.toLowerCase();
+          const rows = document.querySelectorAll("#employeeTable tr");
+
+          rows.forEach((row) => {
+            const name = row.getAttribute("data-name").toLowerCase();
+            const id = row.getAttribute("data-id").toLowerCase();
+
+            if (name.includes(searchValue) || id.includes(searchValue)) {
+              row.style.display = "";
+            } else {
+              row.style.display = "none";
+            }
+          });
+        });
+    </script>
+  </body>
+</html>
