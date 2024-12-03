@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/branch_home.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/output.css" />
+
+    <title>Quản lý doanh thu món ăn</title>
+  </head>
+  <body class="text-gray-800 font-inter">
+    <!--sidenav -->
+    <%- include('../partials/company/company_side_nav') %>
+    <!-- end sidenav -->
+
+    <main
+      class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-gray-200 min-h-screen transition-all main"
+    >
+      <!-- Navbar -->
+      <%- include('../partials/company/company_navbar') %>
+      <!-- End Navbar -->
+
+      <!-- Content -->
+      <div class="mx-10 mt-10">
+        <!-- Title -->
+        <div class="text-[30px] font-semibold text-[#374151] mb-5">
+          Quản lý doanh thu món ăn
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <form id="filterForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Chọn ngày bắt đầu -->
+            <div class="col-span-1">
+              <label
+                for="startDate"
+                class="block text-sm font-medium text-gray-700"
+                >Ngày bắt đầu</label
+              >
+              <input
+                type="date"
+                id="startDate"
+                class="mt-1 p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border-2"
+              />
+            </div>
+
+            <!-- Chọn ngày kết thúc -->
+            <div class="col-span-1">
+              <label
+                for="endDate"
+                class="block text-sm font-medium text-gray-700"
+                >Ngày kết thúc</label
+              >
+              <input
+                type="date"
+                id="endDate"
+                class="mt-1 p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border-2"
+              />
+            </div>
+
+            <!-- Chọn khu vực -->
+            <div class="col-span-1 md:col-span-3">
+              <label
+                for="region"
+                class="block text-sm font-medium text-gray-700"
+                >Khu vực</label
+              >
+              <select
+                id="region"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+              >
+                <option value="all">Tất cả</option>
+                <option value="region1">Khu vực 1</option>
+                <option value="region2">Khu vực 2</option>
+              </select>
+            </div>
+
+            <!-- Chọn chi nhánh -->
+            <div class="col-span-1 md:col-span-3">
+              <label
+                for="branch"
+                class="block text-sm font-medium text-gray-700"
+                >Chi nhánh</label
+              >
+              <select
+                id="branch"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+              >
+                <option value="all">Tất cả</option>
+                <option value="branch1">Chi nhánh 1</option>
+                <option value="branch2">Chi nhánh 2</option>
+              </select>
+            </div>
+            <!-- Nút Lọc -->
+            <div class="col-span-1 md:col-span-3">
+              <button
+                type="submit"
+                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Lọc
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Charts -->
+        <div>
+          <!-- Biểu đồ doanh thu món ăn -->
+          <h3 class="text-lg font-medium text-gray-700 mb-2">
+            Doanh thu theo từng món
+          </h3>
+          <canvas id="revenueByDishChart" class="w-full h-[200px]"></canvas>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          <!-- Biểu đồ món chạy nhất -->
+          <div class="flex justify-center">
+            <div>
+              <h3 class="text-lg font-medium text-gray-700 mb-2 text-center">
+                Món chạy nhất
+              </h3>
+              <canvas
+                id="bestSellingDishChart"
+                class="w-[500px] h-[400px]"
+              ></canvas>
+            </div>
+          </div>
+
+          <!-- Biểu đồ món bán chậm nhất -->
+          <div class="flex justify-center">
+            <div>
+              <h3 class="text-lg font-medium text-gray-700 mb-2 text-center">
+                Món bán chậm nhất
+              </h3>
+              <canvas
+                id="leastSellingDishChart"
+                class="w-[500px] h-[400px]"
+              ></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- End Content -->
+    </main>
+
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/popper.js"></script>
+    <script>
+      // Start Chart
+      const ctxRevenue = document
+        .getElementById("revenueByDishChart")
+        .getContext("2d");
+      const ctxBestSelling = document
+        .getElementById("bestSellingDishChart")
+        .getContext("2d");
+      const ctxLeastSelling = document
+        .getElementById("leastSellingDishChart")
+        .getContext("2d");
+
+      // Sample data (Thay bằng dữ liệu từ backend)
+      const dishes = [
+        "Sushi Cá Hồi",
+        "Maki Roll",
+        "Tempura",
+        "Sashimi",
+        "Udon",
+      ];
+      const revenue = [2000, 3000, 1500, 4000, 1000];
+
+      // Data cho món chạy nhất và món bán chậm nhất (Thay bằng dữ liệu thực tế)
+      const bestSelling = ["Sushi Cá Hồi", "Sashimi", "Maki Roll"];
+      const bestSellingData = [4000, 3000, 2000];
+      const leastSelling = ["Udon", "Tempura", "Sashimi"];
+      const leastSellingData = [1000, 1500, 2000];
+
+      // Chart 1: Biểu đồ doanh thu theo từng món (Horizontal Bar)
+      new Chart(ctxRevenue, {
+        type: "bar",
+        data: {
+          labels: dishes,
+          datasets: [
+            {
+              label: "Doanh thu (VNĐ)",
+              data: revenue,
+              backgroundColor: "rgba(54, 162, 235, 0.5)",
+              borderColor: "rgba(54, 162, 235, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          indexAxis: "y", // Horizontal bar chart
+          scales: {
+            x: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+
+      // Chart 2: Món chạy nhất (Pie Chart)
+      new Chart(ctxBestSelling, {
+        type: "pie",
+        data: {
+          labels: bestSelling,
+          datasets: [
+            {
+              data: bestSellingData,
+              backgroundColor: ["#4caf50", "#8bc34a", "#cddc39"],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+        },
+      });
+
+      // Chart 3: Món bán chậm nhất (Pie Chart)
+      new Chart(ctxLeastSelling, {
+        type: "pie",
+        data: {
+          labels: leastSelling,
+          datasets: [
+            {
+              data: leastSellingData,
+              backgroundColor: ["#f44336", "#e57373", "#ffcdd2"],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+        },
+      });
+      // End Chart
+
+      // Start Form
+      document
+        .getElementById("filterForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault(); // Ngừng hành động mặc định của form (không reload trang)
+
+          // Lấy giá trị từ các input
+          const startDate = document.getElementById("startDate").value;
+          const endDate = document.getElementById("endDate").value;
+          const branch = document.getElementById("branch").value;
+          const region = document.getElementById("region").value;
+
+          // Log các giá trị để kiểm tra
+          console.log("Start Date: ", startDate);
+          console.log("End Date: ", endDate);
+          console.log("Branch: ", branch);
+          console.log("Region: ", region);
+
+          // Giả lập dữ liệu lọc (Thay bằng dữ liệu thực tế từ API hoặc backend)
+          const filteredData = getFilteredData(
+            startDate,
+            endDate,
+            branch,
+            region,
+          );
+
+          // Log dữ liệu đã lọc
+          console.log("Filtered Data: ", filteredData);
+
+          // Cập nhật biểu đồ với dữ liệu đã lọc
+          updateChart(
+            ctxRevenue,
+            filteredData.revenueData,
+            filteredData.labels,
+          );
+          updateChart(
+            ctxBestSelling,
+            filteredData.bestSellingData,
+            filteredData.bestSellingLabels,
+          );
+          updateChart(
+            ctxLeastSelling,
+            filteredData.leastSellingData,
+            filteredData.leastSellingLabels,
+          );
+        });
+
+      // Giả lập hàm lọc dữ liệu (Cập nhật với backend thật sự)
+      function getFilteredData(startDate, endDate, branch, region) {
+        // Đây là dữ liệu giả lập, bạn có thể thay thế bằng logic xử lý dữ liệu từ backend
+        const mockFilteredData = {
+          labels: ["Sushi Cá Hồi", "Maki Roll", "Tempura", "Sashimi", "Udon"],
+          revenueData: [2500, 3500, 2000, 4500, 1200],
+          bestSellingLabels: ["Sushi Cá Hồi", "Sashimi", "Maki Roll"],
+          bestSellingData: [4500, 3500, 2500],
+          leastSellingLabels: ["Udon", "Tempura", "Sashimi"],
+          leastSellingData: [1200, 2000, 2500],
+        };
+
+        // Trả về dữ liệu đã lọc (hoặc gọi API thực tế)
+        return mockFilteredData;
+      }
+
+      function updateChart(chartContext, newData, newLabels) {
+        chartContext.data.datasets[0].data = newData;
+        chartContext.data.labels = newLabels;
+        chartContext.update();
+      }
+      // End Form
+    </script>
+  </body>
+</html>
