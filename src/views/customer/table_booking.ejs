@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đặt bàn</title>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/output.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Akaya+Kanadaka&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="/fontawesome-free-6.6.0-web/css/fontawesome.css"
+      rel="stylesheet"
+    />
+    <link href="/fontawesome-free-6.6.0-web/css/brands.css" rel="stylesheet" />
+    <link href="/fontawesome-free-6.6.0-web/css/solid.css" rel="stylesheet" />
+    <!-- Link đến Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMt23cez/3paNdF+QQ6piDz4VRL94mzbqhl67KH"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body class="bg-[#143B36]">
+    <%- include('../partials/customer/header.ejs') %> <%-
+    include('../partials/customer/page_flow.ejs') %>
+    <!-- Tabble booking-->
+    <div
+      class="relative flex h-[80vh] overflow-hidden my-8 items-center justify-center"
+    >
+      <img
+        src="https://vietmartjp.com/wp-content/uploads/2021/05/top-nha-hang-sushi-gia-re-tai-nhat-vietmart-cho-vietnam-tai-nhat-ban.jpg"
+        alt=""
+        class="absolute inset-0 h-full object-cover object-center rounded-lg mx-auto"
+      />
+      <div
+        class="px-6 relative inset-0 justify-center bg-[#143B36] h-[80%] w-[50%] text-white rounded-lg opacity-90"
+      >
+        <div class="akaya-kanadaka-regular block text-center text-[40px] pt-5">
+          Đặt bàn
+        </div>
+
+        <div class="flex space-x-8 justify-center mb-[20px]">
+          <!-- Người lớn -->
+          <div class="items-start w-[50%]">
+            <label for="adults" class="text-lg"
+              ><ion-icon name="person-outline"></ion-icon> &nbsp;Người
+              lớn</label
+            >
+            <select
+              id="adults"
+              name="adults"
+              class="text-black p-2 rounded w-[100%] mt-3"
+            ></select>
+          </div>
+
+          <!-- Trẻ em -->
+          <div class="items-start w-[50%]">
+            <label for="children" class="text-lg flex"
+              ><i class="fa-solid fa-baby pt-1"></i>&nbsp;Trẻ em</label
+            >
+            <select
+              id="children"
+              name="children"
+              class="text-black p-2 rounded w-[100%] mt-3"
+            ></select>
+          </div>
+        </div>
+        <div class="flex space-x-8 justify-center mb-[20px]">
+          <!-- Chi nhánh -->
+          <div class="items-start w-[50%]">
+            <label for="branch" class="text-lg"> Chi nhánh </label>
+            <select
+              id="branch"
+              name="branch"
+              class="text-black p-2 rounded w-[100%] mt-3"
+            >
+              <option value="Hà Nội - 10 Tràng Thi, Hoàn Kiếm, Hà Nội">
+                Hà Nội - 10 Tràng Thi, Hoàn Kiếm, Hà Nội
+              </option>
+              <option value="Hà Nội - 56 Nguyễn Thái Học, Ba Đình, Hà Nội">
+                Hà Nội - 56 Nguyễn Thái Học, Ba Đình, Hà Nội
+              </option>
+              <option value="Hồ Chí Minh - 23 Lê Lợi, Quận 1, TP.HCM">
+                Hồ Chí Minh - 23 Lê Lợi, Quận 1, TP.HCM
+              </option>
+              <option value="Hồ Chí Minh - 75 Nguyễn Huệ, Quận 1, TP.HCM">
+                Hồ Chí Minh - 75 Nguyễn Huệ, Quận 1, TP.HCM
+              </option>
+              <option value="Đà Nẵng - 12 Bạch Đằng, Hải Châu, Đà Nẵng">
+                Đà Nẵng - 12 Bạch Đằng, Hải Châu, Đà Nẵng
+              </option>
+              <option value="Đà Nẵng - 100 Nguyễn Văn Linh, Thanh Khê, Đà Nẵng">
+                Đà Nẵng - 100 Nguyễn Văn Linh, Thanh Khê, Đà Nẵng
+              </option>
+              <option value="Hải Phòng - 15 Lạch Tray, Ngô Quyền, Hải Phòng">
+                Hải Phòng - 15 Lạch Tray, Ngô Quyền, Hải Phòng
+              </option>
+              <option value="Hải Phòng - 89 Trần Phú, Hải An, Hải Phòng">
+                Hải Phòng - 89 Trần Phú, Hải An, Hải Phòng
+              </option>
+              <option value="Cần Thơ - 45 Nguyễn Trãi, Ninh Kiều, Cần Thơ">
+                Cần Thơ - 45 Nguyễn Trãi, Ninh Kiều, Cần Thơ
+              </option>
+              <option value="Cần Thơ - 20 Lý Tự Trọng, Ninh Kiều, Cần Thơ">
+                Cần Thơ - 20 Lý Tự Trọng, Ninh Kiều, Cần Thơ
+              </option>
+              <option
+                value="Bình Dương - 100 Đại Lộ Bình Dương, Thủ Dầu Một, Bình Dương"
+              >
+                Bình Dương - 100 Đại Lộ Bình Dương, Thủ Dầu Một, Bình Dương
+              </option>
+              <option value="Bình Dương - 30 Lê Lai, Thủ Dầu Một, Bình Dương">
+                Bình Dương - 30 Lê Lai, Thủ Dầu Một, Bình Dương
+              </option>
+              <option value="Quảng Ninh - 30 Hạ Long, Hạ Long, Quảng Ninh">
+                Quảng Ninh - 30 Hạ Long, Hạ Long, Quảng Ninh
+              </option>
+              <option
+                value="Quảng Ninh - 10 Lê Thánh Tông, Uông Bí, Quảng Ninh"
+              >
+                Quảng Ninh - 10 Lê Thánh Tông, Uông Bí, Quảng Ninh
+              </option>
+              <option value="Nha Trang - 25 Trần Phú, Nha Trang, Khánh Hòa">
+                Nha Trang - 25 Trần Phú, Nha Trang, Khánh Hòa
+              </option>
+            </select>
+          </div>
+
+          <!-- Thời điểm -->
+          <div class="items-start w-[50%]">
+            <label for="date time" class="text-lg">Thời gian đến</label>
+
+            <div class="flex space-x-4 mt-3">
+              <div class="">
+                <input
+                  type="date"
+                  id="date"
+                  name="date"
+                  class="text-black p-2 rounded focus:outline-none"
+                  required
+                />
+              </div>
+              <div class="">
+                <input
+                  type="time"
+                  id="time"
+                  name="time"
+                  class="text-black p-2 rounded focus:outline-none"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex mt-10">
+          <button
+            class="mx-auto bg-[#D69C52] hover:bg-[#a17231] text-white py-[6px] px-5 rounded-md -translate-y-1 font-medium transition-colors duration-300 w-[100%]"
+            onclick="window.location.href='/table-booking/pre-order'"
+          >
+            Đặt bàn ngay
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <%- include('../partials/customer/footer.ejs') %>
+    <%-
+    include('../partials/customer/float_button.ejs') %>
+    <script>
+      // Hàm để thêm tùy chọn từ 0 đến 100 vào dropdown
+      function populateSelectOptions(selectId) {
+        const selectElement = document.getElementById(selectId);
+        for (let i = 0; i <= 100; i++) {
+          const option = document.createElement("option");
+          option.value = i;
+          option.textContent = i;
+          selectElement.appendChild(option);
+        }
+      }
+
+      // Gọi hàm để thêm tùy chọn cho dropdown người lớn và trẻ em
+      populateSelectOptions("adults");
+      populateSelectOptions("children");
+    </script>
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+  </body>
+</html>

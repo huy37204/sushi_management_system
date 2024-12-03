@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giỏ hàng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+
+  <body class="bg-[#143B36]">
+    <%- include('../partials/customer/header.ejs') %> <%-
+    include('../partials/customer/page_flow.ejs') %>
+    <div class="grid lg:grid-cols-3 gap-8 text-[#ffffff] py-5">
+      <!-- Bảng giỏ hàng -->
+      <div
+        class="col-span-2 bg-[#244a41] rounded-lg p-6 border-4 border-yellow-600 shadow-md"
+      >
+        <table class="w-full text-left">
+          <thead>
+            <tr class="border-b border-gray-600">
+              <th class="pb-3">Thông tin sản phẩm</th>
+              <th class="pb-3">Đơn giá</th>
+              <th class="pb-3">Số lượng</th>
+              <th class="pb-3">Thành tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Sản phẩm 1 -->
+            <tr class="border-b border-gray-600">
+              <td class="py-4 flex items-center">
+                <img
+                  src="https://oldsailor.com.vn/vnt_upload/product/08_2022/172cd53c1e23db7d823243.jpg"
+                  alt="Salad rau"
+                  class="w-16 h-16 rounded-md mr-4"
+                />
+                <div>
+                  <p class="font-medium">Salad rau mùa sốt cam</p>
+                  <a href="#" class="text-orange-400 text-sm hover:underline"
+                    >Xóa</a
+                  >
+                </div>
+              </td>
+              <td class="py-4">68.000đ</td>
+              <td class="py-4 flex items-center">
+                <button
+                  class="w-8 h-8 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+                >
+                  -
+                </button>
+                <input
+                  type="text"
+                  value="1"
+                  class="w-12 mx-2 text-center bg-transparent border border-gray-600 rounded-md"
+                />
+                <button
+                  class="w-8 h-8 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+                >
+                  +
+                </button>
+              </td>
+              <td class="py-4">68.000đ</td>
+            </tr>
+            <!-- Sản phẩm 2 -->
+            <tr>
+              <td class="py-4 flex items-center">
+                <img
+                  src="https://product.hstatic.net/1000369857/product/ao_ab19_xanh_den_1_c691c6dc769d483e860b6a1805be1b6f.jpg"
+                  alt="Phở cuốn"
+                  class="w-16 h-16 rounded-md mr-4"
+                />
+                <div>
+                  <p class="font-medium">Phở cuốn</p>
+                  <a href="#" class="text-orange-400 text-sm hover:underline"
+                    >Xóa</a
+                  >
+                </div>
+              </td>
+              <td class="py-4">82.000đ</td>
+              <td class="py-4 flex items-center">
+                <button
+                  class="w-8 h-8 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+                >
+                  -
+                </button>
+                <input
+                  type="text"
+                  value="1"
+                  class="w-12 mx-2 text-center bg-transparent border border-gray-600 rounded-md"
+                />
+                <button
+                  class="w-8 h-8 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+                >
+                  +
+                </button>
+              </td>
+              <td class="py-4">82.000đ</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Tổng tiền -->
+        <div class="text-right mt-6">
+          <h5 class="text-xl font-semibold">
+            Tổng tiền: <span class="text-orange-500">150.000đ</span>
+          </h5>
+          <button
+            class="mt-4 px-8 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+          >
+            Thanh toán
+          </button>
+        </div>
+      </div>
+
+      <!-- Phần voucher -->
+      <div
+        class="bg-[#244a41] rounded-lg p-6 border-4 border-yellow-600 shadow-md"
+      >
+        <h5 class="text-lg font-semibold text-orange-400 mb-4">
+          🎁 Nhập voucher ngay !!!
+        </h5>
+        <ul class="space-y-4">
+          <li class="flex justify-between items-center">
+            <span>Còn <strong>150.000đ</strong> để nhận mã freeship</span>
+            <button
+              class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+            >
+              Thêm
+            </button>
+          </li>
+          <li class="flex justify-between items-center">
+            <span
+              >Còn <strong>550.000đ</strong> để nhận mã giảm
+              <strong>20.000đ</strong></span
+            >
+            <button
+              class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+            >
+              Thêm
+            </button>
+          </li>
+          <li class="flex justify-between items-center">
+            <span
+              >Còn <strong>850.000đ</strong> để nhận mã giảm
+              <strong>50.000đ</strong></span
+            >
+            <button
+              class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+            >
+              Thêm
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <%- include('../partials/customer/footer.ejs') %>
+    <%-
+    include('../partials/customer/float_button.ejs') %>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Lấy tất cả các hàng trong bảng giỏ hàng
+        const rows = document.querySelectorAll("tbody tr");
+
+        rows.forEach((row) => {
+          // Lấy các thành phần cần sử dụng
+          const minusBtn = row.querySelector("button:first-child"); // Nút giảm
+          const plusBtn = row.querySelector("button:last-child"); // Nút tăng
+          const quantityInput = row.querySelector("input"); // Ô nhập số lượng
+          const unitPriceElement = row.querySelector("td:nth-child(2)"); // Đơn giá
+          const totalPriceElement = row.querySelector("td:nth-child(4)"); // Thành tiền
+
+          // Lấy giá trị đơn giá (chuyển đổi từ text sang số)
+          const unitPrice = parseInt(
+            unitPriceElement.textContent.replace(/\D/g, ""),
+          );
+
+          // Hàm cập nhật số lượng và tính thành tiền
+          const updateTotal = () => {
+            let quantity = parseInt(quantityInput.value) || 1; // Số lượng, mặc định là 1 nếu không hợp lệ
+            if (quantity < 1) quantity = 1; // Không cho số lượng nhỏ hơn 1
+            quantityInput.value = quantity; // Cập nhật số lượng vào ô input
+            const total = quantity * unitPrice; // Tính thành tiền
+            totalPriceElement.textContent = `${total.toLocaleString()}đ`; // Hiển thị thành tiền
+            updateGrandTotal(); // Cập nhật tổng tiền toàn giỏ hàng
+          };
+
+          // Thêm sự kiện cho nút giảm
+          minusBtn.addEventListener("click", () => {
+            quantityInput.value = Math.max(
+              1,
+              parseInt(quantityInput.value) - 1,
+            ); // Giảm số lượng, tối thiểu là 1
+            updateTotal();
+          });
+
+          // Thêm sự kiện cho nút tăng
+          plusBtn.addEventListener("click", () => {
+            quantityInput.value = parseInt(quantityInput.value) + 1; // Tăng số lượng
+            updateTotal();
+          });
+
+          // Sự kiện khi người dùng nhập trực tiếp vào ô số lượng
+          quantityInput.addEventListener("input", updateTotal);
+        });
+
+        // Hàm cập nhật tổng tiền toàn giỏ hàng
+        const updateGrandTotal = () => {
+          let grandTotal = 0;
+          const totalElements = document.querySelectorAll(
+            "tbody tr td:nth-child(4)",
+          );
+          totalElements.forEach((totalElement) => {
+            grandTotal +=
+              parseInt(totalElement.textContent.replace(/\D/g, "")) || 0;
+          });
+          const grandTotalElement = document.querySelector(".text-orange-500");
+          grandTotalElement.textContent = `${grandTotal.toLocaleString()}đ`; // Cập nhật tổng tiền
+        };
+      });
+    </script>
+  </body>
+</html>

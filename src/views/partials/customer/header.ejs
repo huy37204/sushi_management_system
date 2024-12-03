@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/main.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Akaya+Kanadaka&family=Birthstone&family=Lavishly+Yours&family=Lobster&family=Molle&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <nav
+      id="navbar"
+      class="<%= activePage === 'home' ? 'absolute' : 'relative' %> text-white flex items-center font-bold w-[100%] z-40"
+    >
+      <div class="absolute inset-0 bg-[#143B36] opacity-70"></div>
+      <div id="logo" class="z-10">
+        <a href="/">
+          <img
+            src="https://bizweb.dktcdn.net/100/469/097/themes/882205/assets/logo.png?1705898809027"
+            alt=""
+            class="h-16 ml-[30%] mr-[200px]"
+          />
+        </a>
+      </div>
+      <div class="z-10 space-x-7">
+        <a
+          href="/"
+          class="<%= activePage === 'home' ? 'text-[#D69C52]' : 'text-white' %> hover:text-[#D69C52]"
+          >Trang chủ</a
+        >
+        <a href="#about-us" class="hover:text-[#D69C52]">Giới thiệu</a>
+
+        <!-- Dropdown menu -->
+        <div class="relative inline-block dropdown">
+          <a
+            href="/menu"
+            class="flex items-center dropdown-toggle <%= activePage === 'menu' ? 'text-[#D69C52]' : 'text-white' %> hover:text-[#D69C52] h-[75px]"
+          >
+            Menu&nbsp;
+            <ion-icon name="caret-down-outline"></ion-icon>
+          </a>
+
+          <!-- Dropdown menu -->
+          <a href="/menu">
+            <div
+              class="fixed left-[15%] bg-black rounded-lg border-2 border-[#f8b358] dropdown-menu w-[70%]"
+            >
+              <div class="flex flex-wrap ml-7 pt-4 pb-2 text-[18px] w-[100%]">
+                <% menuDropDownData.forEach(category => { %>
+                <div class="w-[20%] mb-[40px]">
+                  <div class="text-[#f5bd74]">
+                    <%= category.CATEGORY_NAME %>
+                  </div>
+                  <div class="pb-2 font-medium">
+                    <% category.DISHES.split(', ').forEach(dish => { %>
+                    <div><%= dish %></div>
+                    <% }); %>
+                  </div>
+                </div>
+                <% }); %>
+              </div>
+              <div class="block text-center">XEM THÊM...</div>
+            </div>
+          </a>
+        </div>
+
+        <a
+          href=""
+          class="hover:text-[#D69C52] <%= activePage === 'contact' ? 'text-[#D69C52]' : 'text-white' %>"
+          >Liên hệ</a
+        >
+      </div>
+      <div class="z-10 ml-auto mr-[10%] space-x-[15px] h-full items-center">
+        <ion-icon
+          name="search-outline"
+          class="pt-2"
+          style="font-size: 22px; font-weight: bold"
+        ></ion-icon>
+        <a href="/cart">
+          <ion-icon
+            name="cart-outline"
+            class="pt-2"
+            style="font-size: 22px; font-weight: bold"
+          ></ion-icon>
+        </a>
+        <div class="relative inline-block profile cursor-pointer">
+          <ion-icon
+            name="person-outline"
+            class="pt-2"
+            style="font-size: 22px; font-weight: bold"
+          ></ion-icon>
+
+          <!-- Person dropdown content -->
+          <div
+            class="absolute right-0 hidden bg-white shadow-md rounded-lg mt-2 w-48 text-center"
+          >
+            <% if (user) { %>
+            <p class="py-2 text-black"><%= user.name %></p>
+            <!-- Hiển thị tên người dùng -->
+            <a
+              href="/logout"
+              class="block py-2 px-4 text-black hover:bg-gray-200"
+              >Đăng xuất</a
+            >
+            <% } else { %>
+            <a
+              href="/login"
+              class="block py-2 px-4 text-black hover:bg-gray-200"
+              >Đăng nhập</a
+            >
+            <% } %>
+          </div>
+        </div>
+        <ion-icon
+          name="location-outline"
+          class="pt-2"
+          style="font-size: 22px; font-weight: bold"
+        ></ion-icon>
+        <button
+          class="bg-[#D69C52] hover:bg-[#a17231] text-white py-[6px] px-5 rounded-md -translate-y-1 font-medium transition-colors duration-300"
+          onclick="window.location.href='/table-booking'"
+        >
+          Đặt bàn
+        </button>
+      </div>
+    </nav>
+
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+    <script>
+      // Hiển thị dropdown khi click vào person-outline và tắt khi click lại
+      const personDropdown = document.querySelector(".profile");
+      const dropdownMenu = personDropdown.querySelector(".absolute");
+
+      personDropdown.addEventListener("click", function () {
+        // Kiểm tra và chuyển đổi trạng thái `hidden`
+        dropdownMenu.classList.toggle("hidden");
+      });
+
+      // Tùy chọn (không bắt buộc): Đóng menu khi click ra ngoài
+      document.addEventListener("click", function (event) {
+        if (!personDropdown.contains(event.target)) {
+          dropdownMenu.classList.add("hidden");
+        }
+      });
+    </script>
+  </body>
+</html>
