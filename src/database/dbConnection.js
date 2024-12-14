@@ -1,9 +1,9 @@
 import sql from "mssql";
 
 const config = {
-  user: "HUY",
+  user: "huy",
   password: "1234",
-  server: "X1-CARBON",
+  server: "localhost",
   database: "SUSUSHISHI",
   options: {
     trustServerCertificate: true,

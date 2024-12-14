@@ -33,8 +33,8 @@
         </div>
         <div class="mb-8 text-center slide-in-right">Món ăn đa dạng</div>
         <button
+          id="booking-button"
           class="bg-[#D69C52] hover:bg-[#a17231] text-white block mx-auto mt-[10px] py-[6px] px-5 rounded-md font-medium slide-in-up"
-          onclick="window.location.href='table-booking'"
         >
           ĐẶT BÀN NGAY
         </button>
@@ -200,8 +200,21 @@
       }
 
       // Hiển thị mặc định danh mục "Tất cả" khi tải trang
+      const user = <%- JSON.stringify(user) %>;
       document.addEventListener("DOMContentLoaded", () => {
         showCategory("all");
+      });
+      document.addEventListener("DOMContentLoaded", () => {
+        const bookingButton = document.getElementById("booking-button");
+
+        bookingButton.addEventListener("click", () => {
+          if (!user) {
+            alert("Bạn cần đăng nhập để đặt bàn.");
+            window.location.href = "/login"; // Chuyển hướng đến trang đăng nhập
+          } else {
+            window.location.href = "/table-booking"; // Chuyển hướng đến trang đặt bàn
+          }
+        });
       });
     </script>
   </body>
