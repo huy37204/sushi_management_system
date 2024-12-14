@@ -6,7 +6,7 @@ const employeeRouter = express.Router();
 
 employeeRouter.get(
   PATH.HOME,
-  verifyRole(["Thu ngân", "Lễ tân"]),
+  verifyRole(["THU NGÂN", "LỄ TÂN"]),
   (req, res) => {
     res.render("employee/employee_home");
   },

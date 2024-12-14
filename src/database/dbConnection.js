@@ -1,15 +1,16 @@
 import sql from "mssql";
 
 const config = {
-  user: "HUY",
+  user: "khoi",
   password: "1234",
-  server: "X1-CARBON",
+  server: "MSI",
   database: "SUSUSHISHI",
   options: {
-    trustServerCertificate: true,
-    trustedConnection: false,
+    encrypt: false, // Tắt mã hóa SSL
+    trustServerCertificate: true, // Chỉ dùng trong môi trường phát triển
     enableArithAbort: true,
-    instancename: "SQLEXPRESS",
+    trustedConnection: false,
+    instancename: "MSSQLSERVER",
   },
   port: 1433,
 };
@@ -17,10 +18,14 @@ const config = {
 const connect = async () => {
   try {
     const pool = await sql.connect(config);
-    return pool; // Trả về pool kết nối
+    console.log("Kết nối thành công!");
+    return pool;
   } catch (err) {
     console.error("Lỗi khi kết nối cơ sở dữ liệu:", err);
-    throw err; // Quăng lỗi để xử lý bên ngoài
+    if (err.code) {
+      console.error("Mã lỗi:", err.code);
+    }
+    throw err;
   }
 };
 

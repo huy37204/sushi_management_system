@@ -37,11 +37,11 @@ export const loginController = async (req, res) => {
     };
 
     // Chuyển hướng theo vai trò người dùng
-    if (user.ROLE === "Quản lý công ty") {
+    if (user.ROLE === "QUẢN LÝ CÔNG TY") {
       return res.redirect("/company");
-    } else if (user.ROLE === "Lễ tân" || user.ROLE === "Thu ngân") {
+    } else if (user.ROLE === "LỄ TÂN" || user.ROLE === "THU NGÂN") {
       return res.redirect("/employee");
-    } else if (user.ROLE === "Khách hàng") {
+    } else if (user.ROLE === "KHÁCH HÀNG") {
       return res.redirect("/");
     }
 
@@ -202,7 +202,7 @@ export const registerUser = async (req, res) => {
 
     req.session.user = {
       id: customer_id,
-      role: "Khách hàng",
+      role: "KHÁCH HÀNG",
       name: name,
     };
 

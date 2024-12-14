@@ -51,7 +51,7 @@ const menuData = {
   ],
 };
 const customerRouter = express.Router();
-const customerRole = "Khách hàng";
+const customerRole = "KHÁCH HÀNG";
 customerRouter.get("/", verifyRole(customerRole), async (req, res) => {
   try {
     // Lấy dữ liệu menu từ controller

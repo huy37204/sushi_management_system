@@ -3,7 +3,7 @@ import express from "express";
 import router from "./routes/index.js";
 import { fileURLToPath } from "url";
 import path from "path";
-import { connect } from "./database/dbConnection.js";
+import { connect, sql } from "./database/dbConnection.js";
 import dotenv from "dotenv";
 import session from "express-session";
 
@@ -54,4 +54,7 @@ app.use(router);
 
 app.listen(port, () => {
   console.log(`Project dang chay o port ${port}`);
+});
+sql.on("error", (err) => {
+  console.error("SQL Error:", err);
 });
