@@ -65,7 +65,6 @@ customerRouter.get("/", verifyRole(customerRole), async (req, res) => {
     // Render view và truyền dữ liệu menu vào
     res.render("customer/home", {
       activePage: "home",
-      menuData, // Truyền danh sách menu vào view
       user: req.user || null,
       menuDropDownData,
     });

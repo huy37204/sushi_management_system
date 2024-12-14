@@ -7,7 +7,7 @@ export const PATH = {
     TABLE_BOOKING_PREORDER: "/table-booking/pre-order",
   },
   BRANCH: {
-    PATH: "/branch",
+    HOME: "/branch/:branchId",
     EMPLOYEE_LIST: "/employee-list",
     EMPLOYEE_SEARCH: "/employee-search",
     ORDER: "/order-form",

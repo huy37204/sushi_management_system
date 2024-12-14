@@ -49,7 +49,6 @@ export const createTableBooking = async (req, res) => {
     const date = now.toISOString().split("T")[0]; // Định dạng YYYY-MM-DD
     const time = now.toISOString().split("T")[1].split(".")[0]; // Định dạng HH:MM:SS
 
-    console.log(newOrderID);
     await request.query(`
         INSERT INTO [ORDER_] (ORDER_ID, ORDER_DATE, BRANCH_ID, CUSTOMER_ID, ORDER_TYPE, ORDER_TIME)
         VALUES ('${newOrderID}', '${date}', '${branch}', '${req.user.id}', 'ONLINE', '${time}')
@@ -132,32 +131,48 @@ export const preorderController = async (req, res) => {
 export const addDishPreorder = async (req, res) => {
   try {
     const { orderId, branchId } = req.query;
-    const dishes = req.body.dishes;
+    const dishes = req.body.dishes; // Dữ liệu nhận từ req.body.dishes
 
-    // Lọc ra các món có quantity > 0
-    const validDishes = Object.values(dishes).filter(
-      (dish) => dish.quantity > 0,
-    );
+    const validDishes = [];
 
+    // Duyệt qua các món ăn và kết hợp id với quantity
+    for (let i = 0; i < dishes[0].id.length; i++) {
+      const id = dishes[0].id[i];
+      const quantity = parseInt(dishes[0].quantity[i], 10);
+
+      if (quantity >= 1) {
+        validDishes.push({ id, quantity });
+      }
+    }
+
+    // Nếu không có món ăn hợp lệ, trả về trang chủ
     if (validDishes.length === 0) {
       return res.redirect("/");
     }
-    console.log(validDishes);
-    // Sử dụng Promise.all để xử lý nhiều truy vấn
+
+    // Chèn các món ăn hợp lệ vào cơ sở dữ liệu
     const insertPromises = validDishes.map(async (dish) => {
-      const { id, quantity } = dish;
-      // Tạo request mới cho mỗi truy vấn
+      let { id, quantity } = dish;
+
+      // Đảm bảo id có độ dài đúng là 4 ký tự
+      if (id.length < 4) {
+        id = id.padEnd(4, " "); // Điền thêm khoảng trắng nếu id ngắn hơn 4 ký tự
+      } else if (id.length > 4) {
+        id = id.substring(0, 4); // Cắt bớt nếu id dài hơn 4 ký tự
+      }
+
       const request = new sql.Request();
       request.input("orderId", sql.NVarChar, orderId);
-      request.input("dishId", sql.Char, id);
+      request.input("dishId", sql.Char(4), id); // Dùng Char(4) cho id
       request.input("quantity", sql.Int, quantity);
+
       return request.query(`
           INSERT INTO ORDER_DISH (ORDER_ID, DISH_ID, QUANTITY)
           VALUES (@orderId, @dishId, @quantity)
         `);
     });
 
-    // Chờ tất cả truy vấn hoàn tất
+    // Chờ tất cả các truy vấn hoàn tất
     await Promise.all(insertPromises);
 
     // Điều hướng đến trang thành công

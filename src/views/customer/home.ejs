@@ -61,37 +61,6 @@
         <img src="/imgs/4-dish.png" alt="4 dish image" />
       </div>
     </div>
-    <div class="w-full bg-[#143B36] pt-[139px] px-[11%] py-10">
-      <!-- Tiêu đề -->
-      <div class="container mx-auto py-10">
-        <!-- Tiêu đề -->
-        <h1 class="text-center text-white text-4xl font-bold mb-6">
-          Thực đơn của chúng tôi
-        </h1>
-
-        <!-- Tabs -->
-        <div class="flex justify-center space-x-4 mb-8">
-          <button
-            class="tab-btn px-6 py-2 border rounded-lg text-white hover:bg-[#D69C52]"
-            onclick="showCategory('all')"
-          >
-            Tất cả
-          </button>
-          <% Object.keys(menuData).forEach(category=> { %>
-          <button
-            class="tab-btn px-6 py-2 border rounded-lg text-white hover:bg-[#D69C52]"
-            onclick="showCategory('<%= category %>')"
-          >
-            <%= category==="appetizers" ? "Khai vị" : category==="mainCourses" ?
-            "Món chính" : category==="soups" ? "Canh - Tiềm - Súp" : category %>
-          </button>
-          <% }); %>
-        </div>
-
-        <!-- Danh sách món ăn -->
-        <%- include('../components/selectDish.ejs') %>
-      </div>
-    </div>
     <%- include('../partials/customer/footer.ejs') %>
     <%-include('../partials/customer/float_button.ejs') %>
 

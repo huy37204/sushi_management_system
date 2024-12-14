@@ -45,10 +45,27 @@ export const loginController = async (req, res) => {
     // Chuyển hướng theo vai trò người dùng
     if (user.ROLE === "Quản lý công ty") {
       return res.redirect("/company");
-    } else if (user.ROLE === "Lễ tân" || user.ROLE === "Thu ngân") {
+    } else if (user.ROLE === "Nhân viên") {
       return res.redirect("/employee");
     } else if (user.ROLE === "Khách hàng") {
       return res.redirect("/");
+    } else if (user.ROLE === "Quản lý chi nhánh") {
+      const request = new sql.Request();
+      request.input("userId", sql.NVarChar, user.Id);
+      console.log(user.Id);
+      const result = await request.query(`
+      SELECT B.BRANCH_ID
+      FROM RESTAURANT_BRANCH B
+      WHERE B.MANAGER_ID = @userId
+    `);
+
+      if (result.recordset.length > 0) {
+        req.branchId = result.recordset[0].BRANCH_ID; // Gắn branchId vào req
+        next();
+      } else {
+        return res.status(404).send("Branch not found");
+      }
+      return res.redirect("/branch/" + req.branchId);
     }
 
     // Nếu không khớp với role nào, trả về lỗi
