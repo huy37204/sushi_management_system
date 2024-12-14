@@ -43,11 +43,11 @@ export const loginController = async (req, res) => {
     });
 
     // Chuyển hướng theo vai trò người dùng
-    if (user.ROLE === "QUẢN LÝ CÔNG TY") {
+    if (user.ROLE === "Quản lý công ty") {
       return res.redirect("/company");
-    } else if (user.ROLE === "LỄ TÂN" || user.ROLE === "THU NGÂN") {
+    } else if (user.ROLE === "Lễ tân" || user.ROLE === "Thu ngân") {
       return res.redirect("/employee");
-    } else if (user.ROLE === "KHÁCH HÀNG") {
+    } else if (user.ROLE === "Khách hàng") {
       return res.redirect("/");
     }
 
