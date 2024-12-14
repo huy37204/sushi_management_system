@@ -15,18 +15,23 @@ accountRouter
   });
 
 accountRouter.get("/logout", (req, res) => {
-  // Xóa user khỏi session
   req.session.user = null;
 
-  // Xóa user khỏi req
-  req.user = null;
-
-  // Destroy session hoàn toàn nếu cần
   req.session.destroy((err) => {
     if (err) {
       console.error("Lỗi khi hủy session:", err);
       return res.status(500).send("Có lỗi xảy ra khi đăng xuất.");
     }
+
+    // Xóa cookie với đúng domain và path, nếu có
+    res.clearCookie("connect.sid", {
+      path: "/", // Chỉ định đường dẫn nếu cần (thường là "/")
+    });
+    res.clearCookie("userInfo", {
+      path: "/", // Chỉ định đường dẫn nếu cần (thường là "/")
+    });
+
+    // Chuyển hướng đến trang login
     res.redirect("/login");
   });
 });

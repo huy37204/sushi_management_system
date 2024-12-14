@@ -1,40 +1,46 @@
 import { sql } from "../../database/dbConnection.js";
 import bcrypt from "bcrypt";
-import { v4 as uuidv4 } from "uuid";
 
 // Controller xử lý đăng nhập
 export const loginController = async (req, res) => {
   const { username, password } = req.body;
-
+  console.log(password);
   try {
-    // Tạo request và sử dụng input để truyền các tham số vào
+    // Tạo request và khai báo tham số
     const request = new sql.Request();
-
-    // Khai báo tham số
     request.input("username", sql.NVarChar, username);
-    request.input("password", sql.VarChar, password);
 
-    // Sử dụng parameterized query để tránh SQL Injection
+    // Truy vấn lấy thông tin người dùng
     const result = await request.query(`
-     EXEC getUserIdByAccount @USER_NAME = @username`);
+      EXEC getUserIdByAccount @USERNAME = @username
+    `);
 
     if (result.recordset.length === 0) {
-      // Nếu không tìm thấy người dùng, quay lại trang login
-      res.redirect("/login");
-      return;
+      // Nếu không tìm thấy người dùng
+      return res.status(401).json({ message: "Invalid username or password" });
     }
 
     const user = result.recordset[0];
 
-    if (user.PASSWORD !== password) {
-      return res.redirect("/login");
+    // So sánh mật khẩu đã nhập với mật khẩu mã hóa trong cơ sở dữ liệu
+    const passwordMatch = await bcrypt.compare(password, user.PASSWORD);
+
+    if (!passwordMatch) {
+      // Mật khẩu không khớp
+      return res.status(401).json({ message: "Invalid username or password" });
     }
-    // Lưu thông tin người dùng vào req.user
+
+    // Lưu thông tin người dùng vào session
     req.session.user = {
       id: user.Id,
       role: user.ROLE,
       name: user.Name,
     };
+
+    res.cookie("userInfo", JSON.stringify(req.session.user), {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // Cookie hết hạn sau 7 ngày
+      httpOnly: true, // Đảm bảo chỉ server có thể đọc cookie này
+    });
 
     // Chuyển hướng theo vai trò người dùng
     if (user.ROLE === "QUẢN LÝ CÔNG TY") {
@@ -51,69 +57,6 @@ export const loginController = async (req, res) => {
     console.error("Lỗi khi xác thực người dùng:", err);
     return res.status(500).send("Lỗi khi xác thực người dùng");
   }
-};
-
-// Controller xử lý đăng nhập
-// export const loginController = async (req, res) => {
-//   const { username, password } = req.body;
-//   console.log(password);
-//   try {
-//     // Tạo request và khai báo tham số
-//     const request = new sql.Request();
-//     request.input("username", sql.NVarChar, username);
-
-//     // Truy vấn lấy thông tin người dùng
-//     const result = await request.query(`
-//       EXEC getUserIdByAccount @USER_NAME = @username
-//     `);
-
-//     if (result.recordset.length === 0) {
-//       // Nếu không tìm thấy người dùng
-//       return res.status(401).json({ message: "Invalid username or password" });
-//     }
-
-//     const user = result.recordset[0];
-
-//     // So sánh mật khẩu đã nhập với mật khẩu mã hóa trong cơ sở dữ liệu
-//     const passwordMatch = await bcrypt.compare(password, user.PASSWORD);
-
-//     if (!passwordMatch) {
-//       // Mật khẩu không khớp
-//       return res.status(401).json({ message: "Invalid username or password" });
-//     }
-
-//     // Lưu thông tin người dùng vào session
-//     req.session.user = {
-//       id: user.Id,
-//       role: user.ROLE,
-//       name: user.Name,
-//     };
-
-//     // Chuyển hướng theo vai trò người dùng
-//     if (user.ROLE === "Quản lý công ty") {
-//       return res.redirect("/company");
-//     } else if (user.ROLE === "Lễ tân" || user.ROLE === "Thu ngân") {
-//       return res.redirect("/employee");
-//     } else if (user.ROLE === "Khách hàng") {
-//       return res.redirect("/");
-//     }
-
-//     // Nếu không khớp với role nào, trả về lỗi
-//     return res.status(400).send("Role không hợp lệ.");
-//   } catch (err) {
-//     console.error("Lỗi khi xác thực người dùng:", err);
-//     return res.status(500).send("Lỗi khi xác thực người dùng");
-//   }
-// };
-
-// Hàm tạo ID ngẫu nhiên có độ dài 6 ký tự
-const generateRandomId = (length = 6) => {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
 };
 
 export const registerUser = async (req, res) => {
@@ -155,7 +98,7 @@ export const registerUser = async (req, res) => {
       "SELECT * FROM CUSTOMER WHERE EMAIL = @email",
     );
     const existingUsername = await checkRequest.query(
-      "SELECT * FROM ACCOUNT WHERE USER_NAME = @username",
+      "SELECT * FROM ACCOUNT WHERE USERNAME = @username",
     );
 
     if (
@@ -167,44 +110,85 @@ export const registerUser = async (req, res) => {
         .json({ message: "Email or username already exists" });
     }
 
-    // Tạo các ID mới dưới dạng CHAR(6)
-    const customer_id = generateRandomId();
-    const account_id = generateRandomId();
+    // Lấy giá trị customer_id cuối cùng từ cơ sở dữ liệu
+    const customerRequest = new sql.Request();
+    const customerResult = await customerRequest.query(
+      "SELECT TOP 1 CUSTOMER_ID FROM CUSTOMER ORDER BY CUSTOMER_ID DESC",
+    );
+
+    let newCustomerId = "000001C"; // Giá trị mặc định nếu chưa có dữ liệu
+
+    if (customerResult.recordset.length > 0) {
+      // Lấy giá trị CUSTOMER_ID cuối cùng
+      const lastCustomerId = customerResult.recordset[0].CUSTOMER_ID;
+
+      // Tách phần số và phần ký tự
+      const numberPart =
+        parseInt(lastCustomerId.substring(0, lastCustomerId.length - 1)) + 1;
+      const charPart = lastCustomerId.charAt(lastCustomerId.length - 1); // Phần ký tự cuối cùng
+
+      // Đảm bảo phần số có đúng 6 chữ số
+      newCustomerId = numberPart.toString().padStart(6, "0") + charPart;
+    }
+
+    // Lấy giá trị ACCOUNT_ID cuối cùng từ cơ sở dữ liệu
+    const accountRequest = new sql.Request();
+    const accountResult = await accountRequest.query(
+      "SELECT TOP 1 ACCOUNT_ID FROM ACCOUNT ORDER BY ACCOUNT_ID DESC",
+    );
+
+    let account_id = "A001"; // Giá trị mặc định nếu chưa có dữ liệu
+
+    if (accountResult.recordset.length > 0) {
+      // Lấy giá trị ACCOUNT_ID cuối cùng
+      const lastAccountId = accountResult.recordset[0].ACCOUNT_ID;
+
+      // Tăng giá trị lên 1 đơn vị
+      const numberPart = parseInt(lastAccountId.substring(1)) + 1;
+      account_id = "A" + numberPart.toString().padStart(3, "0"); // Đảm bảo định dạng 3 chữ số
+    }
 
     // Hash mật khẩu
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Tạo request để chèn dữ liệu
-    const customerRequest = new sql.Request();
-    customerRequest.input("customer_id", sql.Char(6), customer_id);
-    customerRequest.input("name", sql.NVarChar, name);
-    customerRequest.input("email", sql.NVarChar, email);
-    customerRequest.input("phone_number", sql.NVarChar, phone_number);
-    customerRequest.input("gender", sql.NVarChar, gender);
+    // Tạo request để chèn dữ liệu vào bảng CUSTOMER
+    const insertCustomerRequest = new sql.Request();
+    insertCustomerRequest.input("customer_id", sql.VarChar, newCustomerId);
+    insertCustomerRequest.input("name", sql.NVarChar, name);
+    insertCustomerRequest.input("email", sql.NVarChar, email);
+    insertCustomerRequest.input("phone_number", sql.NVarChar, phone_number);
+    insertCustomerRequest.input("gender", sql.NVarChar, gender);
 
-    await customerRequest.query(`
+    await insertCustomerRequest.query(`
       INSERT INTO CUSTOMER (CUSTOMER_ID, FULL_NAME, PHONE_NUMBER, EMAIL, GENDER)
       VALUES (@customer_id, @name, @phone_number, @email, @gender)
     `);
 
-    const accountRequest = new sql.Request();
-    accountRequest.input("account_id", sql.Char(6), account_id);
-    accountRequest.input("username", sql.NVarChar, username);
-    accountRequest.input("password", sql.NVarChar, hashedPassword);
-    accountRequest.input("role", sql.NVarChar, "Khách hàng"); // Đặt mặc định là "Khách hàng"
-    accountRequest.input("customer_id", sql.Char(6), customer_id);
+    // Chèn dữ liệu vào bảng ACCOUNT
+    const insertAccountRequest = new sql.Request();
+    insertAccountRequest.input("account_id", sql.NVarChar, account_id);
+    insertAccountRequest.input("username", sql.NVarChar, username);
+    insertAccountRequest.input("password", sql.NVarChar, hashedPassword);
+    insertAccountRequest.input("role", sql.NVarChar, "Khách hàng"); // Đặt mặc định là "Khách hàng"
+    insertAccountRequest.input("customer_id", sql.NVarChar, newCustomerId);
 
-    await accountRequest.query(`
-      INSERT INTO ACCOUNT (ACCOUNT_ID, USER_NAME, PASSWORD, ROLE, CUSTOMER_ID)
+    await insertAccountRequest.query(`
+      INSERT INTO ACCOUNT (ACCOUNT_ID, USERNAME, PASSWORD, ROLE, CUSTOMER_ID)
       VALUES (@account_id, @username, @password, @role, @customer_id)
     `);
 
     req.session.user = {
-      id: customer_id,
-      role: "KHÁCH HÀNG",
+      id: newCustomerId,
+      role: "Khách hàng",
       name: name,
     };
+
+    // Lưu thông tin vào cookie
+    res.cookie("userInfo", JSON.stringify(req.session.user), {
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      httpOnly: true,
+    });
 
     // Redirect người dùng về trang chủ
     res.redirect("/");
