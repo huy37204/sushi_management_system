@@ -2,6 +2,12 @@ import { PATH } from "../../config/path.js";
 import express from "express";
 import { verifyRole } from "../../middlewares/authMiddlewares.js";
 import { getMenuDropDownItem } from "../../controllers/menuController/menuDropdownController.js";
+import {
+  addDishPreorder,
+  createTableBooking,
+  orderTableController,
+  preorderController,
+} from "../../controllers/orderTable/orderTableController.js";
 const menuData = {
   appetizers: [
     {
@@ -71,23 +77,10 @@ customerRouter.get("/", verifyRole(customerRole), async (req, res) => {
 customerRouter.get(
   PATH.CUSTOMER.TABLE_BOOKING,
   verifyRole(customerRole),
-  async (req, res) => {
-    try {
-      // Lấy dữ liệu menu từ controller
-      const menuDropDownData = await getMenuDropDownItem();
-
-      // Render view và truyền dữ liệu menu vào
-      res.render("customer/table_booking", {
-        activePage: "table-booking",
-        user: req.user || null,
-        menuDropDownData,
-      });
-    } catch (err) {
-      console.error("Lỗi khi lấy dữ liệu menu:", err);
-      res.status(500).send("Lỗi khi lấy dữ liệu menu");
-    }
-  },
+  orderTableController,
 );
+
+customerRouter.post(PATH.CUSTOMER.TABLE_BOOKING, createTableBooking);
 
 customerRouter.get(
   PATH.CUSTOMER.MENU,
@@ -114,24 +107,10 @@ customerRouter.get(
 customerRouter.get(
   PATH.CUSTOMER.TABLE_BOOKING_PREORDER,
   verifyRole(customerRole),
-  async (req, res) => {
-    try {
-      // Lấy dữ liệu menu từ controller
-      const menuDropDownData = await getMenuDropDownItem();
-
-      // Render view và truyền dữ liệu menu vào
-      res.render("customer/order_menu", {
-        activePage: "table-booking-preorder",
-        user: req.user || null,
-        menuData,
-        menuDropDownData,
-      });
-    } catch (err) {
-      console.error("Lỗi khi lấy dữ liệu menu:", err);
-      res.status(500).send("Lỗi khi lấy dữ liệu menu");
-    }
-  },
+  preorderController,
 );
+
+customerRouter.post(PATH.CUSTOMER.TABLE_BOOKING_PREORDER, addDishPreorder);
 
 customerRouter.get(
   PATH.CUSTOMER.CART,
