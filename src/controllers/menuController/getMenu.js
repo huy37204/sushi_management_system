@@ -13,7 +13,7 @@ export const menuController = async (req, res) => {
 
     let categoriesWithDishes = [];
     const menuDropDownData = await getMenuDropDownItem();
-    
+
     if (dishName) {
       // Kiểm tra xem có tham số tìm kiếm không
       console.log("Hàm tìm kiếm món ăn đã được gọi.");
@@ -146,7 +146,9 @@ export const deliveryOrder = async (req, res) => {
     `);
 
     // Xử lý các món ăn đặt trước
-    const validDishes = Object.values(dishes).filter(dish => dish.quantity > 0);
+    const validDishes = Object.values(dishes).filter(
+      (dish) => dish.quantity > 0,
+    );
 
     if (validDishes.length === 0) {
       return res.redirect("/"); // Nếu không có món nào hợp lệ thì điều hướng về trang chính
