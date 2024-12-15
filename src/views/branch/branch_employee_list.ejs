@@ -83,7 +83,9 @@
               </div>
 
               <div class="mx-5">
-                <h4 class="text-2xl font-semibold text-gray-700">200</h4>
+                <h4 class="text-2xl font-semibold text-gray-700">
+                  <%=employees.length%>
+                </h4>
                 <div class="text-gray-500">Nhân viên</div>
               </div>
             </div>
@@ -112,7 +114,9 @@
               </div>
 
               <div class="mx-5">
-                <h4 class="text-2xl font-semibold text-gray-700">12</h4>
+                <h4 class="text-2xl font-semibold text-gray-700">
+                  <%= departments.length %>
+                </h4>
                 <div class="text-gray-500">Bộ phận</div>
               </div>
             </div>
@@ -126,7 +130,7 @@
           <div
             class="inline-block min-w-full overflow-hidden align-middle border-b border-gray-200 shadow sm:rounded-lg"
           >
-            <table class="min-w-full">
+            <table id="employee-table" class="min-w-full">
               <thead>
                 <tr>
                   <th
@@ -140,20 +144,49 @@
                   >
                     Status
                   </th>
+
                   <th
-                    class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                    colspan="2"
+                    class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-gray-500 uppercase border-b border-gray-200 bg-gray-50 text-center"
                   >
                     Bộ phận
                   </th>
-                  <th
-                    class="px-6 py-3 border-b border-gray-200 bg-gray-50"
-                  ></th>
+
+                  <th class="px-6 py-3 border-b border-gray-200 bg-gray-50">
+                    <div class="flex justify-end space-x-4">
+                      <input
+                        type="text"
+                        id="search-input"
+                        class="rounded-md border-gray-300 p-2 font-normal"
+                        placeholder="Nhập tên, mã nhân viên..."
+                        onkeyup="searchEmployees()"
+                      />
+                      <select
+                        name="select-department"
+                        id="select-department"
+                        class="rounded-md border-gray-300 p-2 font-normal"
+                        onchange="filterByDepartment()"
+                      >
+                        <option value="all">Tất cả</option>
+                        <% departments.forEach(department => { %>
+                        <option value="<%= department.DEPARTMENT_NAME %>">
+                          <%= department.DEPARTMENT_NAME %>
+                        </option>
+                        <% }) %>
+                      </select>
+                    </div>
+                  </th>
                 </tr>
               </thead>
 
               <tbody class="bg-white">
-                <% for (let i = 0; i < 10; i++) { %>
-                <tr class="relative">
+                <% employees.forEach(employee => { %>
+                <tr
+                  class="employee-row relative"
+                  data-department="<%= employee.DEPARTMENT_NAME %>"
+                  data-name="<%= employee.FULL_NAME.toLowerCase() %>"
+                  data-id="<%= employee.EMPLOYEE_ID %>"
+                >
                   <td
                     class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 w-[20%]"
                   >
@@ -169,65 +202,100 @@
                         <div
                           class="text-sm font-medium leading-5 text-gray-900"
                         >
-                          John Doe
+                          <%= employee.FULL_NAME %>
                         </div>
                         <div class="text-sm leading-5 text-gray-500">
-                          09dsa23a@
+                          <%= employee.EMPLOYEE_ID %>
                         </div>
                       </div>
                     </div>
                   </td>
 
                   <td
-                    class="px-6 py-4 whitespace-no-wrap border-b border-gray-200"
+                    class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-center"
                   >
-                    <span
-                      class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full"
-                      >Active</span
+                    <% if(!employee.TERMINATION_DATE) { %>
+                    <div
+                      class="flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full w-[100px] justify-center items-center text-center"
                     >
+                      Active
+                    </div>
+
+                    <% } else {%>
+                    <div
+                      class="flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full w-[100px] justify-center items-center text-center"
+                    >
+                      Terminate
+                    </div>
+
+                    <% } %>
                   </td>
 
                   <td
-                    class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200"
+                    colspan="2"
+                    class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200 text-center"
                   >
-                    Phục vụ bàn
+                    <%= employee.DEPARTMENT_NAME %>
                   </td>
 
                   <td
+                    colspan="2"
                     class="px-6 py-4 text-sm font-medium leading-5 whitespace-no-wrap border-b border-gray-200"
                   >
-                    <!-- SVG Icon -->
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="h-[16px] w-[16px] cursor-pointer"
-                      onclick="toggleDropdown(this)"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                      />
-                    </svg>
+                    <div class="flex justify-end items-center mr-4">
+                      <!-- SVG Icon -->
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="h-[16px] w-[16px] cursor-pointer"
+                        onclick="toggleDropdown(this)"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                        />
+                      </svg>
+                    </div>
 
                     <!-- Dropdown Menu -->
                     <div
                       class="dropdown-content hidden absolute left-0 top-full mt-2 w-full bg-white shadow-lg rounded-lg border border-gray-200 p-6 text-sm text-gray-700 z-10"
                     >
                       <div class="grid grid-cols-3 gap-6">
-                        <div><strong>Ngày sinh:</strong> 01/01/1990</div>
-                        <div><strong>Giới tính:</strong> Nam</div>
-                        <div><strong>Lương:</strong> $5000</div>
-                        <div><strong>Ngày vào làm:</strong> 01/06/2020</div>
-                        <div><strong>Ngày nghỉ việc:</strong> 01/06/2025</div>
+                        <div>
+                          <strong>Ngày sinh:</strong>
+                          <%= new Date(employee.DATE_OF_BIRTH).toLocaleDateString('vi-VN') %>
+                        </div>
+                        <div>
+                          <strong>Giới tính:</strong>
+                          <%= employee.GENDER %>
+                        </div>
+                        <div>
+                          <strong>Lương:</strong>
+                          <%= new Intl.NumberFormat('vi-VN').format(employee.SALARY) %>
+                          đ
+                        </div>
+                        <div>
+                          <strong>Ngày vào làm:</strong>
+                          <%= new Date(employee.START_DATE_WORK).toLocaleDateString('vi-VN') %>
+                        </div>
+                        <div>
+                          <strong>Ngày nghỉ việc:</strong>
+                          <% if (employee.TERMINATION_DATE) { %>
+                          <%= new Date(employee.TERMINATION_DATE).toLocaleDateString('vi-VN') %>
+                          <% } else { %>
+                          Null
+                          <% } %>
+                        </div>
                       </div>
                     </div>
                   </td>
                 </tr>
-                <% } %>
+                <% }) %>
               </tbody>
             </table>
           </div>
@@ -248,6 +316,47 @@
         dropdown.classList.toggle("hidden");
       }
       //end: Toggle-dropdown
+      function filterByDepartment() {
+        // Lấy giá trị bộ phận đã chọn
+        const selectedDepartment =
+          document.getElementById("select-department").value;
+
+        // Lấy tất cả các hàng trong bảng
+        const rows = document.querySelectorAll("#employee-table .employee-row");
+
+        rows.forEach((row) => {
+          const department = row.getAttribute("data-department");
+
+          // Kiểm tra nếu bộ phận trùng với giá trị đã chọn hoặc nếu là "Tất cả"
+          if (
+            selectedDepartment === "all" ||
+            department === selectedDepartment
+          ) {
+            row.style.display = ""; // Hiển thị hàng
+          } else {
+            row.style.display = "none"; // Ẩn hàng
+          }
+        });
+      }
+      // Hàm tìm kiếm nhân viên
+      function searchEmployees() {
+        const searchTerm = document
+          .getElementById("search-input")
+          .value.toLowerCase();
+        const rows = document.querySelectorAll("#employee-table .employee-row");
+
+        rows.forEach((row) => {
+          const name = row.getAttribute("data-name");
+          const employeeId = row.getAttribute("data-id");
+
+          // Kiểm tra nếu tên hoặc mã nhân viên chứa từ khóa tìm kiếm
+          if (name.includes(searchTerm) || employeeId.includes(searchTerm)) {
+            row.style.display = ""; // Hiển thị hàng
+          } else {
+            row.style.display = "none"; // Ẩn hàng
+          }
+        });
+      }
     </script>
   </body>
 </html>

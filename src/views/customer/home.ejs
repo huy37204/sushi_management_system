@@ -61,39 +61,8 @@
         <img src="/imgs/4-dish.png" alt="4 dish image" />
       </div>
     </div>
-    <div class="w-full bg-[#143B36] pt-[139px] px-[11%] py-10">
-      <!-- Tiêu đề -->
-      <div class="container mx-auto py-10">
-        <!-- Tiêu đề -->
-        <h1 class="text-center text-white text-4xl font-bold mb-6">
-          Thực đơn của chúng tôi
-        </h1>
-
-        <!-- Tabs -->
-        <div class="flex justify-center space-x-4 mb-8">
-          <button
-            class="tab-btn px-6 py-2 border rounded-lg text-white hover:bg-[#D69C52]"
-            onclick="showCategory('all')"
-          >
-            Tất cả
-          </button>
-          <% Object.keys(menuData).forEach(category=> { %>
-          <button
-            class="tab-btn px-6 py-2 border rounded-lg text-white hover:bg-[#D69C52]"
-            onclick="showCategory('<%= category %>')"
-          >
-            <%= category==="appetizers" ? "Khai vị" : category==="mainCourses" ?
-            "Món chính" : category==="soups" ? "Canh - Tiềm - Súp" : category %>
-          </button>
-          <% }); %>
-        </div>
-
-        <!-- Danh sách món ăn -->
-        <%- include('../components/selectDish.ejs') %>
-      </div>
-    </div>
     <%- include('../partials/customer/footer.ejs') %>
-    <%-include('../partials/customer/float_button.ejs') %>
+    <%- include('../partials/customer/float_button.ejs') %>
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
@@ -149,60 +118,72 @@
       src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
     ></script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const observerOptions = {
-          threshold: 0.3, // Hiển thị khi 30% phần tử đã vào viewport
-        };
+            document.addEventListener("DOMContentLoaded", () => {
+              const observerOptions = {
+                threshold: 0.3, // Hiển thị khi 30% phần tử đã vào viewport
+              };
 
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("show");
+              const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                  if (entry.isIntersecting) {
+                    entry.target.classList.add("show");
+                  }
+                });
+              }, observerOptions);
+
+              // Thêm lớp "show" ngay khi tải trang để kích hoạt hiệu ứng cho các phần tử
+              document
+                .querySelectorAll(".slide-in-left, .slide-in-right, .slide-in-up")
+                .forEach((el) => {
+                  el.classList.add("show");
+                });
+
+              // Sau đó, tiếp tục quan sát các phần tử để bắt đầu hiệu ứng khi chúng vào viewport
+              document
+                .querySelectorAll(".slide-in-left, .slide-in-right, .slide-in-up")
+                .forEach((el) => {
+                  observer.observe(el);
+                });
+            });
+
+            // Lắng nghe sự kiện cuộn trang
+            window.addEventListener("scroll", function () {
+              const scrollUpBtn = document.getElementById("scrollUpBtn");
+              const navbar = document.getElementById("navbar");
+              const navbarHeight = navbar ? navbar.offsetHeight : 0; // Chiều cao của navbar nếu có
+
+              // Kiểm tra nếu trang cuộn xuống qua navbar
+              if (window.scrollY > navbarHeight) {
+                scrollUpBtn.classList.remove("opacity-0", "pointer-events-none"); // Hiển thị nút cuộn lên
+                scrollUpBtn.classList.add("opacity-100", "pointer-events-auto"); // Kích hoạt sự kiện click
+              } else {
+                scrollUpBtn.classList.add("opacity-0", "pointer-events-none"); // Ẩn nút cuộn lên
+                scrollUpBtn.classList.remove("opacity-100", "pointer-events-auto");
+              }
+            });
+            function showCategory(category) {
+              document.querySelectorAll(".menu-category").forEach((cat) => {
+                cat.style.display = "none"; // Ẩn tất cả danh mục
+              });
+              document.querySelector(`.${category}`).style.display = "block"; // Hiển thị danh mục được chọn
             }
-          });
-        }, observerOptions);
-
-        // Thêm lớp "show" ngay khi tải trang để kích hoạt hiệu ứng cho các phần tử
-        document
-          .querySelectorAll(".slide-in-left, .slide-in-right, .slide-in-up")
-          .forEach((el) => {
-            el.classList.add("show");
-          });
-
-        // Sau đó, tiếp tục quan sát các phần tử để bắt đầu hiệu ứng khi chúng vào viewport
-        document
-          .querySelectorAll(".slide-in-left, .slide-in-right, .slide-in-up")
-          .forEach((el) => {
-            observer.observe(el);
-          });
-      });
-
-      // Lắng nghe sự kiện cuộn trang
-      window.addEventListener("scroll", function () {
-        const scrollUpBtn = document.getElementById("scrollUpBtn");
-        const navbar = document.getElementById("navbar");
-        const navbarHeight = navbar ? navbar.offsetHeight : 0; // Chiều cao của navbar nếu có
-
-        // Kiểm tra nếu trang cuộn xuống qua navbar
-        if (window.scrollY > navbarHeight) {
-          scrollUpBtn.classList.remove("opacity-0", "pointer-events-none"); // Hiển thị nút cuộn lên
-          scrollUpBtn.classList.add("opacity-100", "pointer-events-auto"); // Kích hoạt sự kiện click
-        } else {
-          scrollUpBtn.classList.add("opacity-0", "pointer-events-none"); // Ẩn nút cuộn lên
-          scrollUpBtn.classList.remove("opacity-100", "pointer-events-auto");
-        }
-      });
-      function showCategory(category) {
-        document.querySelectorAll(".menu-category").forEach((cat) => {
-          cat.style.display = "none"; // Ẩn tất cả danh mục
-        });
-        document.querySelector(`.${category}`).style.display = "block"; // Hiển thị danh mục được chọn
-      }
 
       // Hiển thị mặc định danh mục "Tất cả" khi tải trang
       const user = <%- JSON.stringify(user) %>;
       document.addEventListener("DOMContentLoaded", () => {
         showCategory("all");
+      });
+      document.addEventListener("DOMContentLoaded", () => {
+        const bookingButton = document.getElementById("booking-button");
+
+        bookingButton.addEventListener("click", () => {
+          if (!user) {
+            alert("Bạn cần đăng nhập để đặt bàn.");
+            window.location.href = "/login"; // Chuyển hướng đến trang đăng nhập
+          } else {
+            window.location.href = "/table-booking"; // Chuyển hướng đến trang đặt bàn
+          }
+        });
       });
       document.addEventListener("DOMContentLoaded", () => {
         const bookingButton = document.getElementById("booking-button");

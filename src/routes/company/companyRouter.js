@@ -3,7 +3,7 @@ import express from "express";
 import { verifyRole } from "../../middlewares/authMiddlewares.js";
 
 const companyRouter = express.Router();
-const companyRole = "Quản lý công ty";
+const companyRole = "QUẢN LÝ CÔNG TY";
 companyRouter.get(PATH.HOME, verifyRole(companyRole), (req, res) => {
   res.render("company/company_home");
 });

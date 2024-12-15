@@ -1,0 +1,24 @@
+CREATE PROC getRevenueByDate
+	@DATE DATE,
+	@BranchId CHAR(4)
+AS
+BEGIN
+	SELECT * FROM INVOICE I
+	JOIN ORDER_ O ON O.ORDER_ID = I.ORDER_ID AND O.BRANCH_ID = @BranchId
+	WHERE I.ISSUE_DATE = @DATE
+END
+
+GO
+CREATE PROC getRevenueByMonth
+    @Year INT,
+    @Month INT,
+    @BranchId CHAR(4)
+AS
+
+EXEC getRevenueByMonth @Year = '1997', @Month = '7', @BranchId = 'B003'
+BEGIN
+    SELECT *
+    FROM INVOICE I
+    JOIN ORDER_ O ON I.ORDER_ID = O.ORDER_ID AND O.BRANCH_ID = @BranchId
+    WHERE YEAR(I.ISSUE_DATE) = @Year AND MONTH(I.ISSUE_DATE) = @Month;
+END;
