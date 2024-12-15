@@ -308,13 +308,9 @@
           confirmationModal.classList.add("hidden");
           successModal.classList.remove("hidden");
 
-          // Đặt timeout để redirect sau 5 giây
           setTimeout(() => {
-            window.location.href = "/"; // Chuyển hướng về trang "/"
+            form.submit();
           }, 3000);
-
-          // Bạn có thể gửi form ở đây nếu cần server xử lý
-          // form.submit();
         });
       });
     </script>

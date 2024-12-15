@@ -4,18 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cửa hàng - Dola Sushi - Sushi Restaurant</title>
-    <link rel="stylesheet" href="css/output.css" />
-
+    <link rel="stylesheet" href="/css/output.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Akaya+Kanadaka&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
       rel="stylesheet"
     />
   </head>
@@ -23,39 +16,13 @@
   <body class="bg-[#143B36]">
     <%- include('../partials/customer/header.ejs') %> <%-
     include('../partials/customer/page_flow.ejs') %>
+
     <div class="flex pt-20 space-x-4 bg-cover bg-center">
       <!-- Sidebar -->
       <aside class="w-1/4">
         <div class="h-1/3 border-yellow-600 border-4 rounded mb-4">
           <div
             class="text-xl font-semibold mb-4 text-[#fbfbfb] bg-[#D69C52] py-2 rounded-lg"
-          >
-            <h2>DANH MỤC SẢN PHẨM</h2>
-          </div>
-          <ul>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]"
-                >Món chính</a
-              >
-            </li>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]"
-                >Khai vị</a
-              >
-            </li>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]">Menu</a>
-            </li>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]"
-                >Sashimi combo</a
-              >
-            </li>
-          </ul>
-        </div>
-        <div class="h-1/3 border-yellow-600 border-4 rounded mb-4">
-          <div
-            class="text-xl font-semibold mb-4 text-[#fbfbfb] bg-[#D69C52] rounded-lg py-2 space-y-4"
           >
             <h2>DANH MỤC SẢN PHẨM</h2>
           </div>
@@ -87,21 +54,111 @@
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-2xl font-semibold text-[#D69C52]">TẤT CẢ MÓN ĂN</h2>
           <div class="flex items-center bg-[#D69C52] px-4 py-2 rounded-lg">
-            <label class="text-[#fbfbfb] mr-2">Sắp xếp theo:</label>
-            <select class="bg-[#D69C52] px-4 py-2 rounded-lg text-[#ffffff]">
-              <option class="bg-slate-200" value="option1">Tùy chọn 1</option>
-              <option class="bg-slate-200" value="option2">Tùy chọn 2</option>
-              <option class="bg-slate-200" value="option3">Tùy chọn 3</option>
+            <label class="text-[#fbfbfb] mr-2">Chọn chi nhánh:</label>
+            <select
+              id="branch-select"
+              class="bg-[#D69C52] px-4 py-2 rounded-lg text-[#ffffff]"
+            >
+              <option value="">Chọn chi nhánh</option>
+              <% branches.forEach(branch => { %>
+              <option value="<%= branch.BRANCH_ID %>">
+                <%= branch.BRANCH_NAME %>
+              </option>
+              <% }) %>
             </select>
+            <button
+              onclick="filterMenuByBranch()"
+              class="ml-2 bg-[#D69C52] text-white px-4 py-2 rounded-lg"
+            >
+              Xem Menu
+            </button>
           </div>
         </div>
 
         <!-- Products -->
-        <%- include('../components/selectDish.ejs') %>
+        <div id="menu-items" style="display: none">
+          <div class="grid grid-cols-4 gap-6" id="dishes-container">
+            <!-- Món ăn sẽ được cập nhật ở đây -->
+          </div>
+        </div>
+
+        <div id="no-branch-message" class="text-white" style="display: none">
+          <p>Vui lòng chọn chi nhánh để xem menu.</p>
+        </div>
+
+        <%- include('../partials/customer/footer.ejs') %>
+        <%- include('../partials/customer/float_button.ejs') %>
+
+        <script>
+          async function filterMenuByBranch() {
+            const branchId = document.getElementById("branch-select").value;
+            const menuItems = document.getElementById("menu-items");
+            const noBranchMessage =
+              document.getElementById("no-branch-message");
+            const dishesContainer = document.getElementById("dishes-container");
+
+            if (branchId) {
+              menuItems.style.display = "block";
+              noBranchMessage.style.display = "none";
+
+              try {
+                const response = await fetch(`/menu?branchId=${branchId}`);
+                if (!response.ok) {
+                  throw new Error("Network response was not ok");
+                }
+
+                const data = await response.json();
+
+                // Xóa nội dung cũ
+                dishesContainer.innerHTML = "";
+
+                if (data && data.length > 0) {
+                  console.log(data);
+                  data.forEach((category) => {
+                    const categoryTitle = document.createElement("h3");
+                    categoryTitle.className =
+                      "text-lg font-semibold text-gray-800 mb-2";
+                    categoryTitle.innerText = category.categoryName;
+                    dishesContainer.appendChild(categoryTitle);
+
+                    if (category.dishes && category.dishes.length > 0) {
+                      category.dishes.forEach((dish) => {
+                        const dishCard = document.createElement("div");
+                        dishCard.className =
+                          "dish-card border rounded-lg p-4 text-center bg-white";
+
+                        dishCard.innerHTML = `
+                <img src="" alt="${dish.DISH_NAME}" class="w-full h-40 object-cover rounded-md mb-4" />
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">${dish.DISH_NAME}</h3>
+                <p class="text-red-500 text-lg font-bold">${dish.DISH_PRICE.toLocaleString(
+                  "vi-VN",
+                )}đ</p>
+                <button class="bg-[#D69C52] text-white px-4 py-2 rounded-lg mt-2">Xem chi tiết</button>
+              `;
+
+                        dishesContainer.appendChild(dishCard);
+                      });
+                    } else {
+                      dishesContainer.innerHTML +=
+                        '<p class="text-gray-500">Không có món nào trong danh mục này.</p>';
+                    }
+                  });
+                } else {
+                  dishesContainer.innerHTML =
+                    '<p class="text-gray-500">Không có món nào trong danh mục này.</p>';
+                }
+              } catch (error) {
+                console.error("Error fetching menu:", error);
+                dishesContainer.innerHTML =
+                  '<p class="text-red-500">Lỗi khi tải menu.</p>';
+              }
+            } else {
+              menuItems.style.display = "none";
+              noBranchMessage.style.display = "block";
+            }
+          }
+        </script>
       </main>
     </div>
-    <%- include('../partials/customer/footer.ejs') %>
-    <%-
-    include('../partials/customer/float_button.ejs') %>
   </body>
 </html>

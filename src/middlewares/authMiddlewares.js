@@ -2,7 +2,6 @@ export const verifyRole = (roles) => {
   return (req, res, next) => {
     const role = req.user ? req.user.role : "Khách hàng";
 
-    console.log(role);
     if (roles.includes(role)) {
       next();
     } else {

@@ -44,7 +44,7 @@
 
         <!-- Search Form -->
         <form
-          class="bg-white p-6 mt-6 rounded-lg shadow-md grid grid-cols-1 md:grid-cols-4 gap-4 items-center"
+          class="bg-white p-6 mt-6 rounded-lg shadow-md items-end"
           id="searchForm"
         >
           <!-- Employee ID -->
@@ -53,70 +53,130 @@
               for="employeeId"
               class="block text-sm font-medium text-gray-700"
             >
-              Employee ID
+              Thông tin nhân viên
             </label>
             <input
               type="text"
-              id="employeeId"
-              name="employeeId"
+              id="employeeInfo"
+              name="employeeInfo"
               class="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="Enter Employee ID"
+              placeholder="Nhập tên, mã nhân viên"
             />
           </div>
 
-          <!-- Day -->
-          <div>
-            <label for="day" class="block text-sm font-medium text-gray-700">
-              Ngày
-            </label>
-            <select
-              id="day"
-              name="day"
-              class="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            >
-              <option value="">Chọn ngày</option>
-              <% for (let d = 1; d <= 31; d++) { %>
-              <option value="<%= d %>"><%= d %></option>
-              <% } %>
-            </select>
-          </div>
+          <div class="w-full mt-4">
+            <label for="">Xem điểm phục vụ cuối mỗi:</label>
 
-          <!-- Month -->
-          <div>
-            <label for="month" class="block text-sm font-medium text-gray-700">
-              Tháng
-            </label>
-            <select
-              id="month"
-              name="month"
-              class="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            >
-              <option value="">Chọn tháng</option>
-              <% for (let m = 1; m <= 12; m++) { %>
-              <option value="<%= m %>">Month <%= m %></option>
-              <% } %>
-            </select>
-          </div>
+            <div class="flex space-x-4 items-end mb-[40px] mt-4">
+              <!-- Chọn năm -->
+              <div>
+                <div>Chọn năm:</div>
+                <select
+                  name="year"
+                  id="select-year-for-month"
+                  class="border rounded-md py-2 px-4"
+                  required
+                >
+                  <script>
+                    const currentYear = new Date().getFullYear();
+                    for (let i = 1997; i <= currentYear; i++) {
+                      let option = document.createElement("option");
+                      option.value = i; // Đặt giá trị là số năm
+                      option.textContent = "Năm " + i;
+                      if (i === currentYear) {
+                        option.selected = true; // Set current year as selected
+                      }
+                      document
+                        .getElementById("select-year-for-month")
+                        .appendChild(option);
+                    }
+                  </script>
+                </select>
+              </div>
 
-          <!-- Year -->
-          <div>
-            <label for="year" class="block text-sm font-medium text-gray-700">
-              Năm
-            </label>
-            <select
-              id="year"
-              name="year"
-              class="mt-1 px-4 py-2 w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            >
-              <option value="">Chọn năm</option>
-              <% for (let y = 2020; y <= 2030; y++) { %>
-              <option value="<%= y %>"><%= y %></option>
-              <% } %>
-            </select>
+              <!-- Chọn tháng -->
+              <div id="month-container" class="hidden">
+                <div>Chọn tháng:</div>
+                <select
+                  name="month"
+                  id="select-month"
+                  class="border rounded-md py-2 px-4"
+                  required
+                >
+                  <script>
+                    const months = [
+                      "Tháng 1",
+                      "Tháng 2",
+                      "Tháng 3",
+                      "Tháng 4",
+                      "Tháng 5",
+                      "Tháng 6",
+                      "Tháng 7",
+                      "Tháng 8",
+                      "Tháng 9",
+                      "Tháng 10",
+                      "Tháng 11",
+                      "Tháng 12",
+                    ];
+                    months.forEach((month, index) => {
+                      let option = document.createElement("option");
+                      option.value = index + 1; // Giá trị là số tháng (1-12)
+                      option.textContent = month;
+                      if (index === new Date().getMonth()) {
+                        option.selected = true; // Set current month as selected
+                      }
+                      document
+                        .getElementById("select-month")
+                        .appendChild(option);
+                    });
+                  </script>
+                </select>
+              </div>
+
+              <!-- Chọn quý -->
+              <div id="quarter-container" class="hidden">
+                <div>Chọn quý:</div>
+                <select
+                  id="select-quarter"
+                  name="quarter"
+                  class="border rounded-md py-2 px-4"
+                  required
+                >
+                  <option value="1">Quý 1</option>
+                  <option value="2">Quý 2</option>
+                  <option value="3">Quý 3</option>
+                  <option value="4">Quý 4</option>
+                </select>
+              </div>
+
+              <!-- Chọn ngày -->
+              <div id="date-container" class="hidden">
+                <div>Chọn ngày:</div>
+                <input
+                  type="date"
+                  name="date"
+                  class="border rounded-md py-2 px-4"
+                />
+              </div>
+
+              <!-- Select loại thời gian -->
+              <div>
+                <select
+                  name="select-type"
+                  id="select-type"
+                  class="border rounded-md py-2 px-4"
+                >
+                  <option value="date">Cuối ngày</option>
+                  <option value="month">Cuối tháng</option>
+                  <option value="quarter">Cuối quý</option>
+                  <option value="year">Cuối năm</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           <!-- Search Button -->
-          <div class="md:col-span-4">
+          <div class="">
             <button
               type="submit"
               class="w-full py-2 bg-blue-600 text-white font-semibold rounded-md shadow hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
@@ -177,51 +237,33 @@
 
     <script>
       document
-        .getElementById("searchForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
+        .getElementById("select-type")
+        .addEventListener("change", function () {
+          const type = this.value;
 
-          // Get form data
-          const employeeId = document.getElementById("employeeId").value;
-          const day = document.getElementById("day").value;
-          const month = document.getElementById("month").value;
-          const year = document.getElementById("year").value;
+          // Ẩn tất cả các phần tử
+          document.getElementById("month-container").classList.add("hidden");
+          document.getElementById("quarter-container").classList.add("hidden");
+          document.getElementById("date-container").classList.add("hidden");
 
-          // Mock search result
-          const results = [
-            {
-              id: "EMP001",
-              name: "John Doe",
-              department: "IT",
-              salary: "33.33",
-            },
-            {
-              id: "EMP002",
-              name: "Jane Smith",
-              department: "HR",
-              salary: "33.33",
-            },
-          ];
-
-          // Clear existing table rows
-          const resultsTable = document.getElementById("resultsTable");
-          resultsTable.innerHTML = "";
-
-          // Render search results
-          results.forEach((result) => {
-            const row = `
-                        <tr class="hover:bg-gray-100">
-                            <td class="px-4 py-3 text-center text-sm text-gray-600 border-b">${result.id}</td>
-                            <td class="px-4 py-3 text-center text-sm text-gray-600 border-b">${result.name}</td>
-                            <td class="px-4 py-3 text-center text-sm text-gray-600 border-b">${result.department}</td>
-                            <td class="px-4 py-3 text-center text-sm text-gray-600 border-b">${result.salary}</td>
-                        </tr>
-                    `;
-            resultsTable.innerHTML += row;
-          });
-
-          // Show results section
-          document.getElementById("searchResults").style.display = "block";
+          // Hiện phần tử tương ứng
+          if (type === "date") {
+            document
+              .getElementById("date-container")
+              .classList.remove("hidden");
+          } else if (type === "month") {
+            document
+              .getElementById("month-container")
+              .classList.remove("hidden");
+          } else if (type === "quarter") {
+            document
+              .getElementById("quarter-container")
+              .classList.remove("hidden");
+          } else if (type === "year") {
+            document
+              .getElementById("year-container")
+              .classList.remove("hidden");
+          }
         });
     </script>
   </body>

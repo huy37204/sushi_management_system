@@ -73,150 +73,187 @@
                 </button>
               </div>
             </div>
-
             <div
-              class="select-time-container select-for-day-container space-x-4 items-center hidden"
+              class="select-time-container hidden select-for-day-container space-x-4 items-center"
             >
-              <div>Chọn tháng:</div>
-              <select
-                name=""
-                id="select-month"
-                class="border border-[#2AC18F] rounded-md py-2 px-4"
-                onchange="updateChart('day')"
-                required
-              >
-                <script>
-                  const currentMonth = new Date().getMonth() + 1; // Get current month (1-12)
-                  for (let i = 1; i <= 12; i++) {
-                    let option = document.createElement("option");
-                    option.value = i; // Đặt giá trị là số tháng để dễ xử lý
-                    option.textContent = "Tháng " + i;
-                    if (i === currentMonth) {
-                      option.selected = true; // Set current month as selected
-                    }
-                    document.getElementById("select-month").appendChild(option);
-                  }
-                </script>
-              </select>
-
-              <div>Chọn năm:</div>
-              <select
-                name=""
-                id="select-year"
-                class="border border-[#2AC18F] rounded-md py-2 px-4"
-                onchange="updateChart('day')"
-                required
-              >
-                <script>
-                  const currentYear = new Date().getFullYear();
-                  for (let i = 2000; i <= currentYear; i++) {
-                    let option = document.createElement("option");
-                    option.value = i; // Đặt giá trị là số tháng để dễ xử lý
-                    option.textContent = "Năm " + i;
-                    if (i === currentYear) {
-                      option.selected = true; // Set current month as selected
-                    }
-                    document.getElementById("select-year").appendChild(option);
-                  }
-                </script>
-              </select>
+              <form action="/branch/<%= branchId %>/date-revenue" method="POST">
+                <label for="selectDate">Chọn ngày:</label>
+                <input
+                  type="date"
+                  id="selectDate"
+                  name="selectDate"
+                  class="border border-[#2AC18F] rounded-md py-2 px-4"
+                  required
+                />
+                <button
+                  type="submit"
+                  class="bg-[#2AC18F] hover:bg-[#4bdfae] rounded-lg px-4 py-2 font-bold"
+                >
+                  Tìm kiếm
+                </button>
+              </form>
             </div>
             <div
               class="select-time-container select-for-month-container space-x-4 items-center hidden"
             >
-              <div>Chọn năm:</div>
-              <select
-                name=""
-                id="select-year-for-month"
-                class="border border-[#F7798F] rounded-md py-2 px-4"
-                onchange="updateChart('month')"
-                required
+              <form
+                action="/branch/<%= branchId %>/month-revenue"
+                method="POST"
+                class="flex space-x-4 items-center"
               >
-                <script>
-                  for (let i = 2000; i <= currentYear; i++) {
-                    let option = document.createElement("option");
-                    option.value = i; // Đặt giá trị là số tháng để dễ xử lý
-                    option.textContent = "Năm " + i;
-                    if (i === currentYear) {
-                      option.selected = true; // Set current month as selected
+                <!-- Chọn năm -->
+                <div>Chọn năm:</div>
+                <select
+                  name="year"
+                  id="select-year-for-month"
+                  class="border border-[#F7798F] rounded-md py-2 px-4"
+                  required
+                >
+                  <script>
+                    const currentYear = new Date().getFullYear();
+                    for (let i = 1997; i <= currentYear; i++) {
+                      let option = document.createElement("option");
+                      option.value = i; // Đặt giá trị là số năm
+                      option.textContent = "Năm " + i;
+                      if (i === currentYear) {
+                        option.selected = true; // Set current year as selected
+                      }
+                      document
+                        .getElementById("select-year-for-month")
+                        .appendChild(option);
                     }
-                    document
-                      .getElementById("select-year-for-month")
-                      .appendChild(option);
-                  }
-                </script>
-              </select>
+                  </script>
+                </select>
+
+                <!-- Chọn tháng -->
+                <div>Chọn tháng:</div>
+                <select
+                  name="month"
+                  id="select-month"
+                  class="border border-[#F7798F] rounded-md py-2 px-4"
+                  required
+                >
+                  <script>
+                    const months = [
+                      "Tháng 1",
+                      "Tháng 2",
+                      "Tháng 3",
+                      "Tháng 4",
+                      "Tháng 5",
+                      "Tháng 6",
+                      "Tháng 7",
+                      "Tháng 8",
+                      "Tháng 9",
+                      "Tháng 10",
+                      "Tháng 11",
+                      "Tháng 12",
+                    ];
+                    months.forEach((month, index) => {
+                      let option = document.createElement("option");
+                      option.value = index + 1; // Giá trị là số tháng (1-12)
+                      option.textContent = month;
+                      if (index === new Date().getMonth()) {
+                        option.selected = true; // Set current month as selected
+                      }
+                      document
+                        .getElementById("select-month")
+                        .appendChild(option);
+                    });
+                  </script>
+                </select>
+                <button
+                  type="submit"
+                  class="bg-[#F7798F] hover:bg-[#f88ea0] rounded-lg px-4 py-2 font-bold"
+                >
+                  Tìm kiếm
+                </button>
+              </form>
             </div>
             <div
               class="select-time-container select-for-quarter-container hidden space-x-4 items-center"
             >
-              <div>Chọn năm:</div>
-              <select
-                name=""
-                id="select-year-for-quarter"
-                class="border border-[#CF4AC4] rounded-md py-2 px-4"
-                onchange="updateChart('quarter')"
-                required
+              <form
+                action="/branch/<%= branchId %>/quarter-revenue"
+                method="POST"
+                class="flex space-x-4 items-center"
               >
-                <script>
-                  for (let i = 2000; i <= currentYear; i++) {
-                    let option = document.createElement("option");
-                    option.value = i; // Đặt giá trị là số tháng để dễ xử lý
-                    option.textContent = "Năm " + i;
-                    if (i === currentYear) {
-                      option.selected = true; // Set current month as selected
+                <div>Chọn năm:</div>
+                <select
+                  id="select-year-for-quarter"
+                  name="year"
+                  class="border border-[#CF4AC4] rounded-md py-2 px-4"
+                  required
+                >
+                  <script>
+                    // Chạy vòng lặp để tạo các tùy chọn năm
+                    for (let i = 1997; i <= currentYear; i++) {
+                      let option = document.createElement("option");
+                      option.value = i;
+                      option.textContent = "Năm " + i;
+                      if (i === currentYear) {
+                        option.selected = true;
+                      }
+                      document
+                        .getElementById("select-year-for-quarter")
+                        .appendChild(option);
                     }
-                    document
-                      .getElementById("select-year-for-quarter")
-                      .appendChild(option);
-                  }
-                </script>
-              </select>
+                  </script>
+                </select>
+
+                <div class="ml-4">Chọn quý:</div>
+                <select
+                  id="select-quarter"
+                  name="quarter"
+                  class="border border-[#CF4AC4] rounded-md py-2 px-4"
+                  required
+                >
+                  <option value="1">Quý 1</option>
+                  <option value="2">Quý 2</option>
+                  <option value="3">Quý 3</option>
+                  <option value="4">Quý 4</option>
+                </select>
+                <button
+                  type="submit"
+                  class="bg-[#CF4AC4] hover:bg-[#da64d0] rounded-lg px-4 py-2 text-white font-bold"
+                >
+                  Tìm kiếm
+                </button>
+              </form>
             </div>
             <div
               class="select-time-container select-for-year-container hidden space-x-4 items-center"
             >
-              <div>Năm bắt đầu</div>
-              <select
-                name=""
-                id="start-year"
-                class="border border-indigo-600 rounded-md py-2 px-4"
-                onchange="updateChart('year')"
-                required
+              <form
+                action="/branch/<%= branchId %>/year-revenue"
+                method="POST"
+                class="flex space-x-4 items-center"
               >
-                <script>
-                  for (let i = 2000; i <= currentYear; i++) {
-                    let option = document.createElement("option");
-                    option.value = i; // Đặt giá trị là số tháng để dễ xử lý
-                    option.textContent = "Năm " + i;
-                    if (i === currentYear) {
-                      option.selected = true; // Set current month as selected
+                <div>Chọn năm</div>
+                <select
+                  name="year"
+                  id="year"
+                  class="border border-[#5850ec] rounded-md py-2 px-4"
+                  required
+                >
+                  <script>
+                    for (let i = 1997; i <= currentYear; i++) {
+                      let option = document.createElement("option");
+                      option.value = i; // Đặt giá trị là số tháng để dễ xử lý
+                      option.textContent = "Năm " + i;
+                      if (i === currentYear) {
+                        option.selected = true; // Set current month as selected
+                      }
+                      document.getElementById("year").appendChild(option);
                     }
-                    document.getElementById("start-year").appendChild(option);
-                  }
-                </script>
-              </select>
-
-              <div>Năm kết thúc:</div>
-              <select
-                name=""
-                id="end-year"
-                class="border border-indigo-600 rounded-md py-2 px-4"
-                onchange="updateChart('year')"
-                required
-              >
-                <script>
-                  for (let i = 2000; i <= currentYear; i++) {
-                    let option = document.createElement("option");
-                    option.value = i; // Đặt giá trị là số tháng để dễ xử lý
-                    option.textContent = "Năm " + i;
-                    if (i === currentYear) {
-                      option.selected = true; // Set current month as selected
-                    }
-                    document.getElementById("end-year").appendChild(option);
-                  }
-                </script>
-              </select>
+                  </script>
+                </select>
+                <button
+                  type="submit"
+                  class="bg-[#5850ec] hover:bg-[#6c65f0] rounded-lg px-4 py-2 text-white font-bold"
+                >
+                  Tìm kiếm
+                </button>
+              </form>
             </div>
             <div
               class="w-[30%] mb-4 text-center rounded-md border border-dashed border-gray-200 p-4 mx-auto mt-5"
@@ -273,28 +310,30 @@
                 </ul>
               </div>
             </div>
-            <div class="overflow-x-auto">
-              <table class="w-full min-w-[460px]">
+            <div class="overflow-y-auto max-h-[704px]">
+              <table class="w-full">
                 <thead>
                   <tr>
                     <th
                       class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md"
                     >
-                      Giai đoạn
+                      Invoice ID
+                    </th>
+                    <th
+                      class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left"
+                    >
+                      Thời gian
                     </th>
                     <th
                       class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-center"
                     >
                       Số tiền
                     </th>
-                    <th
-                      class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 rounded-tr-md rounded-br-md text-center"
-                    >
-                      Status
-                    </th>
                   </tr>
                 </thead>
+
                 <tbody>
+                  <% invoices.forEach((invoice) => { %>
                   <tr>
                     <td
                       class="py-2 px-[10px] border-b border-b-gray-50 text-start"
@@ -303,50 +342,27 @@
                         <a
                           href="#"
                           class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate"
-                          >Ngày 1</a
                         >
+                          <%= invoice.INVOICE_ID %>
+                        </a>
                       </div>
                     </td>
-
                     <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span class="text-[13px] font-medium text-emerald-500"
-                        >+ 3.000.000 VNĐ</span
-                      >
+                      <span class="text-[13px] font-medium text-[#b4b4b4]">
+                        <%= new Date(invoice.ISSUE_TIME).toLocaleString("vi-VN")
+                        %>
+                      </span>
                     </td>
-                    <td class="border-b border-b-gray-50 text-center">
+                    <td class="py-2 px-4 border-b border-b-gray-50 text-center">
                       <span
                         class="inline-block p-1 rounded bg-emerald-500/10 text-emerald-500 font-medium text-[12px] leading-none"
-                        >Pending</span
                       >
+                        <%= invoice.FINAL_AMOUNT.toLocaleString("vi-VN", {
+                        style: "currency", currency: "VND" }) %>
+                      </span>
                     </td>
                   </tr>
-                  <tr>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <div class="flex items-center">
-                        <img
-                          src="https://placehold.co/32x32"
-                          alt=""
-                          class="w-8 h-8 rounded object-cover block"
-                        />
-                        <a
-                          href="#"
-                          class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate"
-                          >Create landing page</a
-                        >
-                      </div>
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span class="text-[13px] font-medium text-rose-500"
-                        >-$235</span
-                      >
-                    </td>
-                    <td class="py-2 px-4 border-b border-b-gray-50">
-                      <span
-                        class="inline-block p-1 rounded bg-rose-500/10 text-rose-500 font-medium text-[12px] leading-none"
-                        >Withdrawn</span
-                      >
-                    </td>
-                  </tr>
+                  <% }) %>
                 </tbody>
               </table>
             </div>
@@ -362,166 +378,241 @@
     <script src="/js/popper.js"></script>
 
     <script>
-      // start: Chart
-      const ctx = document.getElementById("order-chart").getContext("2d");
-      let chart;
+            // start: Chart
+            const hourlyTotals = <%- JSON.stringify(hourlyTotals || []) %>;
+            const dailyTotals = <%- JSON.stringify(dailyTotals || []) %>;
+            const quarter = <%- JSON.stringify(quarter || '0') %>;
+            const monthlyTotals = <%- JSON.stringify(monthlyTotals || []) %>;
+            document.addEventListener("DOMContentLoaded", () => {
+              const ctx = document.getElementById("order-chart").getContext("2d");
 
-      function initChart(labels, month, year) {
-        chart = new Chart(ctx, {
-          type: "line",
+              const type = "<%= type %>";
+              if (type === "date-revenue") {
+                const labels = [
+                  "0-3",
+                  "3-6",
+                  "6-9",
+                  "9-12",
+                  "12-15",
+                  "15-18",
+                  "18-21",
+                  "21-24",
+                ];
+                new Chart(ctx, {
+                  type: "line",
+                  data: {
+                    labels: labels,
+                    datasets: [
+                      {
+                        label: "Doanh thu theo giờ",
+                        data: hourlyTotals,
+                        borderWidth: 1,
+                        fill: true,
+                        pointBackgroundColor: "rgb(16, 185, 129)",
+                        borderColor: "rgb(16, 185, 129)",
+                        backgroundColor: "rgb(16 185 129 / .05)",
+                        tension: 0.2,
+                      },
+                    ],
+                  },
+                  options: {
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                        title: { display: true, text: "Doanh thu (VNĐ)" },
+                      },
+                      x: {
+                        title: { display: true, text: "Khoảng thời gian (giờ)" },
+                      },
+                    },
+                  },
+                });
+              } else if (type === "month-revenue") {
+                const daysInMonth = dailyTotals.length; // Số ngày trong tháng
+                const labels = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+                new Chart(ctx, {
+                  type: "line",
+                  data: {
+                    labels: labels, // Các ngày trong tháng
+                    datasets: [
+                      {
+                        label: "Doanh thu theo tháng",
+                        data: dailyTotals, // Dữ liệu doanh thu theo từng ngày
+                        borderWidth: 1,
+                        fill: true,
+                        pointBackgroundColor: "#F88C9F", // Màu cho điểm trên biểu đồ
+                        borderColor: "#FAA6B5", // Màu đường kẻ
+                        backgroundColor: "rgb(248 121 143 / .05)", // Màu nền nhẹ
+                        tension: 0.2, // Độ cong của đường
+                      },
+                    ],
+                  },
+                  options: {
+                    scales: {
+                      y: {
+                        beginAtZero: true, // Bắt đầu từ 0
+                        title: { display: true, text: "Doanh thu (VNĐ)" }, // Tiêu đề trục Y
+                      },
+                      x: {
+                        title: { display: true, text: "Ngày" }, // Tiêu đề trục X
+                      },
+                    },
+                  },
+                });
+              } else if (type === "quarter-revenue") {
+                console.log(quarter);
+                let labels = [];
+
+                // Xác định các tháng trong quý dựa trên `quarter`
+                if (quarter === "1") {
+                  labels = ["Tháng 1", "Tháng 2", "Tháng 3"]; // Quý 1
+                } else if (quarter === "2") {
+                  labels = ["Tháng 4", "Tháng 5", "Tháng 6"]; // Quý 2
+                } else if (quarter === "3") {
+                  labels = ["Tháng 7", "Tháng 8", "Tháng 9"]; // Quý 3
+                } else if (quarter === "4") {
+                  labels = ["Tháng 10", "Tháng 11", "Tháng 12"]; // Quý 4
+                }
+
+                // Kiểm tra nếu monthlyTotals có 3 phần tử
+                if (monthlyTotals.length !== 3) {
+                  console.warn(
+                    "monthlyTotals không có đủ 3 tháng, vui lòng kiểm tra lại dữ liệu.",
+                  );
+                }
+
+                new Chart(ctx, {
+                  type: "line",
+                  data: {
+                    labels: labels, // Các tháng trong quý
+                    datasets: [
+                      {
+                        label: "Doanh thu theo quý",
+                        data: monthlyTotals, // Dữ liệu doanh thu theo từng tháng trong quý
+                        borderWidth: 1,
+                        fill: true,
+                        pointBackgroundColor: "rgb(207,74,196)", // Màu cho điểm trên biểu đồ
+                        borderColor: "rgb(207,74,196)", // Màu đường kẻ
+                        backgroundColor: "rgb(207 74 196 / .05)", // Màu nền nhẹ
+                        tension: 0.2, // Độ cong của đường
+                      },
+                    ],
+                  },
+                  options: {
+                    scales: {
+                      y: {
+                        beginAtZero: true, // Bắt đầu từ 0
+                        title: { display: true, text: "Doanh thu (VNĐ)" }, // Tiêu đề trục Y
+                      },
+                      x: {
+                        title: { display: true, text: "Tháng" }, // Tiêu đề trục X
+                      },
+                    },
+                  },
+                });
+              } else if (type === "year-revenue") {
+        const labels = [
+          "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
+          "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
+        ];
+
+        // Kiểm tra nếu monthlyTotals có đủ 12 tháng
+        if (monthlyTotals.length !== 12) {
+          console.warn(
+            "monthlyTotals không có đủ 12 tháng, vui lòng kiểm tra lại dữ liệu."
+          );
+        }
+
+        new Chart(ctx, {
+          type: "line", // Chọn loại biểu đồ đường
           data: {
-            labels: labels,
+            labels: labels, // Các tháng trong năm
             datasets: [
               {
-                label: "Tháng " + month + " Năm " + year, // Hiển thị tháng đã chọn
-                data: generateRandomData(30),
-                borderWidth: 1,
-                fill: true,
-                pointBackgroundColor: "rgb(16, 185, 129)",
-                borderColor: "rgb(16, 185, 129)",
-                backgroundColor: "rgb(16 185 129 / .05)",
-                tension: 0.2,
+                label: "Doanh thu theo năm",
+                data: monthlyTotals, // Dữ liệu doanh thu theo từng tháng trong năm
+                borderWidth: 1, // Độ rộng của đường kẻ
+                fill: true, // Điền màu cho không gian dưới đường
+                pointBackgroundColor: "rgb(120,169,249)", // Màu cho điểm trên biểu đồ
+                borderColor: "rgb(120,169,249)", // Màu đường kẻ
+                backgroundColor: "rgb(120,169,249, 0.05)", // Màu nền nhẹ
+                tension: 0.2, // Độ cong của đường
               },
             ],
           },
           options: {
             scales: {
-              y: { beginAtZero: true },
+              y: {
+                beginAtZero: true, // Bắt đầu từ 0
+                title: { display: true, text: "Doanh thu (VNĐ)" }, // Tiêu đề trục Y
+              },
+              x: {
+                title: { display: true, text: "Tháng" }, // Tiêu đề trục X
+              },
             },
           },
         });
       }
-      function updateChart(type) {
-        let labels = [];
-        let labelTitle = "";
-        let borderColor = "";
 
-        switch (type) {
-          case "day": // Select theo ngày
-            const selectedMonth = document.getElementById("select-month").value;
-            const selectedYear = document.getElementById("select-year").value;
-            labels = generateNDays(30, selectedMonth, selectedYear);
-            labelTitle = `Tháng ${selectedMonth} Năm ${selectedYear}`;
-            borderColor = "rgb(16, 185, 129)"; // Màu xanh lá
-            backgroundColor = "rgb(16 185 129 / .05)";
-            break;
+              else {
+                let chart;
+                function initChart(labels, month, year) {
+                  if (chart) chart.destroy();
+                  chart = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                      labels: labels,
+                      datasets: [
+                        {
+                          label: `Tháng ${month} Năm ${year}`,
+                          data: generateRandomData(labels.length),
+                          borderWidth: 1,
+                          fill: true,
+                          pointBackgroundColor: "rgb(16, 185, 129)",
+                          borderColor: "rgb(16, 185, 129)",
+                          backgroundColor: "rgb(16 185 129 / .05)",
+                          tension: 0.2,
+                        },
+                      ],
+                    },
+                    options: {
+                      scales: { y: { beginAtZero: true } },
+                    },
+                  });
+                }
 
-          case "month": // Select theo tháng
-            const selectedYearForMonth = document.getElementById(
-              "select-year-for-month",
-            ).value;
-            labels = generateMonths();
-            labelTitle = `Năm ${selectedYearForMonth}`;
-            borderColor = "rgb(244, 63, 94)";
-            backgroundColor = "rgba(244, 63, 94, 0.05)"; // Màu đỏ
-            break;
+                function generateNDays(days, month) {
+                  const labels = [];
+                  for (let i = 1; i <= days; i++) {
+                    labels.push(`${i}/${month}`);
+                  }
+                  return labels;
+                }
 
-          case "quarter": // Select theo quý
-            const selectedYearForQuarter = document.getElementById(
-              "select-year-for-quarter",
-            ).value;
-            labels = [
-              "1st Quarter",
-              "2nd Quarter",
-              "3rd Quarter",
-              "4th Quarter",
-            ];
-            labelTitle = `Năm ${selectedYearForQuarter}`;
-            borderColor = "rgb(208,78,197)"; //Màu tím
-            backgroundColor = "rgb(208,78,197, 0.05)";
-            break;
+                // Khởi tạo mặc định
+                initChart(
+                  generateNDays(30, new Date().getMonth() + 1),
+                  new Date().getMonth() + 1,
+                  new Date().getFullYear(),
+                );
+              }
+            });
 
-          case "year": // Select theo năm
-            const startYear = document.getElementById("start-year").value;
-            const endYear = document.getElementById("end-year").value;
-            labels = generateYears(parseInt(startYear), parseInt(endYear));
-            labelTitle = `Từ năm ${startYear} đến năm ${endYear}`;
-            borderColor = "rgb(79,70,229)"; // Màu xanh dương
-            backgroundColor = "rgba(79,70,229, 0.05)";
-            break;
-
-          default:
-            console.error("Invalid chart type");
-            return;
-        }
-
-        // Cập nhật dữ liệu biểu đồ
-        chart.data.labels = labels;
-        chart.data.datasets[0].label = labelTitle;
-        chart.data.datasets[0].data = generateRandomData(labels.length); // Dữ liệu ngẫu nhiên phù hợp số lượng nhãn
-        chart.data.datasets[0].borderColor = borderColor;
-        chart.data.datasets[0].backgroundColor = backgroundColor;
-        chart.data.datasets[0].pointBackgroundColor = borderColor;
-        chart.update(); // Cập nhật biểu đồ
-      }
-
-      function generateNDays(n, month) {
-        const data = [];
-        const date = new Date();
-        date.setMonth(month - 1); // Set the month based on selection
-        for (let i = 0; i < n; i++) {
-          date.setDate(i + 1); // Set day within the month
-          data.push(
-            date.toLocaleString("en-US", { month: "short", day: "numeric" }),
-          );
-        }
-        return data;
-      }
-
-      function generateRandomData(n) {
-        const data = [];
-        for (let i = 0; i < n; i++) {
-          data.push(Math.round(Math.random() * 10));
-        }
-        return data;
-      }
-
-      // Hàm tạo mảng các tháng
-      function generateMonths() {
-        return [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "November",
-          "December",
-        ];
-      }
-
-      // Hàm tạo mảng các năm trong khoảng
-      function generateYears(startYear, endYear) {
-        const years = [];
-        for (let i = startYear; i <= endYear; i++) {
-          years.push(i.toString());
-        }
-        return years;
-      }
-
-      // Khởi tạo biểu đồ với tháng hiện tại
-      initChart(
-        generateNDays(30, new Date().getMonth() + 1),
-        new Date().getMonth() + 1,
-        new Date().getFullYear(),
-      );
-      // end: Chart
-
-      // Hide time select
-      function chooseSelectTimeType(className, type) {
-        var container = document.querySelector(`.${className}`);
-        if (container.classList.contains("hidden")) {
-          document
-            .querySelectorAll(".select-time-container")
-            .forEach((el) => el.classList.replace("flex", "hidden"));
-          container.classList.replace("hidden", "flex");
-          updateChart(type);
-        } else container.classList.replace("flex", "hidden");
-      }
+            // Hide time select
+            function chooseSelectTimeType(className, type) {
+              const container = document.querySelector(`.${className}`);
+              if (!container) {
+                console.error(`Element with class "${className}" not found.`);
+                return;
+              }
+              document.querySelectorAll(".select-time-container").forEach((el) => {
+                if (!el.classList.contains(className))
+                  el.classList.replace("flex", "hidden");
+              });
+              container.classList.toggle("hidden");
+              container.classList.toggle("flex");
+            }
     </script>
   </body>
 </html>

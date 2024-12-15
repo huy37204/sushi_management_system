@@ -69,3 +69,6 @@ app.use(router);
 app.listen(port, () => {
   console.log(`Project dang chay o port ${port}`);
 });
+sql.on("error", (err) => {
+  console.error("SQL Error:", err);
+});
