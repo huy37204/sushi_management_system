@@ -1,164 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cửa hàng - Dola Sushi - Sushi Restaurant</title>
-    <link rel="stylesheet" href="/css/output.css" />
+    <link rel="stylesheet" href="css/output.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
       rel="stylesheet"
     />
-  </head>
+</head>
 
-  <body class="bg-[#143B36]">
-    <%- include('../partials/customer/header.ejs') %> <%-
-    include('../partials/customer/page_flow.ejs') %>
+<body class="bg-[#143B36]">
+    <%- include('../partials/customer/header.ejs') %>
+    <%- include('../partials/customer/page_flow.ejs') %>
 
     <div class="flex pt-20 space-x-4 bg-cover bg-center">
-      <!-- Sidebar -->
-      <aside class="w-1/4">
-        <div class="h-1/3 border-yellow-600 border-4 rounded mb-4">
-          <div
-            class="text-xl font-semibold mb-4 text-[#fbfbfb] bg-[#D69C52] py-2 rounded-lg"
-          >
-            <h2>DANH MỤC SẢN PHẨM</h2>
-          </div>
-          <ul>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]"
-                >Món chính</a
-              >
-            </li>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]"
-                >Khai vị</a
-              >
-            </li>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]">Menu</a>
-            </li>
-            <li>
-              <a href="#" class="text-[#fbfbfb] hover:text-[#D69C52]"
-                >Sashimi combo</a
-              >
-            </li>
-          </ul>
-        </div>
-      </aside>
+        <!-- Sidebar -->
+        <aside class="w-1/4">
+            <div class="border-yellow-600 border-4 rounded mb-4">
+                <div class="text-xl font-semibold mb-4 text-[#fbfbfb] bg-[#D69C52] py-2 rounded-lg text-center">
+                    <h2>DANH MỤC SẢN PHẨM</h2>
+                </div>
+                <ul class="space-y-2 text-center">
+                    <% categoriesWithDishes.forEach(category => { %>
+                    <li>
+                        <a href="#<%= category.categoryName.replace(/\s+/g, '-').toLowerCase() %>" class="text-[#fbfbfb] hover:text-[#D69C52]">
+                            <%= category.categoryName %>
+                        </a>
+                    </li>
+                    <% }) %>
+                </ul>
+            </div>
+        </aside>
 
-      <!-- Main Content -->
-      <main class="w-3/4">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-2xl font-semibold text-[#D69C52]">TẤT CẢ MÓN ĂN</h2>
-          <div class="flex items-center bg-[#D69C52] px-4 py-2 rounded-lg">
-            <label class="text-[#fbfbfb] mr-2">Chọn chi nhánh:</label>
-            <select
-              id="branch-select"
-              class="bg-[#D69C52] px-4 py-2 rounded-lg text-[#ffffff]"
-            >
-              <option value="">Chọn chi nhánh</option>
-              <% branches.forEach(branch => { %>
-              <option value="<%= branch.BRANCH_ID %>">
-                <%= branch.BRANCH_NAME %>
-              </option>
-              <% }) %>
-            </select>
-            <button
-              onclick="filterMenuByBranch()"
-              class="ml-2 bg-[#D69C52] text-white px-4 py-2 rounded-lg"
-            >
-              Xem Menu
-            </button>
-          </div>
-        </div>
+        <!-- Main Content -->
+        <main class="w-3/4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center bg-[#D69C52] px-4 py-2 rounded-lg">
+                    <label class="text-[#fbfbfb] mr-2">Chọn chi nhánh:</label>
+                    <form id="branch-form" method="GET" action="/menu">
+                        <select
+                            id="branch-select"
+                            name="branchId"
+                            class="bg-[#fefefe] px-4 py-2 rounded-lg text-[#000000]"
+                            required
+                        >
+                            <option value="" disabled <%= selectedBranchId ? '' : 'selected' %>>Chọn chi nhánh</option>
+                            <% branches.forEach(branch => { %>
+                            <option value="<%= branch.BRANCH_ID %>" <%= selectedBranchId === branch.BRANCH_ID ? 'selected' : '' %> >
+                                <%= branch.BRANCH_NAME %>
+                            </option>
+                            <% }) %>
+                        </select>
+                        <input
+                            type="hidden"
+                            name="branchName"
+                            value="<%= selectedBranchName || '' %>"
+                        />
+                        <button type="submit" class="ml-2 bg-[#D69C52] text-white px-4 py-2 rounded-lg">
+                            Xem Menu
+                        </button>
+                    </form>
+                </div>
 
-        <!-- Products -->
-        <div id="menu-items" style="display: none">
-          <div class="grid grid-cols-4 gap-6" id="dishes-container">
-            <!-- Món ăn sẽ được cập nhật ở đây -->
-          </div>
-        </div>
+                <!-- Tìm kiếm món ăn -->
+                <div class="flex items-center bg-[#D69C52] px-4 py-2 rounded-lg ml-4">
+                    <label class="text-[#fbfbfb] mr-2">Tìm món ăn:</label>
+                    <form id="search-form" method="GET" action="/menu">
+                        <input
+                            type="text"
+                            name="dishName"
+                            placeholder="Nhập tên món ăn"
+                            class="px-4 py-2 rounded-lg"
+                            required
+                        />
+                        <input
+                            type="hidden"
+                            name="branchId"
+                            value="<%= selectedBranchId %>"
+                        />
+                        <button type="submit" class="ml-2 bg-[#D69C52] text-white px-4 py-2 rounded-lg">
+                            Tìm
+                        </button>
+                    </form>
+                </div>
+            </div>
 
-        <div id="no-branch-message" class="text-white" style="display: none">
-          <p>Vui lòng chọn chi nhánh để xem menu.</p>
-        </div>
-
-        <%- include('../partials/customer/footer.ejs') %>
-        <%- include('../partials/customer/float_button.ejs') %>
-
-        <script>
-          async function filterMenuByBranch() {
-            const branchId = document.getElementById("branch-select").value;
-            const menuItems = document.getElementById("menu-items");
-            const noBranchMessage =
-              document.getElementById("no-branch-message");
-            const dishesContainer = document.getElementById("dishes-container");
-
-            if (branchId) {
-              menuItems.style.display = "block";
-              noBranchMessage.style.display = "none";
-
-              try {
-                const response = await fetch(`/menu?branchId=${branchId}`);
-                if (!response.ok) {
-                  throw new Error("Network response was not ok");
-                }
-
-                const data = await response.json();
-
-                // Xóa nội dung cũ
-                dishesContainer.innerHTML = "";
-
-                if (data && data.length > 0) {
-                  console.log(data);
-                  data.forEach((category) => {
-                    const categoryTitle = document.createElement("h3");
-                    categoryTitle.className =
-                      "text-lg font-semibold text-gray-800 mb-2";
-                    categoryTitle.innerText = category.categoryName;
-                    dishesContainer.appendChild(categoryTitle);
-
-                    if (category.dishes && category.dishes.length > 0) {
-                      category.dishes.forEach((dish) => {
-                        const dishCard = document.createElement("div");
-                        dishCard.className =
-                          "dish-card border rounded-lg p-4 text-center bg-white";
-
-                        dishCard.innerHTML = `
-                <img src="" alt="${dish.DISH_NAME}" class="w-full h-40 object-cover rounded-md mb-4" />
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">${dish.DISH_NAME}</h3>
-                <p class="text-red-500 text-lg font-bold">${dish.DISH_PRICE.toLocaleString(
-                  "vi-VN",
-                )}đ</p>
-                <button class="bg-[#D69C52] text-white px-4 py-2 rounded-lg mt-2">Xem chi tiết</button>
-              `;
-
-                        dishesContainer.appendChild(dishCard);
-                      });
-                    } else {
-                      dishesContainer.innerHTML +=
-                        '<p class="text-gray-500">Không có món nào trong danh mục này.</p>';
-                    }
-                  });
-                } else {
-                  dishesContainer.innerHTML =
-                    '<p class="text-gray-500">Không có món nào trong danh mục này.</p>';
-                }
-              } catch (error) {
-                console.error("Error fetching menu:", error);
-                dishesContainer.innerHTML =
-                  '<p class="text-red-500">Lỗi khi tải menu.</p>';
-              }
-            } else {
-              menuItems.style.display = "none";
-              noBranchMessage.style.display = "block";
-            }
-          }
-        </script>
-      </main>
+            <!-- Order Form -->
+            <form id="order-form" method="POST" action="/menu?branchId=<%= selectedBranchId %>">
+                <!-- Products -->
+                <div class="grid grid-cols-1 gap-6" id="dishes-category">
+                    <% categoriesWithDishes.forEach(category => { %>
+                    <h2
+                        id="<%= category.categoryName.replace(/\s+/g, '-').toLowerCase() %>"
+                        class="text-2xl font-semibold text-[#D69C52]"
+                    >
+                        <%= category.categoryName %>
+                    </h2>
+                    <div class="grid grid-cols-4 gap-6" id="dishes-container">
+                        <% if (category.dishes.length === 0) { %>
+                        <p class="text-gray-500">Không có món nào trong danh mục này.</p>
+                        <% } else { %>
+                        <% category.dishes.forEach(dish => { %>
+                        <div class="dish-card border rounded-lg p-4 text-center bg-white">
+                            <img
+                                src=""
+                                alt="<%= dish.DISH_NAME %>"
+                                class="w-full h-40 object-cover rounded-md mb-4"
+                            />
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                                <%= dish.DISH_NAME %>
+                            </h3>
+                            <p class="text-red-500 text-lg font-bold">
+                                <%= dish.DISH_PRICE.toLocaleString("vi-VN") %>đ
+                            </p>
+                            <div class="flex justify-center items-center mt-2">
+                                <button type="button" class="decrement bg-[#D69C52] text-white px-3 py-1 rounded-l-lg">
+                                    -
+                                </button>
+                                <input
+                                    type="text"
+                                    name="dishes[<%= dish.DISH_ID %>]" 
+                                    class="quantity-input w-12 text-center border"
+                                    value="0"
+                                    readonly
+                                    data-dish-id="<%= dish.DISH_ID %>"
+                                />
+                                <button type="button" class="increment bg-[#D69C52] text-white px-3 py-1 rounded-r-lg">
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                        <% }) %>
+                        <% } %>
+                    </div>
+                    <% }) %>
+                </div>
+                <div class="text-right mt-4">
+                    <button id="order-button" type="submit" class="bg-[#D69C52] text-white px-6 py-2 rounded-lg">
+                        Đặt hàng
+                    </button>
+                </div>
+            </form>
+            <div id="no-branch-message" class="text-white" style="display: none">
+                <p>Vui lòng chọn chi nhánh để xem menu.</p>
+            </div>
+        </main>
     </div>
-  </body>
+    <%- include('../partials/customer/footer.ejs') %>
+    <%- include('../partials/customer/float_button.ejs') %>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lấy tất cả các nút tăng và giảm
+            const incrementButtons = document.querySelectorAll('.increment');
+            const decrementButtons = document.querySelectorAll('.decrement');
+    
+            // Xử lý nút tăng
+            incrementButtons.forEach(button => {
+                button.addEventListener('click', event => {
+                    const quantityInput = event.target.closest('.flex').querySelector('.quantity-input');
+                    let currentValue = parseInt(quantityInput.value, 10);
+                    quantityInput.value = currentValue + 1;
+                });
+            });
+    
+            // Xử lý nút giảm
+            decrementButtons.forEach(button => {
+                button.addEventListener('click', event => {
+                    const quantityInput = event.target.closest('.flex').querySelector('.quantity-input');
+                    let currentValue = parseInt(quantityInput.value, 10);
+                    if (currentValue > 0) {
+                        quantityInput.value = currentValue - 1;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
 </html>
