@@ -8,7 +8,10 @@ import {
   orderTableController,
   preorderController,
 } from "../../controllers/orderTable/orderTableController.js";
-import { menuController } from "../../controllers/menuController/getMenu.js";
+import {
+  menuController,
+  deliveryOrder,
+} from "../../controllers/menuController/getMenu.js";
 
 const customerRouter = express.Router();
 const customerRole = "Khách hàng";
@@ -19,7 +22,6 @@ customerRouter.get("/", verifyRole(customerRole), async (req, res) => {
     // Render view và truyền dữ liệu menu vào
     res.render("customer/home", {
       activePage: "home",
-      menuData, // Truyền danh sách menu vào view
       user: req.user || null,
       menuDropDownData,
     });
@@ -40,6 +42,11 @@ customerRouter.get(
   PATH.CUSTOMER.MENU,
   verifyRole(customerRole),
   menuController,
+);
+customerRouter.post(
+  PATH.CUSTOMER.MENU,
+  verifyRole(customerRole),
+  deliveryOrder,
 );
 
 customerRouter.get(
