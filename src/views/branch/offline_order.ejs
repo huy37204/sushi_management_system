@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/branch_home.css" />
+    <link rel="stylesheet" href="/css/output.css" />
+
+    <title>Quản lý phiếu đặt món</title>
+  </head>
+  <body class="text-gray-800 font-inter">
+    <!--sidenav -->
+    <%- include('../partials/branch/branch_side_nav') %>
+    <!-- end sidenav -->
+
+    <main
+      class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-gray-200 min-h-screen transition-all main"
+    >
+      <!-- Navbar -->
+      <%- include('../partials/branch/branch_navbar') %>
+      <!-- End Navbar -->
+
+      <!-- Content -->
+      <div class="mx-10 mt-10">
+        <!-- Title -->
+        <div class="text-[30px] font-semibold text-[#374151]">
+          Tạo phiếu offline
+        </div>
+        <form
+          action="/branch/<%=branchId%>/order-form/offline-order"
+          method="POST"
+        >
+          <div class="flex w-full space-x-4">
+            <div class="flex flex-col w-[50%]">
+              <label for="">Nhập số điện thoại khách hàng</label>
+              <input
+                name="phoneNumber"
+                type="number"
+                placeholder="Nhập số điện thoại..."
+                class="w-full"
+                required
+              />
+            </div>
+            <div class="flex flex-col w-[50%]">
+              <label for="tableNum">Nhập số điện thoại khách hàng</label>
+              <select name="tableNum" id="tableNum">
+                <% tables.forEach((table) => { %>
+                <option value="<%= table.TABLE_NUM %>">
+                  <div>
+                    <strong
+                      >Bàn số
+                      <%=table.TABLE_NUM%></strong
+                    >, Số người tối đa:
+                    <%=table.SEAT_AVAILABLE%>
+                  </div>
+                </option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+          <div class="text-center">
+            <h2 class="text-[40px] font-bold mt-4">Chọn món</h2>
+          </div>
+
+          <div class="flex justify-end mt-8 mb-4">
+            <select
+              name="select-category"
+              id="select-category"
+              class="py-2 rounded-lg"
+            >
+              <option value="all">Tất cả</option>
+              <% categoriesWithDishes.forEach((category) => { %>
+              <option value="<%= category.categoryName %>">
+                <%= category.categoryName %>
+              </option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div id="menu-items">
+            <% categoriesWithDishes.forEach((category) => { %>
+            <div
+              class="category-container mb-12"
+              id="category-<%= category.categoryName %>"
+              style="display: none"
+            >
+              <h2 class="text-2xl font-bold text-black text-center">
+                <%= category.categoryName %>
+              </h2>
+              <div class="menu-category my-10">
+                <div class="grid grid-cols-4 gap-6">
+                  <% category.dishes.forEach((dish) => { %>
+                  <div
+                    class="dish-card border rounded-lg p-4 text-center bg-white flex-col items-center"
+                  >
+                    <img
+                      src="https://sacus.vn/wp-content/uploads/2019/06/no-image.jpg"
+                      alt="<%= dish.DISH_NAME %>"
+                      class="w-full h-40 object-cover rounded-md mb-4"
+                    />
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                      <%= dish.DISH_NAME %>
+                    </h3>
+                    <p class="text-red-500 text-lg font-bold">
+                      <%= dish.DISH_PRICE.toLocaleString('vi-VN') %>đ
+                    </p>
+                    <div class="flex justify-center mt-4">
+                      <input
+                        type="hidden"
+                        name="dishes[<%= dish.dishId %>][id]"
+                        value="<%= dish.DISH_ID %>"
+                      />
+                      <!-- Input số lượng -->
+                      <div class="flex items-center max-w-[8rem]">
+                        <button
+                          type="button"
+                          class="decrement-btn bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none"
+                        >
+                          <svg
+                            class="w-3 h-3 text-gray-900 dark:text-white"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 18 2"
+                          >
+                            <path
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M1 1h16"
+                            />
+                          </svg>
+                        </button>
+                        <input
+                          type="number"
+                          name="dishes[<%= dish.dishId %>][quantity]"
+                          class="quantity-input bg-gray-50 border-x-0 border-gray-300 h-11 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          value="0"
+                          min="0"
+                          max="50"
+                          required
+                        />
+                        <button
+                          type="button"
+                          class="increment-btn bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-e-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none"
+                        >
+                          <svg
+                            class="w-3 h-3 text-gray-900 dark:text-white"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 18 18"
+                          >
+                            <path
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 1v16M1 9h16"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <% }) %>
+                </div>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+
+          <div class="flex justify-center mt-10">
+            <button
+              type="submit"
+              class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-[50px] py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+            >
+              Lưu
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/popper.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const dishCards = document.querySelectorAll(".dish-card");
+
+        dishCards.forEach((card) => {
+          const decrementBtn = card.querySelector(".decrement-btn");
+          const incrementBtn = card.querySelector(".increment-btn");
+          const quantityInput = card.querySelector(".quantity-input");
+
+          decrementBtn.addEventListener("click", () => {
+            let quantity = parseInt(quantityInput.value, 10) || 0;
+            if (quantity > 0) {
+              quantityInput.value = quantity - 1;
+            }
+          });
+
+          incrementBtn.addEventListener("click", () => {
+            let quantity = parseInt(quantityInput.value, 10) || 0;
+            if (quantity < 50) {
+              quantityInput.value = quantity + 1;
+            }
+          });
+        });
+      });
+      document.addEventListener("DOMContentLoaded", () => {
+        const selectCategory = document.getElementById("select-category");
+        const allCategories = document.querySelectorAll(".category-container");
+
+        // Hiển thị tất cả khi chưa chọn
+        showCategory("all");
+
+        // Lắng nghe sự kiện thay đổi của dropdown
+        selectCategory.addEventListener("change", (event) => {
+          const selectedCategory = event.target.value;
+          showCategory(selectedCategory);
+        });
+
+        function showCategory(category) {
+          allCategories.forEach((categoryContainer) => {
+            const categoryId = categoryContainer.id.replace("category-", "");
+            if (category === "all" || categoryId === category) {
+              categoryContainer.style.display = "block";
+            } else {
+              categoryContainer.style.display = "none";
+            }
+          });
+        }
+      });
+      //   document.addEventListener("DOMContentLoaded", () => {
+      //     const saveButton = document.querySelector("form button[type='submit']");
+      //     const confirmationModal = document.getElementById("confirmationModal");
+      //     const successModal = document.getElementById("successModal");
+      //     const cancelButton = document.getElementById("cancelButton");
+      //     const confirmButton = document.getElementById("confirmButton");
+      //     const form = document.querySelector("form");
+
+      //     // Ngăn submit mặc định và hiển thị modal xác nhận
+      //     saveButton.addEventListener("click", (event) => {
+      //       event.preventDefault();
+      //       confirmationModal.classList.remove("hidden");
+      //     });
+
+      //     // Đóng modal xác nhận khi nhấn "Cancel"
+      //     cancelButton.addEventListener("click", () => {
+      //       confirmationModal.classList.add("hidden");
+      //     });
+
+      //     // Hiển thị modal thành công và redirect sau khi nhấn "Đồng ý"
+      //     confirmButton.addEventListener("click", () => {
+      //       confirmationModal.classList.add("hidden");
+      //       successModal.classList.remove("hidden");
+
+      //       setTimeout(() => {
+      //         form.submit();
+      //       }, 3000);
+      //     });
+      //   });
+    </script>
+  </body>
+</html>

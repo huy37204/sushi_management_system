@@ -10,8 +10,8 @@ export const PATH = {
     HOME: "/branch/:branchId",
     EMPLOYEE_LIST: "/branch/:branchId/employee-list",
     EMPLOYEE_SEARCH: "/branch/:branchId/employee-search",
-    ORDER: "/order-form",
-    INVOICE: "/invoice",
+    ORDER: "/branch/:branchId/order-form",
+    INVOICE: "/branch/:branchId/invoice",
     CUSTOMER_CARD: "/customer-card",
   },
   COMPANY: {
