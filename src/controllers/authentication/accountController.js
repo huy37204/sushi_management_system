@@ -5,7 +5,6 @@ import bcrypt from "bcrypt";
 export const loginController = async (req, res) => {
   const { username, password } = req.body;
 
-  // Kiểm tra đầu vào
   if (!username || !password) {
     return res
       .status(400)
@@ -13,42 +12,54 @@ export const loginController = async (req, res) => {
   }
 
   try {
-    // Tạo request và khai báo tham số
     const request = new sql.Request();
     request.input("username", sql.NVarChar, username);
 
-    // Truy vấn lấy thông tin người dùng
     const result = await request.query(`
       EXEC getUserIdByAccount @USERNAME = @username
     `);
 
-    // Kiểm tra kết quả trả về
     if (result.recordset.length === 0) {
       return res.status(401).json({ message: "Invalid username or password" });
     }
 
     const user = result.recordset[0];
-
-    // So sánh mật khẩu
+    console.log(user);
     const passwordMatch = await bcrypt.compare(password, user.PASSWORD);
     if (!passwordMatch) {
       return res.status(401).json({ message: "Invalid username or password" });
     }
 
-    // Lưu thông tin người dùng vào session
     req.session.user = {
       id: user.Id,
       role: user.ROLE,
       name: user.Name,
     };
+    // Lấy thông tin Membership Card
+    const cardRequest = new sql.Request();
+    cardRequest.input("customerId", sql.NVarChar, user.Id);
 
-    // Đặt cookie
+    const cardResult = await cardRequest.query(`
+      EXEC getMembershipCardInfo @CustomerID = @customerId
+    `);
+
+    if (cardResult.recordset.length > 0) {
+      const cardInfo = cardResult.recordset[0];
+      req.session.membershipCard = {
+        cardId: cardInfo.CARD_ID,
+        cardType: cardInfo.CARD_TYPE,
+        dateIssued: cardInfo.DATE_ISSUED,
+        points: cardInfo.POINTS,
+        cardStatus: cardInfo.CARD_STATUS,
+        discountAmount: cardInfo.DISCOUNT_AMOUNT,
+      };
+    }
+
     res.cookie("userInfo", JSON.stringify(req.session.user), {
-      maxAge: 1000 * 60 * 60 * 24 * 7, // Cookie hết hạn sau 7 ngày
-      httpOnly: true, // Đảm bảo cookie chỉ đọc được bởi server
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      httpOnly: true,
     });
 
-    // Phân nhánh theo vai trò
     switch (user.ROLE) {
       case "Quản lý công ty":
         return res.redirect("/company");
@@ -57,7 +68,6 @@ export const loginController = async (req, res) => {
       case "Khách hàng":
         return res.redirect("/");
       case "Quản lý chi nhánh": {
-        // Tìm branchId cho Quản lý chi nhánh
         const branchRequest = new sql.Request();
         branchRequest.input("userId", sql.NVarChar, user.Id);
 
@@ -82,6 +92,7 @@ export const loginController = async (req, res) => {
     return res.status(500).send("Lỗi khi xác thực người dùng");
   }
 };
+
 export const registerUser = async (req, res) => {
   try {
     const {
@@ -94,7 +105,6 @@ export const registerUser = async (req, res) => {
       phone_number,
     } = req.body;
 
-    // Kiểm tra các trường bắt buộc
     if (
       !name ||
       !email ||
@@ -107,12 +117,10 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Kiểm tra mật khẩu khớp
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    // Tạo request để kiểm tra tồn tại của người dùng
     const checkRequest = new sql.Request();
     checkRequest.input("email", sql.NVarChar, email);
     checkRequest.input("username", sql.NVarChar, username);
@@ -133,49 +141,37 @@ export const registerUser = async (req, res) => {
         .json({ message: "Email or username already exists" });
     }
 
-    // Lấy giá trị customer_id cuối cùng từ cơ sở dữ liệu
     const customerRequest = new sql.Request();
     const customerResult = await customerRequest.query(
       "SELECT TOP 1 CUSTOMER_ID FROM CUSTOMER ORDER BY CUSTOMER_ID DESC",
     );
 
-    let newCustomerId = "000001C"; // Giá trị mặc định nếu chưa có dữ liệu
+    let newCustomerId = "000001C";
 
     if (customerResult.recordset.length > 0) {
-      // Lấy giá trị CUSTOMER_ID cuối cùng
       const lastCustomerId = customerResult.recordset[0].CUSTOMER_ID;
-
-      // Tách phần số và phần ký tự
       const numberPart =
         parseInt(lastCustomerId.substring(0, lastCustomerId.length - 1)) + 1;
-      const charPart = lastCustomerId.charAt(lastCustomerId.length - 1); // Phần ký tự cuối cùng
-
-      // Đảm bảo phần số có đúng 6 chữ số
+      const charPart = lastCustomerId.charAt(lastCustomerId.length - 1);
       newCustomerId = numberPart.toString().padStart(6, "0") + charPart;
     }
 
-    // Lấy giá trị ACCOUNT_ID cuối cùng từ cơ sở dữ liệu
     const accountRequest = new sql.Request();
     const accountResult = await accountRequest.query(
       "SELECT TOP 1 ACCOUNT_ID FROM ACCOUNT ORDER BY ACCOUNT_ID DESC",
     );
 
-    let account_id = "A001"; // Giá trị mặc định nếu chưa có dữ liệu
+    let account_id = "A001";
 
     if (accountResult.recordset.length > 0) {
-      // Lấy giá trị ACCOUNT_ID cuối cùng
       const lastAccountId = accountResult.recordset[0].ACCOUNT_ID;
-
-      // Tăng giá trị lên 1 đơn vị
       const numberPart = parseInt(lastAccountId.substring(1)) + 1;
-      account_id = "A" + numberPart.toString().padStart(3, "0"); // Đảm bảo định dạng 3 chữ số
+      account_id = "A" + numberPart.toString().padStart(3, "0");
     }
 
-    // Hash mật khẩu
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Tạo request để chèn dữ liệu vào bảng CUSTOMER
     const insertCustomerRequest = new sql.Request();
     insertCustomerRequest.input("customer_id", sql.VarChar, newCustomerId);
     insertCustomerRequest.input("name", sql.NVarChar, name);
@@ -188,17 +184,30 @@ export const registerUser = async (req, res) => {
       VALUES (@customer_id, @name, @phone_number, @email, @gender)
     `);
 
-    // Chèn dữ liệu vào bảng ACCOUNT
     const insertAccountRequest = new sql.Request();
     insertAccountRequest.input("account_id", sql.NVarChar, account_id);
     insertAccountRequest.input("username", sql.NVarChar, username);
     insertAccountRequest.input("password", sql.NVarChar, hashedPassword);
-    insertAccountRequest.input("role", sql.NVarChar, "Khách hàng"); // Đặt mặc định là "Khách hàng"
+    insertAccountRequest.input("role", sql.NVarChar, "Khách hàng");
     insertAccountRequest.input("customer_id", sql.NVarChar, newCustomerId);
 
     await insertAccountRequest.query(`
       INSERT INTO ACCOUNT (ACCOUNT_ID, USERNAME, PASSWORD, ROLE, CUSTOMER_ID)
       VALUES (@account_id, @username, @password, @role, @customer_id)
+    `);
+
+    // Tạo Membership Card cho người dùng
+    const membershipCardRequest = new sql.Request();
+    membershipCardRequest.input("customerId", sql.NVarChar, newCustomerId);
+    membershipCardRequest.input("cardType", sql.NVarChar, "Standard");
+    membershipCardRequest.input("dateIssued", sql.DateTime, new Date());
+    membershipCardRequest.input("points", sql.Int, 0);
+    membershipCardRequest.input("cardStatus", sql.NVarChar, "Active");
+    membershipCardRequest.input("discountAmount", sql.Float, 0);
+
+    await membershipCardRequest.query(`
+      INSERT INTO MEMBERSHIP_CARD (CUSTOMER_ID, CARD_TYPE, DATE_ISSUED, POINTS, CARD_STATUS, DISCOUNT_AMOUNT)
+      VALUES (@customerId, @cardType, @dateIssued, @points, @cardStatus, @discountAmount)
     `);
 
     req.session.user = {
@@ -207,13 +216,11 @@ export const registerUser = async (req, res) => {
       name: name,
     };
 
-    // Lưu thông tin vào cookie
     res.cookie("userInfo", JSON.stringify(req.session.user), {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       httpOnly: true,
     });
 
-    // Redirect người dùng về trang chủ
     res.redirect("/");
   } catch (error) {
     console.error("Error registering user:", error);

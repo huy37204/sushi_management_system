@@ -1,11 +1,9 @@
 // Dropdown logic
-console.log("b");
 const dropdownButton = document.getElementById("dropdown-button");
 const dropdownMenu = document.getElementById("dropdown-menu");
 
 // Toggle dropdown menu visibility
 dropdownButton.addEventListener("click", () => {
-  console.log("a");
   dropdownMenu.classList.toggle("hidden");
 });
 
