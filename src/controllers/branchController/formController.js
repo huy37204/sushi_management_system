@@ -281,6 +281,40 @@ export const updateOrderController = async (req, res) => {
           MC.CATEGORY_NAME;
       `);
 
+    // Truy vấn bàn trống
+    const tablesData = await request.query(`
+        SELECT TABLE_NUM, SEAT_AVAILABLE
+        FROM TABLE_
+        WHERE BRANCH_ID = @branchId AND TABLE_STATUS = N'Còn trống'
+      `);
+    const tables = tablesData.recordset;
+
+    // Truy vấn bàn hiện tại của order nếu là Offline hoặc Online
+    let currentTable = null;
+    if (orderType === "Offline") {
+      const currentTableData = await request.query(`
+          SELECT T.TABLE_NUM, T.SEAT_AVAILABLE
+          FROM TABLE_ T
+          JOIN OFFLINE_ORDER O ON O.TABLE_NUMBER = T.TABLE_NUM
+          WHERE O.OFORDER_ID = @orderId
+        `);
+      currentTable =
+        currentTableData.recordset.length > 0
+          ? currentTableData.recordset[0]
+          : null;
+    } else if (orderType === "Online") {
+      const currentTableData = await request.query(`
+          SELECT T.TABLE_NUM, T.SEAT_AVAILABLE
+          FROM TABLE_ T
+          JOIN ONLINE_ORDER O ON O.TABLE_NUMBER = T.TABLE_NUM
+          WHERE O.OORDER_ID = @orderId
+        `);
+      currentTable =
+        currentTableData.recordset.length > 0
+          ? currentTableData.recordset[0]
+          : null;
+    }
+
     // Xử lý dữ liệu món ăn
     const categoriesWithDishes = menuData.recordset.map((row) => ({
       categoryName: row.CATEGORY_NAME,
@@ -296,6 +330,8 @@ export const updateOrderController = async (req, res) => {
       orderType,
       orderDate,
       orderTime,
+      tables,
+      currentTable,
     });
   } catch (error) {
     console.error("Error fetching update order data:", error);
@@ -305,7 +341,7 @@ export const updateOrderController = async (req, res) => {
 
 export const updateOrderForm = async (req, res) => {
   const branchId = req.params.branchId; // Lấy branchId từ URL
-  const orderId = req.body.orderId; // Lấy orderId từ form
+  const { orderId, tableNum, orderType } = req.body; // Lấy orderId, tableNum, orderType từ form
   const dishes = req.body.dishes || { id: [], quantity: [] }; // Đảm bảo có giá trị mặc định cho dishes
   const request = new sql.Request();
 
@@ -348,6 +384,44 @@ export const updateOrderForm = async (req, res) => {
       }
     }
 
+    // Cập nhật TABLE_NUMBER trong ONLINE_ORDER hoặc OFFLINE_ORDER
+    if (orderType === "Online") {
+      await request
+        .input("orderId", sql.Char(7), orderId)
+        .input("tableNum", sql.Int, tableNum)
+        .query(
+          `UPDATE ONLINE_ORDER 
+           SET TABLE_NUMBER = @tableNum 
+           WHERE OORDER_ID = @orderId`,
+        );
+
+      // Cập nhật trạng thái trong bảng TABLE_
+      await request.input("tableNum1", sql.Int, tableNum).query(
+        `UPDATE TABLE_ 
+           SET TABLE_STATUS = 'Đang phục vụ' 
+           WHERE TABLE_NUM = @tableNum1`,
+      );
+    } else if (orderType === "Offline") {
+      await request
+        .input("orderId", sql.Char(7), orderId)
+        .input("tableNum", sql.Int, tableNum)
+        .query(
+          `UPDATE OFFLINE_ORDER 
+           SET TABLE_NUMBER = @tableNum
+           WHERE OFORDER_ID = @orderId`,
+        );
+
+      // Cập nhật trạng thái trong bảng TABLE_
+      await request
+        .input("branchId", sql.Char(7), branchId)
+        .input("tableNum1", sql.Int, tableNum)
+        .query(
+          `UPDATE TABLE_ 
+           SET TABLE_STATUS = 'Đang phục vụ' 
+           WHERE TABLE_NUM = @tableNum1 AND BRANCH_ID = @branchId`,
+        );
+    }
+
     // Sau khi xử lý xong, chuyển hướng người dùng hoặc gửi phản hồi
     res.redirect(`/branch/${branchId}/order-form`);
   } catch (error) {
@@ -356,19 +430,83 @@ export const updateOrderForm = async (req, res) => {
   }
 };
 
+export const branchRatingControlller = async (req, res) => {
+  const { branchId } = req.params;
+  const { orderId, orderType } = req.query;
+  res.render("branch/branch_rating", { branchId, orderId, orderType });
+};
+
 export const payOrderForm = async (req, res) => {
   const branchId = req.params.branchId;
-  const orderId = req.body.orderId;
+  const {
+    orderId,
+    orderType,
+    service_rating,
+    location_rating,
+    price_rating,
+    food_quality_rating,
+    environment_rating,
+    staff_rating,
+    comment,
+  } = req.body;
 
   try {
     const request = new sql.Request();
 
-    // Thêm input cho thủ tục payOrder
-    request.input("OrderId", sql.Char(7), orderId); // Sửa: cần đặt "OrderId" trong dấu ngoặc kép
+    // Thêm các input cho thủ tục
+    request.input("OrderId", sql.Char(7), orderId);
+    request.input("BranchId", sql.Char(7), branchId);
+    request.input("OrderType", sql.NVarChar, orderType);
+    request.input("StaffRating", sql.Int, staff_rating || 0);
 
     // Thực thi thủ tục
     await request.execute("payOrder");
 
+    // Tính `RATING_ID` mới
+    const result = await request.query(`
+      SELECT TOP 1 RATING_ID 
+      FROM BRANCH_RATING 
+      ORDER BY RATING_ID DESC
+    `);
+    const lastRatingId = result.recordset[0]?.RATING_ID || "R000000"; // Nếu bảng rỗng, bắt đầu từ R000000
+    const newRatingId = `R${String(Number(lastRatingId.slice(1)) + 1).padStart(6, "0")}`;
+
+    // Thêm các input cho đánh giá
+    request.input("ServiceRating", sql.Int, service_rating || 0);
+    request.input("LocationRating", sql.Int, location_rating || 0);
+    request.input("PriceRating", sql.Int, price_rating || 0);
+    request.input("FoodQualityRating", sql.Int, food_quality_rating || 0);
+    request.input("EnvironmentRating", sql.Int, environment_rating || 0);
+    request.input("Comment", sql.NVarChar, comment || "");
+    request.input("RatingId", sql.Char(7), newRatingId);
+
+    if (orderType === "Offline") {
+      // Lấy `INVOICE_ID` từ bảng INVOICE
+      const invoiceQuery = await request.query(`
+        SELECT INVOICE_ID 
+        FROM INVOICE 
+        WHERE ORDER_ID = @OrderId
+      `);
+      const invoiceId = invoiceQuery.recordset[0]?.INVOICE_ID || null;
+
+      if (invoiceId) {
+        request.input("InvoiceId", sql.Char(10), invoiceId);
+        await request.query(`
+          INSERT INTO BRANCH_RATING (
+            RATING_ID, SERVICE_RATING, LOCATION_RATING, PRICE_RATING, 
+            DISH_QUALITY_RATING, ENVIRONMENT_RATING, COMMENTS, BRANCH_ID, 
+            RATING_DATE, INVOICE_ID
+          )
+          VALUES (
+            @RatingId, @ServiceRating, @LocationRating, @PriceRating, 
+            @FoodQualityRating, @EnvironmentRating, @Comment, @BranchId, 
+            GETDATE(), @InvoiceId
+          )
+        `);
+      }
+    }
+
+    // Điều hướng lại sau khi thanh toán
     res.redirect(`/branch/${branchId}/order-form`);
   } catch (error) {
     // Xử lý lỗi

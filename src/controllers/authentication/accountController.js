@@ -174,7 +174,6 @@ export const registerUser = async (req, res) => {
     // Hash mật khẩu
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-
     // Tạo request để chèn dữ liệu vào bảng CUSTOMER
     const insertCustomerRequest = new sql.Request();
     insertCustomerRequest.input("customer_id", sql.VarChar, newCustomerId);

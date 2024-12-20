@@ -15,6 +15,7 @@ import {
 } from "../../controllers/branchController/employeeBranchController.js";
 import {
   branchFormController,
+  branchRatingControlller,
   createOfflineOrder,
   deleteOrderForm,
   offlineOrderController,
@@ -92,6 +93,13 @@ branchRouter.get(
 );
 
 branchRouter.post(PATH.BRANCH.INVOICE, getInvoice);
+
+branchRouter.get(
+  "/branch/:branchId/order-form/branch-rating",
+  branchRatingControlller,
+);
+
+branchRouter.post("/branch/:branchId/order-form/branch-rating", payOrderForm);
 
 branchRouter.get(
   PATH.BRANCH.CUSTOMER_CARD,
