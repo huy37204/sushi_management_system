@@ -18,6 +18,18 @@ BEGIN
     LEFT JOIN CUSTOMER C ON AC.CUSTOMER_ID = C.CUSTOMER_ID
     WHERE AC.USERNAME = @USERNAME 
 END
+GO
+CREATE PROCEDURE getMembershipCardInfo
+    @CustomerID CHAR(7) -- Thay đổi kiểu dữ liệu cho phù hợp
+AS
+BEGIN
+    SELECT *
+    FROM MEMBERSHIP_CARD MC
+    WHERE MC.CUSTOMER_ID = @CustomerID; -- So sánh trực tiếp, không chuyển đổi kiểu
+END
+
 
 
 EXEC getUserIdByAccount @USERNAME = 'mark64'
+
+

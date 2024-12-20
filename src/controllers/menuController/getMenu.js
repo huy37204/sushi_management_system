@@ -90,6 +90,7 @@ export const menuController = async (req, res) => {
       branches: branchesData.recordset,
       selectedBranchId: branchId,
       selectedBranchName: branchName,
+      membershipCard: req.session.membershipCard || null,
       categoriesWithDishes,
     });
   } catch (error) {

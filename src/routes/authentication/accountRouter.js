@@ -2,6 +2,7 @@ import { PATH } from "../../config/path.js";
 import {
   loginController,
   registerUser,
+  updateSessionHistory,
 } from "../../controllers/authentication/accountController.js";
 
 import express from "express";
@@ -14,26 +15,33 @@ accountRouter
     res.render("signin");
   });
 
-accountRouter.get("/logout", (req, res) => {
-  req.session.user = null;
-
-  req.session.destroy((err) => {
-    if (err) {
-      console.error("Lỗi khi hủy session:", err);
-      return res.status(500).send("Có lỗi xảy ra khi đăng xuất.");
+accountRouter.get("/logout", async (req, res) => {
+  try {
+ 
+    if (req.user.startTime) {
+      // Update session duration before logging out
+      await updateSessionHistory(req,res);
     }
 
-    // Xóa cookie với đúng domain và path, nếu có
-    res.clearCookie("connect.sid", {
-      path: "/", // Chỉ định đường dẫn nếu cần (thường là "/")
-    });
-    res.clearCookie("userInfo", {
-      path: "/", // Chỉ định đường dẫn nếu cần (thường là "/")
-    });
+    // Clear session and cookies
+    req.user.startTime = null;
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Error destroying session:", err);
+        return res.status(500).send("There was an error during logout.");
+      }
 
-    // Chuyển hướng đến trang login
-    res.redirect("/login");
-  });
+      // Clear cookies
+      res.clearCookie("connect.sid", { path: "/" });
+      res.clearCookie("userInfo", { path: "/" });
+
+      // Redirect to login page
+      res.redirect("/login");
+    });
+  } catch (error) {
+    console.error("Error while logging out:", error);
+    res.status(500).send("There was an error while logging out.");
+  }
 });
 
 accountRouter
