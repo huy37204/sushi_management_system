@@ -12,7 +12,7 @@ router.use(PATH.HOME, accountRouter);
 
 router.use(PATH.HOME, customerRouter);
 
-router.use(PATH.BRANCH.PATH, branchRouter);
+router.use(PATH.HOME, branchRouter);
 
 router.use(PATH.COMPANY.PATH, companyRouter);
 

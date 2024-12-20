@@ -107,23 +107,15 @@ export const deliveryOrder = async (req, res) => {
 
     // Lấy giá trị lớn nhất hiện tại của OORDER_ID và DORDER_ID
     const result1 = await request.query(`
-      SELECT MAX(OORDER_ID) AS MaxOrderID 
-      FROM ONLINE_ORDER
-    `);
-    const result2 = await request.query(`
-      SELECT MAX(DORDER_ID) AS MaxOrderID 
-      FROM DELIVERY_ORDER
+      SELECT MAX(ORDER_ID) AS MaxOrderID 
+      FROM ORDER_
     `);
 
     let maxOrderID = result1.recordset[0].MaxOrderID || "O000000"; // Nếu không có giá trị thì bắt đầu từ O000000
-    let maxOrderID2 = result2.recordset[0].MaxOrderID || "O000000";
 
     // Tăng giá trị MaxOrderID lên 1
     const numericPart = parseInt(maxOrderID.substring(1)) + 1;
     const newOrderID = `O${numericPart.toString().padStart(6, "0")}`;
-
-    const numericPart2 = parseInt(maxOrderID2.substring(1)) + 1;
-    const newOrderID2 = `O${numericPart2.toString().padStart(6, "0")}`;
 
     // Lấy ngày và giờ hiện tại
     const now = new Date();
@@ -135,31 +127,34 @@ export const deliveryOrder = async (req, res) => {
     deliveryDateTime.setMinutes(deliveryDateTime.getMinutes() + 30);
     const time2 = deliveryDateTime.toISOString().split("T")[1].split(".")[0]; // Định dạng HH:MM:SS
     console.log(time2);
+
     // Thực hiện các truy vấn để thêm đơn hàng giao hàng
     await request.query(`
       INSERT INTO [ORDER_] (ORDER_ID, ORDER_DATE, BRANCH_ID, CUSTOMER_ID, ORDER_TYPE, ORDER_TIME)
-      VALUES ('${newOrderID}', '${date}', '${branchId}', '${req.user.id}', 'DELIVERY', '${time}')
+      VALUES ('${newOrderID}', '${date}', '${branchId}', '${req.user.id}', 'Delivery', '${time}')
     `);
     await request.query(`
       INSERT INTO DELIVERY_ORDER (DORDER_ID, TIME_DELIVERY, DATE_DELIVERY)
-      VALUES ('${newOrderID2}', '${date}', '${time}')
+      VALUES ('${newOrderID}', '${date}', '${time}')
     `);
 
     // Xử lý các món ăn đặt trước
-    const validDishes = Object.values(dishes).filter(
-      (dish) => dish.quantity > 0,
-    );
+    const validDishes = Object.entries(dishes)
+      .filter(([key, quantity]) => Number(quantity) > 0)
+      .map(([key, quantity]) => ({ dishId: key, quantity: Number(quantity) }));
 
+    // Kiểm tra nếu không có món hợp lệ
     if (validDishes.length === 0) {
       return res.redirect("/"); // Nếu không có món nào hợp lệ thì điều hướng về trang chính
     }
+    console.log(validDishes);
 
     // Sử dụng Promise.all để xử lý nhiều truy vấn
     const insertPromises = validDishes.map(async (dish) => {
-      const { id, quantity } = dish;
+      const { dishId, quantity } = dish; // Lấy riêng lẻ dishId và quantity
       const request = new sql.Request();
       request.input("orderId", sql.NVarChar, newOrderID); // Sử dụng newOrderID vừa tạo
-      request.input("dishId", sql.Char, id);
+      request.input("dishId", sql.Char, dishId);
       request.input("quantity", sql.Int, quantity);
       return request.query(`
         INSERT INTO ORDER_DISH (ORDER_ID, DISH_ID, QUANTITY)

@@ -4,7 +4,14 @@ import bcrypt from "bcrypt";
 // Controller xử lý đăng nhập
 export const loginController = async (req, res) => {
   const { username, password } = req.body;
-  console.log(password);
+
+  // Kiểm tra đầu vào
+  if (!username || !password) {
+    return res
+      .status(400)
+      .json({ message: "Username and password are required" });
+  }
+
   try {
     // Tạo request và khai báo tham số
     const request = new sql.Request();
@@ -15,18 +22,16 @@ export const loginController = async (req, res) => {
       EXEC getUserIdByAccount @USERNAME = @username
     `);
 
+    // Kiểm tra kết quả trả về
     if (result.recordset.length === 0) {
-      // Nếu không tìm thấy người dùng
       return res.status(401).json({ message: "Invalid username or password" });
     }
 
     const user = result.recordset[0];
 
-    // So sánh mật khẩu đã nhập với mật khẩu mã hóa trong cơ sở dữ liệu
+    // So sánh mật khẩu
     const passwordMatch = await bcrypt.compare(password, user.PASSWORD);
-
     if (!passwordMatch) {
-      // Mật khẩu không khớp
       return res.status(401).json({ message: "Invalid username or password" });
     }
 
@@ -37,28 +42,46 @@ export const loginController = async (req, res) => {
       name: user.Name,
     };
 
+    // Đặt cookie
     res.cookie("userInfo", JSON.stringify(req.session.user), {
       maxAge: 1000 * 60 * 60 * 24 * 7, // Cookie hết hạn sau 7 ngày
-      httpOnly: true, // Đảm bảo chỉ server có thể đọc cookie này
+      httpOnly: true, // Đảm bảo cookie chỉ đọc được bởi server
     });
 
-    // Chuyển hướng theo vai trò người dùng
-    if (user.ROLE === "Quản lý công ty") {
-      return res.redirect("/company");
-    } else if (user.ROLE === "Lễ tân" || user.ROLE === "Thu ngân") {
-      return res.redirect("/employee");
-    } else if (user.ROLE === "Khách hàng") {
-      return res.redirect("/");
-    }
+    // Phân nhánh theo vai trò
+    switch (user.ROLE) {
+      case "Quản lý công ty":
+        return res.redirect("/company");
+      case "Nhân viên":
+        return res.redirect("/employee");
+      case "Khách hàng":
+        return res.redirect("/");
+      case "Quản lý chi nhánh": {
+        // Tìm branchId cho Quản lý chi nhánh
+        const branchRequest = new sql.Request();
+        branchRequest.input("userId", sql.NVarChar, user.Id);
 
-    // Nếu không khớp với role nào, trả về lỗi
-    return res.status(400).send("Role không hợp lệ.");
+        const branchResult = await branchRequest.query(`
+          SELECT B.BRANCH_ID
+          FROM RESTAURANT_BRANCH B
+          WHERE B.MANAGER_ID = @userId
+        `);
+
+        if (branchResult.recordset.length > 0) {
+          const branchId = branchResult.recordset[0].BRANCH_ID;
+          return res.redirect(`/branch/${branchId}`);
+        } else {
+          return res.status(404).send("Branch not found");
+        }
+      }
+      default:
+        return res.status(400).send("Role không hợp lệ.");
+    }
   } catch (err) {
     console.error("Lỗi khi xác thực người dùng:", err);
     return res.status(500).send("Lỗi khi xác thực người dùng");
   }
 };
-
 export const registerUser = async (req, res) => {
   try {
     const {
