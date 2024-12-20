@@ -11,7 +11,7 @@
       class="fixed left-0 top-0 w-64 h-full bg-[#f8f4f3] p-4 z-50 sidebar-menu transition-transform"
     >
       <a
-        href="/branch"
+        href="/branch/<%= branchId %>/"
         class="flex items-center pb-4 border-b border-b-gray-800"
       >
         <h2 class="font-bold text-2xl">
@@ -23,7 +23,7 @@
         <span class="text-gray-400 font-bold">ADMIN</span>
         <li class="mb-1 group">
           <a
-            href="/branch"
+            href="/branch/<%= branchId %>/"
             class="flex font-semibold items-center py-2 px-4 text-gray-900 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100"
           >
             <i class="ri-home-2-line mr-3 text-lg"></i>
@@ -60,7 +60,7 @@
         </li>
         <li class="mb-1 group">
           <a
-            href="/branch/order-form"
+            href="/branch/<%=branchId%>/order-form"
             class="flex font-semibold items-center py-2 px-4 text-gray-900 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100"
           >
             <i class="ri-restaurant-2-line mr-3 text-lg"></i>
@@ -69,7 +69,7 @@
         </li>
         <li class="mb-1 group">
           <a
-            href="/branch/invoice"
+            href="/branch/<%= branchId %>/invoice"
             class="flex font-semibold items-center py-2 px-4 text-gray-900 hover:bg-gray-950 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-950 group-[.selected]:text-gray-100"
           >
             <i class="ri-bill-line mr-3 text-lg"></i>

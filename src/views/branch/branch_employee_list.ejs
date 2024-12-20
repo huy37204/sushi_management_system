@@ -136,13 +136,13 @@
                   <th
                     class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
                   >
-                    Name
+                    Nhân viên
                   </th>
 
                   <th
-                    class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                    class="pl-8 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
                   >
-                    Status
+                    Trạng thái
                   </th>
 
                   <th
@@ -347,8 +347,7 @@
 
         rows.forEach((row) => {
           const name = row.getAttribute("data-name");
-          const employeeId = row.getAttribute("data-id");
-
+          const employeeId = row.getAttribute("data-id").toLowerCase();
           // Kiểm tra nếu tên hoặc mã nhân viên chứa từ khóa tìm kiếm
           if (name.includes(searchTerm) || employeeId.includes(searchTerm)) {
             row.style.display = ""; // Hiển thị hàng

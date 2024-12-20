@@ -18,11 +18,50 @@
       href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
       rel="stylesheet"
     />
+    <link
+      href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/css/branch_home.css" />
     <link rel="stylesheet" href="/css/output.css" />
 
     <title>Quản lý phiếu đặt món</title>
   </head>
+  <style>
+    /* Giữ nguyên các style rating hiện tại */
+    .rating:not(:checked) > input {
+      position: absolute;
+      appearance: none;
+    }
+
+    .rating:not(:checked) > label {
+      float: right;
+      cursor: pointer;
+      font-size: 30px;
+      color: #666;
+    }
+
+    .rating:not(:checked) > label:before {
+      content: "★";
+    }
+
+    .rating > input:checked + label:hover,
+    .rating > input:checked + label:hover ~ label,
+    .rating > input:checked ~ label:hover,
+    .rating > input:checked ~ label:hover ~ label,
+    .rating > label:hover ~ input:checked ~ label {
+      color: #e58e09;
+    }
+
+    .rating:not(:checked) > label:hover,
+    .rating:not(:checked) > label:hover ~ label {
+      color: #ff9e0b;
+    }
+
+    .rating > input:checked ~ label {
+      color: #ffa723;
+    }
+  </style>
   <body class="text-gray-800 font-inter">
     <!--sidenav -->
     <%- include('../partials/branch/branch_side_nav') %>
@@ -42,95 +81,54 @@
           Quản lý Phiếu đặt món
         </div>
 
-        <!-- Form thêm phiếu đặt món -->
-        <form id="orderForm" class="mt-6 bg-white p-6 rounded-lg shadow-md">
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label
-                for="dishName"
-                class="block text-sm font-medium text-gray-700"
-                >Tên món</label
-              >
-              <input
-                type="text"
-                id="dishName"
-                class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                required
-              />
-            </div>
-            <div>
-              <label
-                for="quantity"
-                class="block text-sm font-medium text-gray-700"
-                >Số lượng</label
-              >
-              <input
-                type="number"
-                id="quantity"
-                min="1"
-                class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                required
-              />
-            </div>
-            <div>
-              <label for="price" class="block text-sm font-medium text-gray-700"
-                >Đơn giá</label
-              >
-              <input
-                type="number"
-                id="price"
-                min="1"
-                class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                disabled
-              />
-            </div>
-            <div>
-              <label
-                for="customerId"
-                class="block text-sm font-medium text-gray-700"
-                >Mã khách hàng</label
-              >
-              <input
-                type="text"
-                id="customerId"
-                class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                required
-              />
-            </div>
-            <div>
-              <label
-                for="orderDate"
-                class="block text-sm font-medium text-gray-700"
-                >Ngày đặt</label
-              >
-              <input
-                type="date"
-                id="orderDate"
-                class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                required
-              />
-            </div>
-            <div>
-              <label
-                for="orderTime"
-                class="block text-sm font-medium text-gray-700"
-                >Giờ đặt</label
-              >
-              <input
-                type="time"
-                id="orderTime"
-                class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                required
-              />
-            </div>
-          </div>
-          <button
-            type="submit"
-            class="mt-4 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-          >
-            Thêm phiếu
-          </button>
-        </form>
+        <h3 class="mb-5 text-lg font-medium text-gray-900 dark:text-white">
+          Tạo phiếu đặt món
+        </h3>
+
+        <ul class="grid w-full gap-6 md:grid-cols-3">
+          <li>
+            <a
+              href="/branch/<%= branchId %>/order-form/offline-order"
+              class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+            >
+              <div class="block text-center">
+                <div class="w-full text-lg font-semibold">Offline</div>
+              </div>
+            </a>
+          </li>
+          <li>
+            <input
+              type="checkbox"
+              id="flowbite-option"
+              value=""
+              class="hidden peer"
+            />
+            <label
+              for="flowbite-option"
+              class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+            >
+              <div class="block">
+                <div class="w-full text-lg font-semibold">Online</div>
+              </div>
+            </label>
+          </li>
+          <li>
+            <input
+              type="checkbox"
+              id="angular-option"
+              value=""
+              class="hidden peer"
+            />
+            <label
+              for="angular-option"
+              class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-blue-600 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+            >
+              <div class="block">
+                <div class="w-full text-lg font-semibold">Đặt hàng</div>
+              </div>
+            </label>
+          </li>
+        </ul>
 
         <!-- Danh sách phiếu đặt món -->
         <div id="orderList" class="mt-8 bg-white p-6 rounded-lg shadow-md">
@@ -138,82 +136,122 @@
           <table class="min-w-full mt-4 border">
             <thead>
               <tr>
-                <th class="border px-4 py-2">Tên món</th>
-                <th class="border px-4 py-2">Số lượng</th>
-                <th class="border px-4 py-2">Đơn giá</th>
-                <th class="border px-4 py-2">Mã khách hàng</th>
+                <th class="border px-4 py-2">Mã phiếu</th>
+                <th class="border px-4 py-2">Loại phiếu</th>
                 <th class="border px-4 py-2">Ngày đặt</th>
                 <th class="border px-4 py-2">Giờ đặt</th>
+                <th class="border px-4 py-2">Trạng thái</th>
+                <th class="border px-4 py-2">Hành động</th>
               </tr>
             </thead>
-            <tbody id="orderTable"></tbody>
+            <tbody id="orderTable">
+              <% if (orders && orders.length > 0) { orders.forEach(order => { %>
+              <tr class="text-center">
+                <td class="border px-4 py-2"><%= order.ORDER_ID %></td>
+                <td class="border px-4 py-2"><%= order.ORDER_TYPE %></td>
+                <td class="border px-4 py-2">
+                  <%= new Date(order.ORDER_DATE).toLocaleDateString("vi-VN") %>
+                </td>
+                <td class="border px-4 py-2">
+                  <%= new Date(order.ORDER_TIME).toLocaleTimeString("vi-VN", {
+                  hour: "2-digit", minute: "2-digit", second: "2-digit" }) %>
+                </td>
+                <td class="border px-4 py-2"><%= order.STATUS %></td>
+                <td class="border py-2">
+                  <% if (order.STATUS === 'Chưa thanh toán') { %>
+                  <div class="flex space-x-2 justify-center">
+                    <form
+                      action="/branch/<%= branchId %>/order-form/pay"
+                      method="POST"
+                      class="inline"
+                    >
+                      <input
+                        type="hidden"
+                        name="orderId"
+                        value="<%= order.ORDER_ID %>"
+                      />
+                      <button
+                        type="submit"
+                        class="bg-[#32B877] text-white px-3 py-1 rounded hover:bg-[#2da36a]"
+                      >
+                        Thanh toán
+                      </button>
+                    </form>
+                    <form
+                      action="/branch/<%= branchId %>/order-form/update"
+                      method="GET"
+                      class="inline"
+                    >
+                      <input
+                        type="hidden"
+                        name="orderId"
+                        value="<%= order.ORDER_ID %>"
+                      />
+                      <input
+                        type="hidden"
+                        name="orderType"
+                        value="<%= order.ORDER_TYPE %>"
+                      />
+                      <input
+                        type="hidden"
+                        name="orderDate"
+                        value="<%= order.ORDER_DATE %>"
+                      />
+                      <input
+                        type="hidden"
+                        name="orderTime"
+                        value="<%= order.ORDER_TIME %>"
+                      />
+                      <button
+                        type="submit"
+                        class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      >
+                        Cập nhật
+                      </button>
+                    </form>
+                    <form
+                      action="/branch/<%= branchId %>/order-form/delete"
+                      method="POST"
+                      class="inline"
+                    >
+                      <input
+                        type="hidden"
+                        name="orderId"
+                        value="<%= order.ORDER_ID %>"
+                      />
+                      <input
+                        type="hidden"
+                        name="orderType"
+                        value="<%= order.ORDER_TYPE %>"
+                      />
+                      <button
+                        type="submit"
+                        class="bg-[#fa2a2a] text-white px-3 py-1 rounded hover:bg-[#c23030]"
+                      >
+                        Xoá
+                      </button>
+                    </form>
+                  </div>
+                  <% } %>
+                </td>
+              </tr>
+              <% }); %>
+              <% } else { %>
+              <tr>
+                <td colspan="6" class="border px-4 py-2 text-center">
+                  Không có phiếu đặt món nào
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
           </table>
         </div>
       </div>
-
-      <!-- End Content -->
     </main>
 
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/js/sidebar.js"></script>
     <script src="/js/popper.js"></script>
-    <script>
-      document
-        .getElementById("orderForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-
-          // Lấy dữ liệu từ form
-          const dishName = document.getElementById("dishName").value;
-          const quantity = document.getElementById("quantity").value;
-          const price = document.getElementById("price").value;
-          const customerId = document.getElementById("customerId").value;
-          const orderDate = document.getElementById("orderDate").value;
-          const orderTime = document.getElementById("orderTime").value;
-
-          // Thêm phiếu mới vào danh sách
-          const table = document.getElementById("orderTable");
-          const row = document.createElement("tr");
-          row.innerHTML = `
-          <td class="border px-4 py-2">${dishName}</td>
-          <td class="border px-4 py-2">${quantity}</td>
-          <td class="border px-4 py-2">${price}</td>
-          <td class="border px-4 py-2">${customerId}</td>
-          <td class="border px-4 py-2">${orderDate}</td>
-          <td class="border px-4 py-2">${orderTime}</td>
-          <td class="border px-4 py-2">
-            <button class="text-blue-500 hover:underline" onclick="editOrder(this)">Sửa</button>
-            <button class="text-red-500 hover:underline" onclick="deleteOrder(this)">Xoá</button>
-          </td>
-        `;
-          table.appendChild(row);
-
-          // Reset form
-          e.target.reset();
-        });
-
-      // Xoá phiếu
-      function deleteOrder(button) {
-        button.closest("tr").remove();
-      }
-
-      // Sửa phiếu
-      function editOrder(button) {
-        const row = button.closest("tr");
-        const cells = row.querySelectorAll("td");
-
-        // Điền dữ liệu vào form
-        document.getElementById("dishName").value = cells[0].innerText;
-        document.getElementById("quantity").value = cells[1].innerText;
-        document.getElementById("price").value = cells[2].innerText;
-        document.getElementById("customerId").value = cells[3].innerText;
-        document.getElementById("orderDate").value = cells[4].innerText;
-        document.getElementById("orderTime").value = cells[5].innerText;
-
-        // Xoá phiếu đang sửa
-        row.remove();
-      }
-    </script>
   </body>
 </html>
