@@ -97,17 +97,21 @@
           ></ion-icon>
 
           <!-- Person dropdown content -->
-          <div class="absolute right-0 hidden bg-white shadow-md rounded-lg mt-2 w-48 text-center">
+          <div
+            class="absolute right-0 hidden bg-white shadow-md rounded-lg mt-2 w-48 text-center"
+          >
             <% if (user) { %>
             <p class="py-2 text-black"><%= user.name %></p>
             <% if (membershipCard) { %>
-              <div class="px-4 py-2 text-left text-sm text-gray-700 border-t border-gray-200">
-                <p class="font-semibold text-black">Thẻ thành viên</p>
-                <p>Mã: <%= membershipCard.cardId %></p>
-                <p>Cấp: <%= membershipCard.cardType %></p>
-                <p>Điểm: <%= membershipCard.points %></p>
-              </div>
-              <% } %>
+            <div
+              class="px-4 py-2 text-left text-sm text-gray-700 border-t border-gray-200"
+            >
+              <p class="font-semibold text-black">Thẻ thành viên</p>
+              <p>Mã: <%= membershipCard.cardId %></p>
+              <p>Cấp: <%= membershipCard.cardType %></p>
+              <p>Điểm: <%= membershipCard.points %></p>
+            </div>
+            <% } %>
             <!-- Hiển thị tên người dùng -->
             <a
               href="/logout"

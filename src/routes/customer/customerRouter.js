@@ -45,7 +45,6 @@ customerRouter.get(
   PATH.CUSTOMER.MENU,
   verifyRole(customerRole),
   menuController,
-  
 );
 
 customerRouter.post(

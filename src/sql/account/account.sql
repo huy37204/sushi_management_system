@@ -23,13 +23,7 @@ CREATE PROCEDURE getMembershipCardInfo
     @CustomerID CHAR(7) -- Thay đổi kiểu dữ liệu cho phù hợp
 AS
 BEGIN
-    SELECT 
-        MC.CARD_ID,
-        MC.CARD_TYPE,
-        MC.DATE_ISSUED,
-        MC.POINTS,
-        MC.CARD_STATUS,
-        MC.DISCOUNT_AMOUNT
+    SELECT *
     FROM MEMBERSHIP_CARD MC
     WHERE MC.CUSTOMER_ID = @CustomerID; -- So sánh trực tiếp, không chuyển đổi kiểu
 END

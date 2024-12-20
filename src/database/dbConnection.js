@@ -13,6 +13,12 @@ const config = {
     instancename: "MSSQLSERVER",
   },
   port: 1433,
+  pool: {
+    max: 10,
+    min: 0,
+    idleTimeoutMillis: 30000, // Thời gian chờ khi idle
+  },
+  requestTimeout: 30000, // Thời gian chờ tối đa cho mỗi request
 };
 
 const connect = async () => {

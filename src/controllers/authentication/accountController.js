@@ -35,6 +35,31 @@ export const loginController = async (req, res) => {
       role: user.ROLE,
       name: user.Name,
     };
+    if (user.ROLE === "Khách hàng") {
+      req.session.user.startTime = new Date(); // Ghi lại thời gian bắt đầu phiên
+      const historyRequest = new sql.Request();
+    
+      // Lấy thời gian hiện tại theo giờ Việt Nam (UTC+7)
+      const currentDate = new Date();
+      const utcOffset = currentDate.getTimezoneOffset() * 60000; // Offset UTC in milliseconds
+      const vietnamTime = new Date(currentDate.getTime() + 7 * 60 * 60 * 1000 - utcOffset);
+      
+      const dateAccessed = vietnamTime.toISOString().split("T")[0]; // Ngày (YYYY-MM-DD)
+      const timeAccessed = `${dateAccessed} ${vietnamTime.getHours()}:${vietnamTime.getMinutes()}:${vietnamTime.getSeconds()}`;
+      console.log("Time Accessed (Vietnam Time):", timeAccessed);
+    
+      console.log("Date Accessed:", dateAccessed);
+
+    
+      historyRequest.input("customerId", sql.NVarChar, user.Id);
+      historyRequest.input("dateAccessed", sql.Date, dateAccessed);
+      historyRequest.input("timeAccessed", sql.DateTime, vietnamTime);
+    
+      await historyRequest.query(`
+        INSERT INTO ONLINE_ACCESS_HISTORY (DATE_ACCESSED, TIME_ACCESSED, CUSTOMER_ID, SESSION_DURATION)
+        VALUES (@dateAccessed, @timeAccessed, @customerId, 0)
+      `);
+    }
     // Lấy thông tin Membership Card
     const cardRequest = new sql.Request();
     cardRequest.input("customerId", sql.NVarChar, user.Id);
@@ -225,5 +250,37 @@ export const registerUser = async (req, res) => {
   } catch (error) {
     console.error("Error registering user:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+export const updateSessionHistory = async (req,res) => {
+  try {
+    // Calculate session duration in seconds
+
+    const sessionEndTime = new Date();
+    const sessionStartTime = new Date(req.user.startTime);
+    console.log(sessionEndTime);
+    console.log("Type of sessionStartTime:", typeof sessionStartTime);
+    const sessionDuration = (sessionEndTime - sessionStartTime) / 1000; // Duration in seconds
+    const customerId = req.user.id;
+    const request = new sql.Request();
+    request.input("customerId", sql.NVarChar, customerId);
+    request.input("sessionDuration", sql.Int, sessionDuration);
+    console.log("aaaaaaaaaaaa");
+    console.log(sessionDuration);
+    await request.query(`
+      UPDATE ONLINE_ACCESS_HISTORY
+      SET SESSION_DURATION = @sessionDuration
+      WHERE CUSTOMER_ID = @customerId
+        AND DATE_ACCESSED = CONVERT(DATE, GETDATE())
+        AND TIME_ACCESSED = (
+            SELECT MAX(TIME_ACCESSED)
+            FROM ONLINE_ACCESS_HISTORY
+            WHERE CUSTOMER_ID = @customerId
+        )
+    `);
+    console.log(`Session duration updated for customer ID: ${req.user.id}`);
+  } catch (error) {
+    console.error("Error updating session history:", error);
+    throw new Error("Error updating session history.");
   }
 };
