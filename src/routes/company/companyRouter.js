@@ -18,6 +18,14 @@ import {
   transferResource,
   updateResource,
 } from "../../controllers/companyController/resourceController.js";
+import{
+getSalaries,
+updateSalaries,
+} from "../../controllers/company/UpdateSalary.js"; // Adjust the import path
+import {
+getRevenuePage,
+getRevenueData,
+} from "../../controllers/company/statisticDish.js"; // Adjust the import path
 
 const companyRouter = express.Router();
 const companyRole = "Quản lý công ty";
@@ -50,6 +58,7 @@ companyRouter.post(
   verifyRole(companyRole),
   getCompanyRevenueByYear,
 );
+
 
 companyRouter.get(
   PATH.COMPANY.RESOURCE,
@@ -99,20 +108,27 @@ companyRouter.post(
   addResource,
 );
 
+// Route for getting salaries by branch ID
 companyRouter.get(
   PATH.COMPANY.UPDATE_SALARY,
   verifyRole(companyRole),
-  (req, res) => {
-    res.render("company/company_update_salary");
-  },
+  getSalaries,
 );
-
+// API route to update salaries
+companyRouter.post(
+  PATH.COMPANY.UPDATE_SALARY,
+  verifyRole(companyRole),
+  updateSalaries,
+);
 companyRouter.get(
   PATH.COMPANY.FOOD_REVENUE,
   verifyRole(companyRole),
-  (req, res) => {
-    res.render("company/company_food_revenue");
-  },
+  getRevenuePage,
 );
-
+// API route to update salaries
+companyRouter.post(
+  PATH.COMPANY.FOOD_REVENUE,
+  verifyRole(companyRole),
+  getRevenueData,
+);
 export default companyRouter;

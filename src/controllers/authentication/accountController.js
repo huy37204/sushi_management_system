@@ -41,11 +41,11 @@ export const loginController = async (req, res) => {
 
       // Lấy thời gian hiện tại theo giờ Việt Nam (UTC+7)
       const currentDate = new Date();
-      const utcOffset = currentDate.getTimezoneOffset() * 60000; // Offset UTC in milliseconds
       const vietnamTime = new Date(
-        currentDate.getTime() + 7 * 60 * 60 * 1000 - utcOffset,
-      );
+        currentDate.getTime() + 7 * 60 * 60 * 1000 + 60 * 1000,
+      ); // Cộng thêm 7 giờ và 1 phút
 
+      console.log("Vietnam Time:", vietnamTime.toISOString());
       const dateAccessed = vietnamTime.toISOString().split("T")[0]; // Ngày (YYYY-MM-DD)
       const timeAccessed = `${dateAccessed} ${vietnamTime.getHours()}:${vietnamTime.getMinutes()}:${vietnamTime.getSeconds()}`;
       console.log("Time Accessed (Vietnam Time):", timeAccessed);
@@ -222,21 +222,6 @@ export const registerUser = async (req, res) => {
       INSERT INTO ACCOUNT (ACCOUNT_ID, USERNAME, PASSWORD, ROLE, CUSTOMER_ID)
       VALUES (@account_id, @username, @password, @role, @customer_id)
     `);
-
-    // Tạo Membership Card cho người dùng
-    const membershipCardRequest = new sql.Request();
-    membershipCardRequest.input("customerId", sql.NVarChar, newCustomerId);
-    membershipCardRequest.input("cardType", sql.NVarChar, "Standard");
-    membershipCardRequest.input("dateIssued", sql.DateTime, new Date());
-    membershipCardRequest.input("points", sql.Int, 0);
-    membershipCardRequest.input("cardStatus", sql.NVarChar, "Active");
-    membershipCardRequest.input("discountAmount", sql.Float, 0);
-
-    await membershipCardRequest.query(`
-      INSERT INTO MEMBERSHIP_CARD (CUSTOMER_ID, CARD_TYPE, DATE_ISSUED, POINTS, CARD_STATUS, DISCOUNT_AMOUNT)
-      VALUES (@customerId, @cardType, @dateIssued, @points, @cardStatus, @discountAmount)
-    `);
-
     req.session.user = {
       id: newCustomerId,
       role: "Khách hàng",
