@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/branch_home.css" />
+    <link rel="stylesheet" href="/css/output.css" />
+
+    <title>Cập nhật thẻ khách hàng</title>
+  </head>
+  <body class="text-gray-800 font-inter">
+    <!--sidenav -->
+    <%- include('../partials/branch/branch_side_nav') %>
+    <!-- end sidenav -->
+
+    <main
+    class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-gray-200 min-h-screen transition-all main"
+>
+    <!-- Navbar -->
+    <%- include('../partials/branch/branch_navbar') %>
+    <!-- End Navbar -->
+
+    <!-- Content -->
+    <div class="mx-10 mt-10">
+        <!-- Title -->
+        <div class="text-[30px] font-semibold text-[#374151]">
+            Cập nhật thẻ khách hàng
+        </div>
+
+        <!-- Form -->
+        <form
+            action="/branch/<%= branchId %>/customer-card/update"
+            method="POST"
+            id="updateCardForm"
+            class="mt-6 bg-white p-6 rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+            <!-- Mã thẻ (Read-only) -->
+            <div class="mb-4">
+                <label for="cardId" class="block text-sm font-medium text-gray-700">Mã thẻ</label>
+                <input
+                    type="text"
+                    id="cardId"
+                    name="cardId"
+                    value="<%= membershipCard.CARD_ID %>"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700 cursor-not-allowed"
+                    readonly
+                />
+            </div>
+
+            <!-- Loại thẻ (Read-only) -->
+            <div class="mb-4">
+                <label for="cardType" class="block text-sm font-medium text-gray-700">Loại thẻ</label>
+                <input
+                    type="text"
+                    id="cardType"
+                    name="cardType"
+                    value="<%= membershipCard.CARD_TYPE %>"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700 cursor-not-allowed"
+                    readonly
+                />
+            </div>
+
+            <!-- Mã khách hàng (Read-only) -->
+            <div class="mb-4">
+                <label for="customerId" class="block text-sm font-medium text-gray-700">Mã khách hàng</label>
+                <input
+                    type="text"
+                    id="customerId"
+                    name="customerId"
+                    value="<%= membershipCard.CUSTOMER_ID %>"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700 cursor-not-allowed"
+                    readonly
+                />
+            </div>
+
+            <!-- Ngày cấp (Read-only) -->
+            <div class="mb-4">
+                <label for="dateIssued" class="block text-sm font-medium text-gray-700">Ngày cấp</label>
+                <%
+                    // Chuyển đổi ngày từ YYYY-MM-DD sang dd/mm/yyyy
+                    var dateIssued = new Date(membershipCard.DATE_ISSUED);
+                    var day = String(dateIssued.getDate()).padStart(2, '0');
+                    var month = String(dateIssued.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+                    var year = dateIssued.getFullYear();
+                    var formattedDate = day + '/' + month + '/' + year;
+                %>
+                <input
+                    type="text"
+                    id="dateIssued"
+                    name="dateIssued"
+                    value="<%= formattedDate %>"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700 cursor-not-allowed"
+                    readonly
+                />
+            </div>
+            
+
+            <!-- Mã nhân viên (Read-only) -->
+            <div class="mb-4">
+                <label for="employeeId" class="block text-sm font-medium text-gray-700">Mã nhân viên</label>
+                <input
+                    type="text"
+                    id="employeeId"
+                    name="employeeId"
+                    value="<%= membershipCard.EMPLOYEE_ID %>"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700 cursor-not-allowed"
+                    readonly
+                />
+            </div>
+
+            <!-- Số điểm (Read-only) -->
+            <div class="mb-4">
+                <label for="points" class="block text-sm font-medium text-gray-700">Số điểm</label>
+                <input
+                    type="number"
+                    id="points"
+                    name="points"
+                    value="<%= membershipCard.POINTS %>"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700 cursor-not-allowed"
+                    readonly
+                />
+            </div>
+
+            <!-- Số tiền giảm giá (Read-only) -->
+            <div class="mb-4">
+                <label for="discountAmount" class="block text-sm font-medium text-gray-700">Số tiền giảm giá</label>
+                <input
+                    type="number"
+                    id="discountAmount"
+                    name="discountAmount"
+                    value="<%= membershipCard.DISCOUNT_AMOUNT %>"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700 cursor-not-allowed"
+                    readonly
+                />
+            </div>
+
+            <!-- Trạng thái (Editable) -->
+            <div class="mb-4 col-span-2">
+                <label for="cardStatus" class="block text-sm font-medium text-gray-700">Trạng thái</label>
+                <select
+                    id="cardStatus"
+                    name="cardStatus"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700"
+                >
+                    <option value="Active" <%= membershipCard.CARD_STATUS === 'Active' ? 'selected' : '' %>>Active</option>
+                    <option value="Inactive" <%= membershipCard.CARD_STATUS === 'Inactive' ? 'selected' : '' %>>Inactive</option>
+                </select>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mb-4 col-span-2">
+                <button
+                    type="submit"
+                    class="w-full px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
+                    Cập nhật thẻ
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+
+  
+
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/popper.js"></script>
+  </body>
+</html>

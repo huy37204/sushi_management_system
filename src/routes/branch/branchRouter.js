@@ -15,6 +15,7 @@ import {
 } from "../../controllers/branchController/employeeBranchController.js";
 import {
   branchFormController,
+  branchRatingControlller,
   createOfflineOrder,
   deleteOrderForm,
   offlineOrderController,
@@ -26,6 +27,15 @@ import {
   branchInvoiceController,
   getInvoice,
 } from "../../controllers/branchController/invoiceController.js";
+import {
+  createNewCustomerCard,
+  createOldCustomerCard,
+  customerCardBranchController,
+  deleteCard,
+  getCustomerCardByPhone,
+  updateCard,
+  updateCardController,
+} from "../../controllers/branchController/customerCardController.js";
 
 const branchRouter = express.Router();
 const branchManager = "Quản lý chi nhánh";
@@ -94,10 +104,53 @@ branchRouter.get(
 branchRouter.post(PATH.BRANCH.INVOICE, getInvoice);
 
 branchRouter.get(
+  "/branch/:branchId/order-form/branch-rating",
+  branchRatingControlller,
+);
+
+branchRouter.post("/branch/:branchId/order-form/branch-rating", payOrderForm);
+
+branchRouter.get(
   PATH.BRANCH.CUSTOMER_CARD,
   verifyRole(branchManager),
+  customerCardBranchController,
+);
+
+branchRouter.get(
+  "/branch/:branchId/customer-card/new-customer-card",
   (req, res) => {
-    res.render("branch/branch_customer_card");
+    const { branchId } = req.params;
+    const { user } = req.user;
+    res.render("branch/branch_create_card_for_new", { branchId, user });
   },
 );
+
+branchRouter.post(
+  "/branch/:branchId/customer-card/new-customer-card",
+  createNewCustomerCard,
+);
+
+branchRouter.get(
+  "/branch/:branchId/customer-card/old-customer-card",
+  (req, res) => {
+    const { branchId } = req.params;
+    const { user } = req.user;
+    res.render("branch/branch_create_card_for_old", { branchId, user });
+  },
+);
+
+branchRouter.post(
+  "/branch/:branchId/customer-card/old-customer-card",
+  createOldCustomerCard,
+);
+branchRouter.post("/branch/:branchId/customer-card/delete", deleteCard);
+
+branchRouter.get(
+  "/branch/:branchId/customer-card/update",
+  updateCardController,
+);
+
+branchRouter.post("/branch/:branchId/customer-card/update", updateCard);
+
+branchRouter.post(PATH.BRANCH.CUSTOMER_CARD, getCustomerCardByPhone);
 export default branchRouter;

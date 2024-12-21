@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/branch_home.css" />
+    <link rel="stylesheet" href="/css/output.css" />
+
+    <title>Quản lý thẻ khách hàng</title>
+  </head>
+  <body class="text-gray-800 font-inter">
+    <!--sidenav -->
+    <%- include('../partials/branch/branch_side_nav') %>
+    <!-- end sidenav -->
+
+    <main
+      class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-gray-200 min-h-screen transition-all main"
+    >
+      <!-- Navbar -->
+      <%- include('../partials/branch/branch_navbar') %>
+      <!-- End Navbar -->
+
+      <!-- Content -->
+      <div class="mx-10 mt-10">
+        <!-- Title -->
+        <div class="text-[30px] font-semibold text-[#374151]">
+          Tạo thẻ cho khách hàng cũ
+        </div>
+
+        <!-- Form -->
+        <form
+          action="/branch/<%= branchId %>/customer-card/old-customer-card"
+          method="POST"
+          id="createCardForm"
+          class="mt-6 bg-white p-6 rounded-lg shadow-md"
+        >
+          <!-- Số điện thoại -->
+          <div class="flex flex-col mb-4">
+            <label for="phoneNumber" class="text-sm font-semibold"
+              >Số điện thoại</label
+            >
+            <input
+              type="text"
+              id="phoneNumber"
+              name="phoneNumber"
+              placeholder="Nhập số điện thoại"
+              class="mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          <!-- Số CCCD -->
+          <div class="flex flex-col mb-4">
+            <label for="identityCard" class="text-sm font-semibold"
+              >Số CCCD</label
+            >
+            <input
+              type="text"
+              id="identityCard"
+              name="identityCard"
+              placeholder="Nhập số căn cước công dân"
+              class="mt-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          <!-- Nút tạo thẻ -->
+          <button
+            type="submit"
+            class="mt-4 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
+            Tạo thẻ
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/popper.js"></script>
+  </body>
+</html>

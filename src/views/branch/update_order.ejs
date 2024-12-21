@@ -104,6 +104,40 @@
                 class="w-full bg-gray-100 border border-gray-300 rounded px-2 py-1"
               />
             </div>
+            <div class="flex flex-col w-[50%]">
+              <label for="tableNum">Đặt bàn</label>
+              <select 
+                name="tableNum" 
+                id="tableNum" 
+                class="py-1" 
+                <%= currentTable ? 'disabled' : '' %>
+              >
+                <% if (currentTable) { %>
+                  <option value="<%= currentTable.TABLE_NUM %>" selected>
+                    <div>
+                      <strong>
+                        Bàn số <%= currentTable.TABLE_NUM %>
+                      </strong>, 
+                      Số người tối đa: <%= currentTable.SEAT_AVAILABLE %>
+                    </div>
+                  </option>
+                <% } else { %>
+                  <% tables.forEach((table) => { %>
+                    <option value="<%= table.TABLE_NUM %>" 
+                      <%= currentTable && currentTable.TABLE_NUMBER === table.TABLE_NUM ? 'selected' : '' %>
+                    >
+                      <div>
+                        <strong>
+                          Bàn số <%= table.TABLE_NUM %>
+                        </strong>, 
+                        Số người tối đa: <%= table.SEAT_AVAILABLE %>
+                      </div>
+                    </option>
+                  <% }) %>
+                <% } %>
+              </select>
+            </div>
+            
           </div>
           <div class="text-center">
             <h2 class="text-[40px] font-bold mt-4">Chọn món</h2>
