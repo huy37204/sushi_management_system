@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đánh giá nhà hàng</title>
+    <link rel="stylesheet" href="/css/output.css" />
+    <style>
+      .rating:not(:checked) input {
+        position: absolute;
+        appearance: none;
+      }
+
+      .rating:not(:checked) label {
+        float: right;
+        cursor: pointer;
+        font-size: 30px;
+        color: #666;
+      }
+
+      .rating:not(:checked) label:before {
+        content: "★";
+      }
+
+      .rating input:checked + label:hover,
+      .rating input:checked + label:hover ~ label,
+      .rating input:checked ~ label:hover,
+      .rating input:checked ~ label:hover ~ label,
+      .rating label:hover ~ input:checked ~ label {
+        color: #e58e09;
+      }
+
+      .rating:not(:checked) label:hover,
+      .rating:not(:checked) label:hover ~ label {
+        color: #ff9e0b;
+      }
+
+      .rating input:checked ~ label {
+        color: #ffa723;
+      }
+    </style>
+  </head>
+  <body class="bg-[#609b6f]">
+    <form action="/branch/B003/order-form/branch-rating" method="POST">
+      <input type="hidden" name="orderId" value="<%= orderId %>" />
+      <input type="hidden" name="orderType" value="<%= orderType %>" />
+      <div
+        class="rating-wrapper fixed inset-0 flex flex-wrap justify-center items-center z-50 h-fit my-auto py-4 font-serif font-bold"
+        id="ratingWrapper"
+      >
+        <!-- Phần Rating Dịch vụ -->
+        <div
+          class="rating bg-white p-6 rounded-lg shadow-lg z-60 mb-4 w-[20%] text-center"
+        >
+          <div class="block font-medium mb-2">Đánh giá dịch vụ</div>
+          <div class="flex flex-row-reverse justify-center">
+            <input
+              value="5"
+              name="service_rating"
+              id="service5"
+              type="radio"
+              class="hidden"
+            />
+            <label title="5 stars" for="service5"></label>
+
+            <input
+              value="4"
+              name="service_rating"
+              id="service4"
+              type="radio"
+              class="hidden"
+            />
+            <label title="4 stars" for="service4"></label>
+
+            <input
+              value="3"
+              name="service_rating"
+              id="service3"
+              type="radio"
+              class="hidden"
+            />
+            <label title="3 stars" for="service3"></label>
+
+            <input
+              value="2"
+              name="service_rating"
+              id="service2"
+              type="radio"
+              class="hidden"
+            />
+            <label title="2 stars" for="service2"></label>
+
+            <input
+              value="1"
+              name="service_rating"
+              id="service1"
+              type="radio"
+              class="hidden"
+            />
+            <label title="1 star" for="service1"></label>
+          </div>
+        </div>
+
+        <!-- Phần Rating Địa điểm -->
+        <div
+          class="rating bg-white p-6 rounded-lg shadow-lg z-60 mb-4 w-[20%] text-center"
+        >
+          <div class="block font-medium mb-2">Đánh giá địa điểm</div>
+          <div class="flex justify-center flex-row-reverse">
+            <input
+              value="5"
+              name="location_rating"
+              id="location5"
+              type="radio"
+              class="hidden"
+            />
+            <label title="5 stars" for="location5"></label>
+
+            <input
+              value="4"
+              name="location_rating"
+              id="location4"
+              type="radio"
+              class="hidden"
+            />
+            <label title="4 stars" for="location4"></label>
+
+            <input
+              value="3"
+              name="location_rating"
+              id="location3"
+              type="radio"
+              class="hidden"
+            />
+            <label title="3 stars" for="location3"></label>
+
+            <input
+              value="2"
+              name="location_rating"
+              id="location2"
+              type="radio"
+              class="hidden"
+            />
+            <label title="2 stars" for="location2"></label>
+
+            <input
+              value="1"
+              name="location_rating"
+              id="location1"
+              type="radio"
+              class="hidden"
+            />
+            <label title="1 star" for="location1"></label>
+          </div>
+        </div>
+
+        <!-- Phần Rating Giá cả -->
+        <div
+          class="rating bg-white p-6 rounded-lg shadow-lg z-60 mb-4 w-[20%] text-center"
+        >
+          <div class="block font-medium mb-2">Đánh giá giá cả</div>
+          <div class="flex flex-row-reverse justify-center">
+            <input
+              value="5"
+              name="price_rating"
+              id="price5"
+              type="radio"
+              class="hidden"
+            />
+            <label title="5 stars" for="price5"></label>
+
+            <input
+              value="4"
+              name="price_rating"
+              id="price4"
+              type="radio"
+              class="hidden"
+            />
+            <label title="4 stars" for="price4"></label>
+
+            <input
+              value="3"
+              name="price_rating"
+              id="price3"
+              type="radio"
+              class="hidden"
+            />
+            <label title="3 stars" for="price3"></label>
+
+            <input
+              value="2"
+              name="price_rating"
+              id="price2"
+              type="radio"
+              class="hidden"
+            />
+            <label title="2 stars" for="price2"></label>
+
+            <input
+              value="1"
+              name="price_rating"
+              id="price1"
+              type="radio"
+              class="hidden"
+            />
+            <label title="1 star" for="price1"></label>
+          </div>
+        </div>
+
+        <!-- Phần Rating Chất lượng món ăn -->
+        <div
+          class="rating bg-white p-6 rounded-lg shadow-lg z-60 mb-4 w-[20%] text-center"
+        >
+          <div class="block font-medium mb-2">Đánh giá chất lượng món ăn</div>
+          <div class="flex flex-row-reverse justify-center">
+            <input
+              value="5"
+              name="food_quality_rating"
+              id="food_quality5"
+              type="radio"
+              class="hidden"
+            />
+            <label title="5 stars" for="food_quality5"></label>
+
+            <input
+              value="4"
+              name="food_quality_rating"
+              id="food_quality4"
+              type="radio"
+              class="hidden"
+            />
+            <label title="4 stars" for="food_quality4"></label>
+
+            <input
+              value="3"
+              name="food_quality_rating"
+              id="food_quality3"
+              type="radio"
+              class="hidden"
+            />
+            <label title="3 stars" for="food_quality3"></label>
+
+            <input
+              value="2"
+              name="food_quality_rating"
+              id="food_quality2"
+              type="radio"
+              class="hidden"
+            />
+            <label title="2 stars" for="food_quality2"></label>
+
+            <input
+              value="1"
+              name="food_quality_rating"
+              id="food_quality1"
+              type="radio"
+              class="hidden"
+            />
+            <label title="1 star" for="food_quality1"></label>
+          </div>
+        </div>
+
+        <!-- Phần Rating Môi trường -->
+        <div
+          class="rating bg-white p-6 rounded-lg shadow-lg z-60 mb-4 w-[20%] text-center"
+        >
+          <div class="block font-medium mb-2 text-[16px]">
+            Đánh giá môi trường
+          </div>
+          <div class="flex flex-row-reverse justify-center">
+            <input
+              value="5"
+              name="environment_rating"
+              id="environment5"
+              type="radio"
+              class="hidden"
+            />
+            <label title="5 stars" for="environment5"></label>
+
+            <input
+              value="4"
+              name="environment_rating"
+              id="environment4"
+              type="radio"
+              class="hidden"
+            />
+            <label title="4 stars" for="environment4"></label>
+
+            <input
+              value="3"
+              name="environment_rating"
+              id="environment3"
+              type="radio"
+              class="hidden"
+            />
+            <label title="3 stars" for="environment3"></label>
+
+            <input
+              value="2"
+              name="environment_rating"
+              id="environment2"
+              type="radio"
+              class="hidden"
+            />
+            <label title="2 stars" for="environment2"></label>
+
+            <input
+              value="1"
+              name="environment_rating"
+              id="environment1"
+              type="radio"
+              class="hidden"
+            />
+            <label title="1 star" for="environment1"></label>
+          </div>
+        </div>
+
+        <!-- Phần Rating Nhân viên -->
+        <div
+          class="rating bg-white p-6 rounded-lg shadow-lg z-60 w-[20%] text-center"
+        >
+          <div class="block font-medium mb-2 text-[16px]">
+            Đánh giá nhân viên
+          </div>
+          <div class="flex flex-row-reverse justify-center">
+            <input
+              value="5"
+              name="staff_rating"
+              id="staff5"
+              type="radio"
+              class="hidden"
+            />
+            <label title="5 stars" for="staff5"></label>
+
+            <input
+              value="4"
+              name="staff_rating"
+              id="staff4"
+              type="radio"
+              class="hidden"
+            />
+            <label title="4 stars" for="staff4"></label>
+
+            <input
+              value="3"
+              name="staff_rating"
+              id="staff3"
+              type="radio"
+              checked=""
+              class="hidden"
+            />
+            <label title="3 stars" for="staff3"></label>
+
+            <input
+              value="2"
+              name="staff_rating"
+              id="staff2"
+              type="radio"
+              class="hidden"
+            />
+            <label title="2 stars" for="staff2"></label>
+
+            <input
+              value="1"
+              name="staff_rating"
+              id="staff1"
+              type="radio"
+              class="hidden"
+            />
+            <label title="1 star" for="staff1"></label>
+          </div>
+        </div>
+        <div class="w-full flex justify-center mt-4 font-sans">
+          <input name="comment" type="text" placeholder="Nhận xét dịch vụ..." />
+        </div>
+        <div class="w-full mt-4 flex justify-center space-x-[30px]">
+          <button
+            type="button"
+            id="ratingSubmit"
+            class="bg-[#b8b8b8] px-3 py-3 rounded hover:bg-[#a7a6a6] w-[200px] text-black"
+          >
+            Quay lại
+          </button>
+          <button
+            type="submit"
+            id="ratingSubmit"
+            class="bg-[#8eb1ff] text-white px-3 py-3 rounded w-[200px] hover:bg-[#739df7]"
+          >
+            Xác nhận đánh giá
+          </button>
+        </div>
+      </div>
+    </form>
+  </body>
+</html>

@@ -38,23 +38,25 @@ export const loginController = async (req, res) => {
     if (user.ROLE === "Khách hàng") {
       req.session.user.startTime = new Date(); // Ghi lại thời gian bắt đầu phiên
       const historyRequest = new sql.Request();
-    
+
       // Lấy thời gian hiện tại theo giờ Việt Nam (UTC+7)
       const currentDate = new Date();
-      const utcOffset = currentDate.getTimezoneOffset() * 60000; // Offset UTC in milliseconds
-      const vietnamTime = new Date(currentDate.getTime() + 7 * 60 * 60 * 1000 - utcOffset);
-      
+      const vietnamTime = new Date(
+        currentDate.getTime() + 7 * 60 * 60 * 1000 + 60 * 1000,
+      ); // Cộng thêm 7 giờ và 1 phút
+
+      console.log("Vietnam Time:", vietnamTime.toISOString());
+
       const dateAccessed = vietnamTime.toISOString().split("T")[0]; // Ngày (YYYY-MM-DD)
       const timeAccessed = `${dateAccessed} ${vietnamTime.getHours()}:${vietnamTime.getMinutes()}:${vietnamTime.getSeconds()}`;
       console.log("Time Accessed (Vietnam Time):", timeAccessed);
-    
+
       console.log("Date Accessed:", dateAccessed);
 
-    
       historyRequest.input("customerId", sql.NVarChar, user.Id);
       historyRequest.input("dateAccessed", sql.Date, dateAccessed);
       historyRequest.input("timeAccessed", sql.DateTime, vietnamTime);
-    
+
       await historyRequest.query(`
         INSERT INTO ONLINE_ACCESS_HISTORY (DATE_ACCESSED, TIME_ACCESSED, CUSTOMER_ID, SESSION_DURATION)
         VALUES (@dateAccessed, @timeAccessed, @customerId, 0)
@@ -196,7 +198,7 @@ export const registerUser = async (req, res) => {
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-
+    // Tạo request để chèn dữ liệu vào bảng CUSTOMER
     const insertCustomerRequest = new sql.Request();
     insertCustomerRequest.input("customer_id", sql.VarChar, newCustomerId);
     insertCustomerRequest.input("name", sql.NVarChar, name);
@@ -220,21 +222,6 @@ export const registerUser = async (req, res) => {
       INSERT INTO ACCOUNT (ACCOUNT_ID, USERNAME, PASSWORD, ROLE, CUSTOMER_ID)
       VALUES (@account_id, @username, @password, @role, @customer_id)
     `);
-
-    // Tạo Membership Card cho người dùng
-    const membershipCardRequest = new sql.Request();
-    membershipCardRequest.input("customerId", sql.NVarChar, newCustomerId);
-    membershipCardRequest.input("cardType", sql.NVarChar, "Standard");
-    membershipCardRequest.input("dateIssued", sql.DateTime, new Date());
-    membershipCardRequest.input("points", sql.Int, 0);
-    membershipCardRequest.input("cardStatus", sql.NVarChar, "Active");
-    membershipCardRequest.input("discountAmount", sql.Float, 0);
-
-    await membershipCardRequest.query(`
-      INSERT INTO MEMBERSHIP_CARD (CUSTOMER_ID, CARD_TYPE, DATE_ISSUED, POINTS, CARD_STATUS, DISCOUNT_AMOUNT)
-      VALUES (@customerId, @cardType, @dateIssued, @points, @cardStatus, @discountAmount)
-    `);
-
     req.session.user = {
       id: newCustomerId,
       role: "Khách hàng",
@@ -252,7 +239,7 @@ export const registerUser = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-export const updateSessionHistory = async (req,res) => {
+export const updateSessionHistory = async (req, res) => {
   try {
     // Calculate session duration in seconds
 

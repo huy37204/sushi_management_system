@@ -3,7 +3,7 @@ import sql from "mssql";
 const config = {
   user: "khoi",
   password: "1234",
-  server: "MSI",
+  server: "localhost",
   database: "SUSUSHISHI",
   options: {
     encrypt: false, // Tắt mã hóa SSL

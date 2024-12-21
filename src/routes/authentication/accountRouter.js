@@ -17,10 +17,9 @@ accountRouter
 
 accountRouter.get("/logout", async (req, res) => {
   try {
- 
     if (req.user.startTime) {
       // Update session duration before logging out
-      await updateSessionHistory(req,res);
+      await updateSessionHistory(req, res);
     }
 
     // Clear session and cookies

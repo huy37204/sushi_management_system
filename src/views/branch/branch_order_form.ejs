@@ -27,41 +27,7 @@
 
     <title>Quản lý phiếu đặt món</title>
   </head>
-  <style>
-    /* Giữ nguyên các style rating hiện tại */
-    .rating:not(:checked) > input {
-      position: absolute;
-      appearance: none;
-    }
 
-    .rating:not(:checked) > label {
-      float: right;
-      cursor: pointer;
-      font-size: 30px;
-      color: #666;
-    }
-
-    .rating:not(:checked) > label:before {
-      content: "★";
-    }
-
-    .rating > input:checked + label:hover,
-    .rating > input:checked + label:hover ~ label,
-    .rating > input:checked ~ label:hover,
-    .rating > input:checked ~ label:hover ~ label,
-    .rating > label:hover ~ input:checked ~ label {
-      color: #e58e09;
-    }
-
-    .rating:not(:checked) > label:hover,
-    .rating:not(:checked) > label:hover ~ label {
-      color: #ff9e0b;
-    }
-
-    .rating > input:checked ~ label {
-      color: #ffa723;
-    }
-  </style>
   <body class="text-gray-800 font-inter">
     <!--sidenav -->
     <%- include('../partials/branch/branch_side_nav') %>
@@ -160,9 +126,10 @@
                 <td class="border py-2">
                   <% if (order.STATUS === 'Chưa thanh toán') { %>
                   <div class="flex space-x-2 justify-center">
+                    <% if (order.ORDER_TYPE === 'Offline') { %>
                     <form
-                      action="/branch/<%= branchId %>/order-form/pay"
-                      method="POST"
+                      action="/branch/<%= branchId %>/order-form/branch-rating"
+                      method="GET"
                       class="inline"
                     >
                       <input
@@ -170,9 +137,14 @@
                         name="orderId"
                         value="<%= order.ORDER_ID %>"
                       />
+                      <input
+                        type="hidden"
+                        name="orderType"
+                        value="<%= order.ORDER_TYPE %>"
+                      />
                       <button
                         type="submit"
-                        class="bg-[#32B877] text-white px-3 py-1 rounded hover:bg-[#2da36a]"
+                        class="payButton bg-[#32B877] text-white px-3 py-1 rounded hover:bg-[#2da36a]"
                       >
                         Thanh toán
                       </button>
@@ -231,6 +203,87 @@
                         Xoá
                       </button>
                     </form>
+                    <% } else {%>
+                    <form
+                      action="/branch/<%= branchId %>/order-form/pay"
+                      method="POST"
+                      class="inline"
+                      id="orderForm_<%=order.ORDER_ID%>"
+                    >
+                      <input
+                        type="hidden"
+                        name="orderId"
+                        value="<%= order.ORDER_ID %>"
+                      />
+                      <input
+                        type="hidden"
+                        name="orderType"
+                        value="<%= order.ORDER_TYPE %>"
+                        id="orderType"
+                      />
+
+                      <button
+                        type="submit"
+                        class="payButton bg-[#32B877] text-white px-3 py-1 rounded hover:bg-[#2da36a]"
+                      >
+                        Thanh toán
+                      </button>
+                    </form>
+                    <form
+                      action="/branch/<%= branchId %>/order-form/update"
+                      method="GET"
+                      class="inline"
+                    >
+                      <input
+                        type="hidden"
+                        name="orderId"
+                        value="<%= order.ORDER_ID %>"
+                      />
+                      <input
+                        type="hidden"
+                        name="orderType"
+                        value="<%= order.ORDER_TYPE %>"
+                      />
+                      <input
+                        type="hidden"
+                        name="orderDate"
+                        value="<%= order.ORDER_DATE %>"
+                      />
+                      <input
+                        type="hidden"
+                        name="orderTime"
+                        value="<%= order.ORDER_TIME %>"
+                      />
+                      <button
+                        type="submit"
+                        class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      >
+                        Cập nhật
+                      </button>
+                    </form>
+                    <form
+                      action="/branch/<%= branchId %>/order-form/delete"
+                      method="POST"
+                      class="inline"
+                    >
+                      <input
+                        type="hidden"
+                        name="orderId"
+                        value="<%= order.ORDER_ID %>"
+                      />
+                      <input
+                        type="hidden"
+                        name="orderType"
+                        value="<%= order.ORDER_TYPE %>"
+                      />
+                      <button
+                        type="submit"
+                        class="bg-[#fa2a2a] text-white px-3 py-1 rounded hover:bg-[#c23030]"
+                      >
+                        Xoá
+                      </button>
+                    </form>
+                    <% } %>
                   </div>
                   <% } %>
                 </td>
