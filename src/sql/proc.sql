@@ -60,19 +60,20 @@ GO
 
 GO
 CREATE PROC getRevenueByDate
-	@DATE DATE,
-	@BranchId CHAR(4)
+    @DATE DATE,
+    @BranchId CHAR(4)
 AS
 BEGIN
-	SELECT * FROM INVOICE I
-	JOIN ORDER_ O ON O.ORDER_ID = I.ORDER_ID AND O.BRANCH_ID = @BranchId
-	WHERE I.ISSUE_DATE = @DATE
+    SELECT *
+    FROM INVOICE I
+    INNER JOIN ORDER_ O ON O.ORDER_ID = I.ORDER_ID
+    WHERE O.BRANCH_ID = @BranchId 
+      AND CAST(I.ISSUE_DATE AS DATE) = @DATE;
 END
 
 EXEC getRevenueByDate @DATE = '10-31-2019', @BranchId = 'B003'
 
-select * from invoice
-JOIN ORDER_ O ON O.ORDER_ID = invoice.ORDER_ID AND O.BRANCH_ID = 'B003'
+
 GO
 CREATE PROC getRevenueByMonth
     @Year INT,
@@ -86,7 +87,7 @@ BEGIN
     WHERE YEAR(I.ISSUE_DATE) = @Year AND MONTH(I.ISSUE_DATE) = @Month;
 END;
 
-EXEC getRevenueByMonth @Year = '1997', @Month = '7', @BranchId = 'B003'
+EXEC getRevenueByMonth @Year = '2024', @Month = '12', @BranchId = 'B003'
 
 GO
 CREATE PROC getRevenueByQuarter
@@ -281,28 +282,34 @@ BEGIN
 	WHERE E.EMPLOYEE_ID = @EmployeeId
 	GROUP BY E.EMPLOYEE_ID, E.FULL_NAME
 END
-
+select * from ONLINE_ORDER WHERE OORDER_ID = 'O023963'
 GO
+
 CREATE PROC payOrder
-    @OrderId CHAR(7)
+    @OrderId CHAR(7),
+	@BranchId CHAR(7),
+    @StaffRating INT,
+    @OrderType NVARCHAR(50)
 AS
 BEGIN
-    -- Khai báo các bi?n
     DECLARE @DiscountAmount DECIMAL(18, 2);
     DECLARE @FinalAmount DECIMAL(18, 2);
+    DECLARE @TotalAmountForPoints DECIMAL(18, 2);
+    DECLARE @Points INT;
     DECLARE @NewInvoiceId CHAR(7);
     DECLARE @CurrentMaxInvoiceId INT;
+    DECLARE @TableNum TINYINT;
 
-    -- L?y giá tr? l?n nh?t c?a INVOICE_ID hi?n t?i
+    -- Lấy giá trị lớn nhất của INVOICE_ID
     SELECT 
         @CurrentMaxInvoiceId = MAX(CAST(SUBSTRING(INVOICE_ID, 2, LEN(INVOICE_ID) - 1) AS INT))
     FROM 
         INVOICE;
 
-    -- T?o INVOICE_ID m?i
+    -- Tạo INVOICE_ID mới
     SET @NewInvoiceId = 'I' + RIGHT('000000' + CAST(@CurrentMaxInvoiceId + 1 AS VARCHAR), 6);
 
-    -- Tính giá tr? DiscountAmount
+    -- Lấy số tiền giảm giá
     SELECT 
         @DiscountAmount = ISNULL(MC.DISCOUNT_AMOUNT, 0)
     FROM 
@@ -312,9 +319,9 @@ BEGIN
     LEFT JOIN 
         MEMBERSHIP_CARD MC ON MC.CUSTOMER_ID = CUSTOMER.CUSTOMER_ID
     WHERE 
-        [ORDER_].ORDER_ID = @OrderId 
+        [ORDER_].ORDER_ID = @OrderId;
 
-    -- Tính t?ng giá tr? don hàng (SUM(QUANTITY * PRICE))
+    -- Tính toán tổng tiền cuối cùng
     SELECT 
         @FinalAmount = SUM(OD.QUANTITY * D.DISH_PRICE) - @DiscountAmount
     FROM 
@@ -324,11 +331,16 @@ BEGIN
     WHERE 
         OD.ORDER_ID = @OrderId;
 
-    -- N?u FinalAmount < 0 thì gán b?ng 0
     IF @FinalAmount < 0 
         SET @FinalAmount = 0;
 
-    -- Chèn thông tin hóa don vào b?ng INVOICE
+    -- Tính số tiền để cộng điểm
+    SET @TotalAmountForPoints = @FinalAmount + @DiscountAmount;
+
+    -- Tính số điểm (1 point = 100,000 VNĐ)
+    SET @Points = FLOOR(@TotalAmountForPoints / 100000);
+
+    -- Thêm hóa đơn mới vào bảng INVOICE
     INSERT INTO INVOICE (
         INVOICE_ID, 
         FINAL_AMOUNT, 
@@ -338,15 +350,68 @@ BEGIN
         ORDER_ID
     )
     VALUES (
-        @NewInvoiceId, -- INVOICE_ID m?i
+        @NewInvoiceId, -- INVOICE_ID mới
         @FinalAmount,
         @DiscountAmount,
-        GETDATE(), -- Ngày hi?n t?i
-        CONVERT(TIME, GETDATE()), -- Th?i gian hi?n t?i
+        GETDATE(), -- Ngày hiện tại
+        CONVERT(TIME, GETDATE()), -- Thời gian hiện tại
         @OrderId
     );
+
+    -- Nếu OrderType là Offline, cập nhật StaffRating vào bảng OFFLINE_ORDER
+    IF @OrderType = 'Offline'
+    BEGIN
+        UPDATE OFFLINE_ORDER
+        SET EMPLYEE_RATING = @StaffRating
+        WHERE OFORDER_ID = @OrderId;
+        -- Lấy Table ID để đặt lại trạng thái bàn
+        SELECT @TableNum = TABLE_NUMBER
+        FROM OFFLINE_ORDER
+        WHERE OFORDER_ID = @OrderId;
+
+        -- Cập nhật trạng thái bàn
+        IF @TableNum IS NOT NULL
+        BEGIN
+            UPDATE [TABLE_]
+            SET TABLE_STATUS = N'Còn trống'
+            WHERE TABLE_NUM = @TableNum AND BRANCH_ID = @BranchId;
+        END
+    END
+	IF @OrderType = 'Online'
+	BEGIN
+        -- Lấy Table ID để đặt lại trạng thái bàn
+        SELECT @TableNum = TABLE_NUMBER
+        FROM ONLINE_ORDER
+        WHERE OORDER_ID = @OrderId;
+
+        -- Cập nhật trạng thái bàn
+        IF @TableNum IS NOT NULL
+        BEGIN
+            UPDATE [TABLE_]
+            SET TABLE_STATUS = N'Còn trống'
+            WHERE TABLE_NUM = @TableNum AND BRANCH_ID = @BranchId;
+        END
+    END
+
+    -- Cập nhật điểm vào Membership_Card nếu khách hàng có thẻ
+    IF EXISTS (
+        SELECT 1 
+        FROM [ORDER_] O
+        JOIN CUSTOMER C ON O.CUSTOMER_ID = C.CUSTOMER_ID
+        JOIN MEMBERSHIP_CARD MC ON C.CUSTOMER_ID = MC.CUSTOMER_ID
+        WHERE O.ORDER_ID = @OrderId
+    )
+    BEGIN
+        UPDATE MEMBERSHIP_CARD
+        SET POINTS = POINTS + @Points
+        FROM [ORDER_] O
+        JOIN CUSTOMER C ON O.CUSTOMER_ID = C.CUSTOMER_ID
+        WHERE O.ORDER_ID = @OrderId
+          AND MEMBERSHIP_CARD.CUSTOMER_ID = C.CUSTOMER_ID;
+    END
 END
 GO
+
 
 GO
 CREATE PROC deleteOrder
@@ -470,12 +535,155 @@ BEGIN
 END;
 GO
 
+CREATE PROCEDURE createCustomerCardForNew
+    @fullName NVARCHAR(50),
+    @phoneNumber CHAR(15),
+    @email CHAR(50),
+    @identityCard CHAR(15),
+    @gender NVARCHAR(5),
+    @employeeId CHAR(7)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Kiểm tra nếu khách hàng đã tồn tại theo số điện thoại
+    IF EXISTS (
+        SELECT 1 
+        FROM CUSTOMER 
+        WHERE PHONE_NUMBER = @phoneNumber
+    )
+    BEGIN
+        -- Kiểm tra nếu khách hàng đã có thẻ thành viên
+        IF EXISTS (
+            SELECT 1 
+            FROM CUSTOMER C
+            JOIN MEMBERSHIP_CARD MC ON C.CUSTOMER_ID = MC.CUSTOMER_ID
+            WHERE C.PHONE_NUMBER = @phoneNumber
+        )
+        BEGIN
+            -- Nếu khách hàng đã có thẻ, thoát khỏi thủ tục
+            PRINT 'Khách hàng đã có thẻ thành viên.';
+            RETURN;
+        END
+        ELSE
+        BEGIN
+            -- Nếu khách hàng chưa có thẻ, tạo thẻ cho khách hàng hiện tại
+            DECLARE @existingCustomerId CHAR(7);
+            SELECT @existingCustomerId = CUSTOMER_ID 
+            FROM CUSTOMER 
+            WHERE PHONE_NUMBER = @phoneNumber;
+
+            -- Tạo CARD_ID mới
+            DECLARE @newCardId CHAR(7);
+            SELECT @newCardId = 'C' + RIGHT('00000' + CAST(ISNULL(MAX(CAST(SUBSTRING(CARD_ID, 2, 6) AS INT)), 0) + 1 AS NVARCHAR), 6)
+            FROM MEMBERSHIP_CARD;
+
+            INSERT INTO MEMBERSHIP_CARD (CARD_ID, CARD_TYPE, CUSTOMER_ID, DATE_ISSUED, EMPLOYEE_ID, POINTS, CARD_STATUS, DISCOUNT_AMOUNT)
+            VALUES (
+                @newCardId, 
+                N'Thẻ thành viên', 
+                @existingCustomerId, 
+                GETDATE(), 
+                @employeeId, 
+                0, 
+                'active', 
+                0
+            );
+
+            PRINT 'Thẻ thành viên đã được tạo thành công cho khách hàng hiện tại.';
+            RETURN;
+        END
+    END
+
+    -- Nếu khách hàng chưa tồn tại, tạo mới khách hàng
+    DECLARE @newCustomerId CHAR(7);
+    SELECT @newCustomerId = RIGHT('000000' + CAST(ISNULL(MAX(CAST(LEFT(CUSTOMER_ID, 6) AS INT)), 0) + 1 AS NVARCHAR), 6) + 'C'
+    FROM CUSTOMER;
+
+    INSERT INTO CUSTOMER (CUSTOMER_ID, FULL_NAME, PHONE_NUMBER, EMAIL, IDENTITY_CARD, GENDER)
+    VALUES (
+        @newCustomerId, 
+        @fullName, 
+        @phoneNumber, 
+        @email, 
+        @identityCard, 
+        @gender
+    );
+
+    -- Tạo CARD_ID mới
+    DECLARE @newCardId1 CHAR(7);
+    SELECT @newCardId1 = 'C' + RIGHT('00000' + CAST(ISNULL(MAX(CAST(SUBSTRING(CARD_ID, 2, 6) AS INT)), 0) + 1 AS NVARCHAR), 6)
+    FROM MEMBERSHIP_CARD;
+
+    INSERT INTO MEMBERSHIP_CARD (CARD_ID, CARD_TYPE, CUSTOMER_ID, DATE_ISSUED, EMPLOYEE_ID, POINTS, CARD_STATUS, DISCOUNT_AMOUNT)
+    VALUES (
+        @newCardId1, 
+        N'Thẻ thành viên', 
+        @newCustomerId, 
+        GETDATE(), 
+        @employeeId, 
+        0, 
+        'Active', 
+        0
+    );
+
+END;
+GO
+CREATE PROCEDURE createCustomerCardForOld
+    @phoneNumber CHAR(15),
+    @identityCard CHAR(15),
+    @employeeId CHAR(7)
+AS
+BEGIN
+    -- 1. Cập nhật số căn cước công dân cho khách hàng có PHONE_NUMBER = @phoneNumber
+    UPDATE CUSTOMER
+    SET IDENTITY_CARD = @identityCard
+    WHERE PHONE_NUMBER = @phoneNumber;
+
+    -- 2. Lấy CUSTOMER_ID của khách hàng dựa trên PHONE_NUMBER
+    DECLARE @customerId CHAR(7);
+    SELECT @customerId = CUSTOMER_ID
+    FROM CUSTOMER
+    WHERE PHONE_NUMBER = @phoneNumber;
+
+    -- 3. Kiểm tra nếu khách hàng đã có thẻ "Active"
+    IF NOT EXISTS (
+        SELECT 1
+        FROM MEMBERSHIP_CARD MC
+        WHERE MC.CUSTOMER_ID = @customerId
+        AND MC.CARD_STATUS = 'Active'
+    )
+    BEGIN
+        -- 4. Nếu không có thẻ "Active", tạo thẻ mới cho khách hàng
+
+        -- Tạo mới CARD_ID (tăng dần)
+        DECLARE @newCardId CHAR(7);
+        SELECT @newCardId = 'C' + RIGHT('000000' + CAST(MAX(CAST(SUBSTRING(CARD_ID, 2, 6) AS INT)) + 1 AS VARCHAR(6)), 6)
+        FROM MEMBERSHIP_CARD;
+
+        -- Thêm thẻ mới vào bảng MEMBERSHIP_CARD
+        INSERT INTO MEMBERSHIP_CARD (
+            CARD_ID, CARD_TYPE, CUSTOMER_ID, DATE_ISSUED, EMPLOYEE_ID, POINTS, CARD_STATUS, DISCOUNT_AMOUNT
+        )
+        VALUES (
+            @newCardId,  -- CARD_ID là giá trị mới
+            N'Thẻ thành viên',  -- CARD_TYPE là 'Thẻ thành viên'
+            @customerId,  -- CUSTOMER_ID là giá trị lấy từ khách hàng
+            GETDATE(),  -- Ngày cấp thẻ
+            @employeeId,  -- EMPLOYEE_ID là ID nhân viên tạo thẻ
+            0,  -- POINTS là 0
+            'Active',  -- CARD_STATUS là 'Active'
+            0  -- DISCOUNT_AMOUNT là 0
+        );
+    END
+END
 
 
 
 
+SELECT * FROM RESTAURANT_BRANCH
 SELECT * FROM TABLE_
-SELECT * FROM CUSTOMER
+SELECT * FROM CUSTOMER JOIN MEMBERSHIP_CARD ON MEMBERSHIP_CARD.CUSTOMER_ID = CUSTOMER.CUSTOMER_ID
 SELECT * FROM MEMBERSHIP_CARD
 SELECT * FROM INVOICE
 JOIN ORDER_ O ON O.ORDER_ID = INVOICE.ORDER_ID AND O.BRANCH_ID = 'B003'
@@ -484,7 +692,7 @@ select * from ORDER_DISH WHERE ORDER_ID = 'O012016'
 select * from ORDER_
 select * from DELIVERY_ORDER
 SELECT * FROM INVOICE
-select * from ACCOUNT A 
+select * from ACCOUNT A
 select * from RESTAURANT_BRANCH
 select * from invoice WHERE YEAR(ISSUE_DATE) = '1997'
 SELECT * FROM EMPLOYEE
@@ -495,8 +703,13 @@ SELECT * FROM DELIVERY_ORDER
 SELECT * FROM OFFLINE_ORDER
 SELECT * FROM ORDER_ O
 SELECT * FROM TABLE_ WHERE BRANCH_ID = 'B012' AND TABLE_STATUS = N'Còn tr?ng'
-JOIN OFFLINE_ORDER OFO ON OFO.OFORDER_ID = O.ORDER_ID AND O.BRANCH_ID = 'B001'
+SELECT * FROM EMPLOYEE WHERE FULL_NAME = N'Bác Hưng Lêê'
 SELECT * FROM ORDER_DISH
+SELECT * FROM DEPARTMENT
+select * from DISH
+SELECT * FROM WORK_HISTORY WHERE EMPLOYEE_ID = 'E000003'
+SELECT * FROM EMPLOYEE WHERE EMPLOYEE_ID ='E000003'
+	
 
 SELECT E.EMPLOYEE_ID, E.FULL_NAME,  AVG(CAST(OFO.EMPLYEE_RATING AS FLOAT)) AS AVERAGE_RATE 
 	FROM EMPLOYEE E

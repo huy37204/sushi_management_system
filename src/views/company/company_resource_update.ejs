@@ -44,70 +44,81 @@
 
         <!-- Employee Information Form -->
         <div class="bg-white p-6 shadow-md rounded-lg">
-          <form id="employee-update-form">
+          <form id="employeeForm" action="/company/resource/update" method="POST">
+            
             <!-- Employee ID (Readonly) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label
-                  for="employee-id"
-                  class="block text-gray-700 font-medium mb-2"
-                >
+                <label for="employeeId" class="block text-gray-700 font-medium mb-2">
                   Mã nhân viên
                 </label>
                 <input
                   type="text"
-                  id="employee-id"
-                  name="employee-id"
+                  id="employeeId"
+                  name="employeeId"
                   class="block w-full p-2 border rounded-md bg-gray-100 text-gray-500 cursor-not-allowed"
-                  value="NV12345"
+                  value="<%= employee.EMPLOYEE_ID %>"
                   readonly
                 />
               </div>
-
-              <!-- Gender -->
               <div>
-                <label
-                  for="gender"
-                  class="block text-gray-700 font-medium mb-2"
-                >
+                <label for="fullName" class="block text-gray-700 font-medium mb-2">
+                  Họ và tên
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  name="fullName"
+                  class="block w-full p-2 border rounded-md"
+                  value="<%= employee.FULL_NAME %>"
+                />
+              </div>
+          
+             
+            </div>
+          
+            <!-- Department, Date of Joining and Date of Resignation -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+               <!-- Gender -->
+               <div>
+                <label for="gender" class="block text-gray-700 font-medium mb-2">
                   Giới tính
                 </label>
                 <select
                   id="gender"
                   name="gender"
                   class="block w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                  required
                 >
-                  <option value="male">Nam</option>
-                  <option value="female">Nữ</option>
-                  <option value="other">Khác</option>
+                  <option value="Nam" <%= employee.GENDER === 'male' ? 'selected' : '' %>>Nam</option>
+                  <option value="Nữ" <%= employee.GENDER === 'female' ? 'selected' : '' %>>Nữ</option>
+
                 </select>
               </div>
-            </div>
-
-            <!-- Department, Date of Joining and Date of Resignation -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <div>
-                <label
-                  for="department"
-                  class="block text-gray-700 font-medium mb-2"
-                >
+                <label for="department" class="block text-gray-700 font-medium mb-2">
                   Bộ phận
                 </label>
                 <select
                   id="department"
                   name="department"
                   class="block w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                  required
                 >
-                  <option value="kitchen">Bếp</option>
-                  <option value="reception">Lễ tân</option>
-                  <option value="waiter">Phục vụ bàn</option>
-                  <option value="cashier">Thu ngân</option>
-                  <option value="manager">Quản lý chi nhánh</option>
+                  <% departments.forEach(department => { %>
+                    <option value="<%= department.DEPARTMENT_ID %>" <%= employee.DEPARTMENT_ID === department.DEPARTMENT_ID ? 'selected' : '' %>>
+                      <%= department.DEPARTMENT_NAME %>
+                    </option>
+                  <% }); %>
                 </select>
               </div>
-
-              <!-- Date of Birth -->
-              <div>
+          
+            </div>
+          
+            <!-- Date of Resignation and Date of Joining -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+               <!-- Date of Birth -->
+               <div>
                 <label for="dob" class="block text-gray-700 font-medium mb-2">
                   Ngày sinh
                 </label>
@@ -116,54 +127,58 @@
                   id="dob"
                   name="dob"
                   class="block w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                  value="<%= employee.DATE_OF_BIRTH %>"
+                  required
                 />
               </div>
-            </div>
-
-            <!-- Date of Resignation and Date of Birth -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
               <div>
-                <label
-                  for="date-resignation"
-                  class="block text-gray-700 font-medium mb-2"
-                >
+                <label for="terminationDate" class="block text-gray-700 font-medium mb-2">
                   Ngày nghỉ việc
                 </label>
                 <input
                   type="date"
-                  id="date-resignation"
-                  name="date-resignation"
+                  id="terminationDate"
+                  name="terminationDate"
                   class="block w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                  value="<%= employee.TERMINATION_DATE %>"
                 />
               </div>
-
+              
+          
               <!-- Date of Joining -->
               <div>
-                <label
-                  for="date-joining"
-                  class="block text-gray-700 font-medium mb-2"
-                >
+                <label for="startDateWork" class="block text-gray-700 font-medium mb-2">
                   Ngày vào làm
                 </label>
                 <input
                   type="date"
-                  id="date-joining"
-                  name="date-joining"
+                  id="startDateWork"
+                  name="startDateWork"
                   class="block w-full p-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-300"
+                  value="<%= employee.START_DATE_WORK %>"
+                  required
                 />
               </div>
             </div>
-
+          
             <!-- Submit Button -->
-            <div class="mt-6 flex justify-center">
+            <div class="mt-6 flex justify-center space-x-4">
               <button
-                type="submit"
-                class="bg-indigo-600 text-white px-9 py-2 rounded-lg hover:bg-indigo-700"
-              >
-                Cập nhật
-              </button>
+              type="button"
+              class="bg-[#fd7272] text-white px-9 py-2 rounded-lg hover:bg-[#fd6161] w-[150px]"
+              onclick="submitDeleteForm()"
+            >
+              Xoá
+            </button>
+              <button
+              type="submit"
+              class="bg-indigo-600 text-white px-9 py-2 rounded-lg hover:bg-indigo-700 w-[150px]"
+            >
+              Cập nhật
+            </button>
             </div>
           </form>
+          
         </div>
       </div>
 
@@ -182,24 +197,12 @@
         dropdown.classList.toggle("hidden");
       }
       //end: Toggle-dropdown
-      document
-        .getElementById("employee-update-form")
-        .addEventListener("submit", function (e) {
-          e.preventDefault(); // Ngừng hành động mặc định (không gửi form)
-
-          // Lấy thông tin từ form
-          const employeeData = {
-            employeeId: document.getElementById("employee-id").value,
-            gender: document.getElementById("gender").value,
-            department: document.getElementById("department").value,
-            dateJoining: document.getElementById("date-joining").value,
-            dateResignation: document.getElementById("date-resignation").value,
-            dob: document.getElementById("dob").value,
-          };
-
-          console.log("Thông tin nhân viên đã cập nhật:", employeeData);
-          alert("Thông tin nhân viên đã được cập nhật thành công!");
-        });
+      function submitDeleteForm() {
+    const form = document.getElementById("employeeForm");
+    form.action = "/company/resource/delete";
+    form.method = "POST";
+    form.submit();
+  }
     </script>
   </body>
 </html>

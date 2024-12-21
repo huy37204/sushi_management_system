@@ -42,91 +42,90 @@
           Chuyển nhân sự
         </div>
         <!-- Form chuyển nhân viên -->
-        <div class="bg-white rounded-lg shadow-lg w-[80%] p-6">
-          <!-- Thông tin nhân viên -->
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <!-- Mã nhân viên -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700"
-                >Mã nhân viên</label
-              >
-              <input
-                type="text"
-                value="NV001"
-                readonly
-                class="mt-1 p-2 w-full rounded-md border-gray-300 bg-gray-100 cursor-not-allowed"
-              />
+        <form
+          action="/company/resource/transfer?employeeId=<%= employee.EMPLOYEE_ID %>&branchId=<%= branchId %>"
+          method="POST"
+        >
+          <div class="bg-white rounded-lg shadow-lg w-[80%] p-6">
+            <!-- Thông tin nhân viên -->
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <!-- Mã nhân viên -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700"
+                  >Mã nhân viên</label
+                >
+                <input
+                  type="text"
+                  value="<%= employee.EMPLOYEE_ID %>"
+                  readonly
+                  class="mt-1 p-2 w-full rounded-md border-gray-300 bg-gray-100 cursor-not-allowed"
+                />
+              </div>
+              <!-- Họ tên -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700"
+                  >Họ tên</label
+                >
+                <input
+                  type="text"
+                  value="<%= employee.FULL_NAME%>"
+                  readonly
+                  class="mt-1 p-2 w-full rounded-md border-gray-300 bg-gray-100 cursor-not-allowed"
+                />
+              </div>
+              <!-- Bộ phận -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700"
+                  >Bộ phận</label
+                >
+                <input
+                  type="text"
+                  value="<%= employee.DEPARTMENT_NAME  %>"
+                  readonly
+                  class="mt-1 p-2 w-full rounded-md border-gray-300 bg-gray-100 cursor-not-allowed"
+                />
+              </div>
             </div>
-            <!-- Họ tên -->
-            <div>
+
+            <!-- Chọn chi nhánh -->
+            <div class="mb-6">
               <label class="block text-sm font-medium text-gray-700"
-                >Họ tên</label
+                >Chi nhánh</label
               >
-              <input
-                type="text"
-                value="Nguyễn Văn A"
-                readonly
-                class="mt-1 p-2 w-full rounded-md border-gray-300 bg-gray-100 cursor-not-allowed"
-              />
-            </div>
-            <!-- Bộ phận -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700"
-                >Bộ phận</label
+              <select
+                class="mt-1 p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                name="departmentId"
               >
-              <input
-                type="text"
-                value="Lễ tân"
-                readonly
-                class="mt-1 p-2 w-full rounded-md border-gray-300 bg-gray-100 cursor-not-allowed"
-              />
+                <% if (branches && branches.length > 0) { %> <%
+                branches.forEach(branch => { %>
+                <option value="<%= branch.DEPARTMENT_ID%>">
+                  <%= branch.BRANCH_NAME %>, <%=branch.BRANCH_ID%>
+                </option>
+                <% }) %>
+                <% } else { %>
+                <option value="" disabled>Không có chi nhánh</option>
+                <% } %>
+              </select>
             </div>
-          </div>
 
-          <!-- Chọn khu vực -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700"
-              >Khu vực</label
-            >
-            <select
-              class="mt-1 p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            >
-              <option value="kv1">Khu vực 1</option>
-              <option value="kv2">Khu vực 2</option>
-              <option value="kv3">Khu vực 3</option>
-            </select>
-          </div>
-
-          <!-- Chọn chi nhánh -->
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700"
-              >Chi nhánh</label
-            >
-            <select
-              class="mt-1 p-2 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            >
-              <option value="cn1">Chi nhánh 1</option>
-              <option value="cn2">Chi nhánh 2</option>
-              <option value="cn3">Chi nhánh 3</option>
-            </select>
-          </div>
-
-          <!-- Nút hành động -->
-          <div class="flex justify-center gap-4">
-            <a href="/company-resource">
+            <!-- Nút hành động -->
+            <div class="flex justify-center gap-4">
+              <a href="/company-resource">
+                <button
+                  class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 w-[100px]"
+                >
+                  Hủy
+                </button>
+              </a>
               <button
-                class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 w-[100px]"
+                type="submit"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 w-[100px]"
               >
-                Hủy
+                Chuyển
               </button>
-            </a>
-            <button
-              class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 w-[100px]"
-            >
-              Chuyển
-            </button>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
 
       <!-- End Content -->

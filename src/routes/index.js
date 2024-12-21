@@ -14,7 +14,7 @@ router.use(PATH.HOME, customerRouter);
 
 router.use(PATH.HOME, branchRouter);
 
-router.use(PATH.COMPANY.PATH, companyRouter);
+router.use(PATH.HOME, companyRouter);
 
 router.use(PATH.EMPLOYEE.PATH, employeeRouter);
 

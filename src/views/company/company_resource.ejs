@@ -21,7 +21,68 @@
     <link rel="stylesheet" href="/css/branch_home.css" />
     <link rel="stylesheet" href="/css/output.css" />
 
-    <title>Quản lý doanh thu món ăn</title>
+    <title>Quản lý nhân viên</title>
+    <style>
+      .button {
+        position: relative;
+        width: 200px;
+        height: 40px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        border: 1px solid #34974d;
+        background-color: #3aa856;
+      }
+
+      .button,
+      .button__icon,
+      .button__text {
+        transition: all 0.3s;
+      }
+
+      .button .button__text {
+        transform: translateX(20px);
+        color: #fff;
+        font-weight: 600;
+      }
+
+      .button .button__icon {
+        position: absolute;
+        transform: translateX(160px);
+        height: 100%;
+        width: 39px;
+        background-color: #34974d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .button .svg {
+        width: 30px;
+        stroke: #fff;
+      }
+
+      .button:hover {
+        background: #34974d;
+      }
+
+      .button:hover .button__text {
+        color: transparent;
+      }
+
+      .button:hover .button__icon {
+        width: 148px;
+        transform: translateX(20px);
+      }
+
+      .button:active .button__icon {
+        background-color: #2e8644;
+      }
+
+      .button:active {
+        border: 1px solid #2e8644;
+      }
+    </style>
   </head>
   <body class="text-gray-800 font-inter">
     <!--sidenav -->
@@ -41,43 +102,53 @@
         <div class="text-[30px] font-semibold text-[#374151] mb-5">
           Quản lý nhân viên
         </div>
-        <div class="flex space-x-10">
-          <div class="w-[30%]">
-            <label for="branch-select">Khu vực</label>
-            <div class="mt-2">
-              <select
-                name="branch-select"
-                id="branch-select"
-                class="p-2 w-full"
-              >
-                <option value="default">-Chọn khu vực-</option>
-                <option value="HCM">Hồ Chí Minh</option>
-              </select>
-            </div>
-          </div>
+        <div class="flex justify-between items-end">
           <div class="w-[30%]">
             <label for="branch-select">Chi nhánh</label>
             <div class="mt-2">
               <select
-                name="branch-select"
                 id="branch-select"
-                class="p-2 w-full"
+                name="branchId"
+                class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#f84525] focus:border-[#f84525] text-gray-700"
+                onchange="updateUrlWithBranchId(this)"
               >
-                <option value="default">-Chọn chi nhánh-</option>
-                <option value="NVC-HCM">
-                  45/6, Nguyễn Văn Cừ, Quận 5, Thành phố Hồ Chí Minh
+                <option value="" disabled selected>- Chọn chi nhánh -</option>
+                <% branches.forEach(branch => { %>
+                <option value="<%= branch.BRANCH_ID %>">
+                  <%= branch.BRANCH_NAME %>
                 </option>
+                <% }); %>
               </select>
             </div>
           </div>
-          <div class="mt-auto">
+          <% if (branchId) { %>
+          <div class="">
             <button
-              type="submit"
-              class="bg-[#219BE5] hover:bg-[#47b1f3] rounded-md py-2 px-4 text-white font-bold"
+              type="button"
+              class="button"
+              onclick="window.location.href='/company/resource/add?branchId=<%= branchId %>'"
             >
-              Tìm kiếm
+              <span class="button__text">Thêm nhân viên</span>
+              <span class="button__icon"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                  stroke="currentColor"
+                  height="24"
+                  fill="none"
+                  class="svg"
+                >
+                  <line y2="19" y1="5" x2="12" x1="12"></line>
+                  <line y2="12" y1="12" x2="19" x1="5"></line>
+                </svg>
+              </span>
             </button>
           </div>
+          <% } %>
         </div>
         <div class="flex flex-col mt-2">
           <div
@@ -86,7 +157,7 @@
             <div
               class="inline-block min-w-full overflow-hidden align-middle border-b border-gray-200 shadow sm:rounded-lg"
             >
-              <table class="min-w-full">
+              <table id="employeeTable" class="min-w-full">
                 <thead>
                   <tr>
                     <th
@@ -94,7 +165,6 @@
                     >
                       Name
                     </th>
-
                     <th
                       class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
                     >
@@ -106,15 +176,18 @@
                       <select
                         id="departmentFilter"
                         class="p-1 border border-black rounded-md text-sm text-center"
+                        onchange="filterTable()"
                       >
                         <option value="">Tất cả</option>
-                        <option value="bếp">Bếp</option>
-                        <option value="lễ tân">Lễ tân</option>
-                        <option value="phục vụ bàn">Phục vụ bàn</option>
-                        <option value="thu ngân">Thu ngân</option>
-                        <option value="quản lý chi nhánh">
-                          Quản lý chi nhánh
+                        <% if (departmentList && departmentList.length > 0) { %>
+                        <% departmentList.forEach(department => { %>
+                        <option value="<%= department.DEPARTMENT_ID %>">
+                          <%= department.DEPARTMENT_NAME %>
                         </option>
+                        <% }) %>
+                        <% } else { %>
+                        <option disabled>Không có phòng ban</option>
+                        <% } %>
                       </select>
                     </th>
                     <th
@@ -128,6 +201,7 @@
                           type="text"
                           placeholder="Nhập tên, mã nhân viên..."
                           class="p-2 pl-3 pr-10 w-[80%] border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          oninput="filterTable()"
                         />
                         <i
                           class="ri-search-line absolute top-1/2 transform -translate-y-1/2 right-[15%] text-gray-400"
@@ -136,19 +210,19 @@
                     </th>
                   </tr>
                 </thead>
-
-                <tbody class="bg-white" id="employeeTable">
-                  <% for (let i = 0; i < 10; i++) { %>
+                <tbody class="bg-white" id="employeeTableBody">
+                  <% if (employeeList.length > 0) { %> <%
+                  employeeList.forEach(employee => { %>
                   <tr
-                    data-name="John Doe"
-                    data-id="09dsa23a@"
-                    data-department="phục vụ bàn"
+                    data-name="<%= employee.FULL_NAME %>"
+                    data-id="<%= employee.EMPLOYEE_ID %>"
+                    data-department="<%= employee.DEPARTMENT_ID %>"
                     class="relative text-center"
                   >
                     <td
                       class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 w-[20%]"
                     >
-                      <div class="flex items-center">
+                      <div class="flex items-center text-start">
                         <div class="flex-shrink-0 w-10 h-10">
                           <img
                             class="w-10 h-10 rounded-full"
@@ -160,76 +234,58 @@
                           <div
                             class="text-sm font-medium leading-5 text-gray-900"
                           >
-                            John Doe
+                            <%= employee.FULL_NAME %>
                           </div>
                           <div class="text-sm leading-5 text-gray-500">
-                            09dsa23a@
+                            <%= employee.EMPLOYEE_ID %>
                           </div>
                         </div>
                       </div>
                     </td>
-
                     <td
-                      class="px-6 py-4 whitespace-no-wrap border-b border-gray-200"
+                      class="px-6 py-7 whitespace-no-wrap border-b border-gray-200 flex justify-center"
                     >
-                      <span
-                        class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full"
-                        >Active</span
+                      <% if (!employee.TERMINATION_DATE) { %>
+                      <div
+                        class="flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full w-[100px] justify-center items-center text-center"
                       >
+                        Active
+                      </div>
+                      <% } else { %>
+                      <div
+                        class="flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full w-[100px] justify-center items-center text-center"
+                      >
+                        Terminate
+                      </div>
+                      <% } %>
                     </td>
                     <td
                       class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200"
                     >
-                      Phục vụ bàn
+                      <%= employee.DEPARTMENT_NAME %>
                     </td>
                     <td
                       class="px-6 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 text-blue-500"
                     >
-                      <a href="/company/resource/transfer/:employeeId"
+                      <a
+                        href="/company/resource/transfer?employeeId=<%= employee.EMPLOYEE_ID %>&branchId=<%= branchId %>"
                         >Chuyển chi nhánh</a
                       >
                     </td>
-
                     <td
                       class="px-6 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 text-purple-400"
                     >
-                      <a href="/company/resource/update/:employeeId"
+                      <a
+                        href="/company/resource/update?employeeId=<%= employee.EMPLOYEE_ID %>&branchId=<%= branchId %>"
                         >Cập nhật</a
                       >
                     </td>
-
-                    <td
-                      class="px-6 py-4 text-sm font-medium leading-5 whitespace-no-wrap border-b border-gray-200"
-                    >
-                      <!-- SVG Icon -->
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="h-[16px] w-[16px] cursor-pointer"
-                        onclick="toggleDropdown(this)"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="m19.5 8.25-7.5 7.5-7.5-7.5"
-                        />
-                      </svg>
-
-                      <!-- Dropdown Menu -->
-                      <div
-                        class="dropdown-content hidden absolute left-0 top-full mt-2 w-full bg-white shadow-lg rounded-lg border border-gray-200 p-6 text-sm text-gray-700 z-10"
-                      >
-                        <div class="grid grid-cols-3 gap-6 text-left">
-                          <div><strong>Ngày sinh:</strong> 01/01/1990</div>
-                          <div><strong>Giới tính:</strong> Nam</div>
-                          <div><strong>Lương:</strong> $5000</div>
-                          <div><strong>Ngày vào làm:</strong> 01/06/2020</div>
-                          <div><strong>Ngày nghỉ việc:</strong> 01/06/2025</div>
-                        </div>
-                      </div>
+                  </tr>
+                  <% }) %>
+                  <% } else { %>
+                  <tr>
+                    <td colspan="5" class="text-center py-4">
+                      Không có dữ liệu nhân viên
                     </td>
                   </tr>
                   <% } %>
@@ -255,39 +311,57 @@
         dropdown.classList.toggle("hidden");
       }
       //end: Toggle-dropdown
-      document
-        .getElementById("departmentFilter")
-        .addEventListener("change", function () {
-          const selectedDepartment = this.value.toLowerCase();
-          const rows = document.querySelectorAll("#employeeTable tr");
-
-          rows.forEach((row) => {
-            const department = row.getAttribute("data-department");
-
-            if (!selectedDepartment || department === selectedDepartment) {
-              row.style.display = ""; // Hiện dòng
-            } else {
-              row.style.display = "none"; // Ẩn dòng
-            }
-          });
+      function filterByDepartment(departmentId) {
+        const rows = document.querySelectorAll("#employeeTable tr");
+        rows.forEach((row) => {
+          const department = row.getAttribute("data-department");
+          if (!departmentId || department === departmentId) {
+            row.style.display = ""; // Hiển thị dòng
+          } else {
+            row.style.display = "none"; // Ẩn dòng
+          }
         });
-      document
-        .getElementById("searchInput")
-        .addEventListener("input", function () {
-          const searchValue = this.value.toLowerCase();
-          const rows = document.querySelectorAll("#employeeTable tr");
+      }
+      function filterTable() {
+        const searchValue = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const departmentFilterValue =
+          document.getElementById("departmentFilter").value;
+        const rows = document.querySelectorAll("#employeeTableBody tr");
 
-          rows.forEach((row) => {
-            const name = row.getAttribute("data-name").toLowerCase();
-            const id = row.getAttribute("data-id").toLowerCase();
+        rows.forEach((row) => {
+          const employeeName = row.dataset.name.toLowerCase();
+          const employeeId = row.dataset.id.toLowerCase();
+          const departmentId = row.dataset.department;
 
-            if (name.includes(searchValue) || id.includes(searchValue)) {
-              row.style.display = "";
-            } else {
-              row.style.display = "none";
-            }
-          });
+          // Kiểm tra điều kiện lọc tên và mã nhân viên
+          const matchesSearch =
+            employeeName.includes(searchValue) ||
+            employeeId.includes(searchValue);
+
+          // Kiểm tra điều kiện lọc phòng ban
+          const matchesDepartment =
+            departmentFilterValue === "" ||
+            departmentId === departmentFilterValue;
+
+          // Nếu cả hai điều kiện đều thỏa mãn, hiển thị hàng
+          if (matchesSearch && matchesDepartment) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
         });
+      }
+    </script>
+    <script>
+      function updateUrlWithBranchId(selectElement) {
+        const branchId = selectElement.value;
+
+        // Chuyển hướng đến URL mới
+        const newUrl = `/company/resource?branchId=${branchId}`; // Tạo URL với key và value
+        window.location.href = newUrl; // Điều hướng tới URL mới
+      }
     </script>
   </body>
 </html>
