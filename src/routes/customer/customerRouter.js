@@ -15,21 +15,24 @@ import {
 
 const customerRouter = express.Router();
 const customerRole = "Khách hàng";
+
 customerRouter.get("/", verifyRole(customerRole), async (req, res) => {
   try {
     // Lấy dữ liệu menu từ controller
     const menuDropDownData = await getMenuDropDownItem();
-    // Render view và truyền dữ liệu menu vào
+    // Render view và truyền dữ liệu menu và thẻ thành viên vào
     res.render("customer/home", {
       activePage: "home",
       user: req.user || null,
       menuDropDownData,
+      membershipCard: req.session.membershipCard || null, // Thêm thẻ thành viên vào đây
     });
   } catch (err) {
     console.error("Lỗi khi lấy dữ liệu menu:", err);
     res.status(500).send("Lỗi khi lấy dữ liệu menu");
   }
 });
+
 customerRouter.get(
   PATH.CUSTOMER.TABLE_BOOKING,
   verifyRole(customerRole),
@@ -43,6 +46,7 @@ customerRouter.get(
   verifyRole(customerRole),
   menuController,
 );
+
 customerRouter.post(
   PATH.CUSTOMER.MENU,
   verifyRole(customerRole),
@@ -65,11 +69,12 @@ customerRouter.get(
       // Lấy dữ liệu menu từ controller
       const menuDropDownData = await getMenuDropDownItem();
 
-      // Render view và truyền dữ liệu menu vào
+      // Render view và truyền dữ liệu menu và thẻ thành viên vào
       res.render("customer/cart", {
         activePage: "cart",
         user: req.user || null,
         menuDropDownData,
+        membershipCard: req.session.membershipCard || null, // Thêm thẻ thành viên vào đây
       });
     } catch (err) {
       console.error("Lỗi khi lấy dữ liệu menu:", err);

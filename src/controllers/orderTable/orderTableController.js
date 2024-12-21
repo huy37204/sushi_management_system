@@ -18,6 +18,7 @@ export const orderTableController = async (req, res) => {
       user: req.user || null,
       menuDropDownData,
       branchList: branchList.recordset, // Lấy danh sách chi nhánh từ kết quả query
+      membershipCard: req.session.membershipCard || null,
     });
   } catch (err) {
     console.error("Lỗi khi lấy dữ liệu danh sách chi nhánh hoặc menu:", err);
@@ -132,6 +133,7 @@ export const preorderController = async (req, res) => {
       menuDropDownData,
       orderId,
       branchId,
+      membershipCard: req.session.membershipCard || null,
     });
   } catch (error) {
     console.error(error);

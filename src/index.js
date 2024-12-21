@@ -8,7 +8,6 @@ import dotenv from "dotenv";
 import session from "express-session";
 import { hashAllPasswords } from "./controllers/hashPassword/hashPassword.js";
 import cookieParser from "cookie-parser";
-
 dotenv.config();
 
 const app = express();
@@ -31,7 +30,6 @@ app.use(
     },
   }),
 );
-
 const connectToDatabase = async () => {
   try {
     const pool = await connect();

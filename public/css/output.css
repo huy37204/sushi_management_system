@@ -2121,6 +2121,10 @@ input:checked + .toggle-bg {
   border-bottom-width: 2px;
 }
 
+.border-t {
+  border-top-width: 1px;
+}
+
 .border-dashed {
   border-style: dashed;
 }
