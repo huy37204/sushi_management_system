@@ -161,9 +161,8 @@
                         class="rounded-md border-gray-300 p-2 font-normal"
                         placeholder="Nhập tên, mã nhân viên..."
                         value="<%= search %>" 
-                        onkeyup="searchEmployees()"
+                        onkeydown="handleSearchKey(event)"
                       />
-                      
                       <!-- Department Filter -->
                       <select
                         name="select-department"
@@ -324,12 +323,14 @@
         dropdown.classList.toggle("hidden");
       }
       //end: Toggle-dropdown
-      function searchEmployees() {
-    const searchInput = document.getElementById("search-input").value;
-    const department = document.getElementById("select-department").value;
-    const query = `?search=${encodeURIComponent(searchInput)}&department=${encodeURIComponent(department)}`;
-    window.location.href = query; // Chuyển hướng với query
-  }
+      function handleSearchKey(event) {
+        if (event.key === "Enter") {
+          const searchInput = document.getElementById("search-input").value;
+          const department = document.getElementById("select-department").value;
+          const query = `?search=${encodeURIComponent(searchInput)}&department=${encodeURIComponent(department)}`;
+          window.location.href = query; // Chuyển hướng với query
+        }
+      }
 
   function filterByDepartment() {
     const department = document.getElementById("select-department").value;

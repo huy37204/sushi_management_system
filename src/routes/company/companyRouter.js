@@ -18,13 +18,13 @@ import {
   transferResource,
   updateResource,
 } from "../../controllers/companyController/resourceController.js";
-import{
-getSalaries,
-updateSalaries,
+import {
+  getSalaries,
+  updateSalaries,
 } from "../../controllers/company/UpdateSalary.js"; // Adjust the import path
 import {
-getRevenuePage,
-getRevenueData,
+  getRevenuePage,
+  getRevenueData,
 } from "../../controllers/company/statisticDish.js"; // Adjust the import path
 
 const companyRouter = express.Router();
@@ -58,7 +58,6 @@ companyRouter.post(
   verifyRole(companyRole),
   getCompanyRevenueByYear,
 );
-
 
 companyRouter.get(
   PATH.COMPANY.RESOURCE,

@@ -35,37 +35,35 @@ export const employeeBranchController = async (req, res) => {
 
     // Nếu có dữ liệu trả về
 
-      const employees = employeesList.recordset; // Danh sách toàn bộ nhân viên đã lọc
-      const totalRecords = employees.length; // Tổng số bản ghi
-      const totalPages = Math.ceil(totalRecords / pageSize); // Tổng số trang
+    const employees = employeesList.recordset; // Danh sách toàn bộ nhân viên đã lọc
+    const totalRecords = employees.length; // Tổng số bản ghi
+    const totalPages = Math.ceil(totalRecords / pageSize); // Tổng số trang
 
-      // Cắt dữ liệu dựa trên trang hiện tại
-      const paginatedEmployees = employees.slice(
-        (pageNum - 1) * pageSize,
-        pageNum * pageSize
-      );
+    // Cắt dữ liệu dựa trên trang hiện tại
+    const paginatedEmployees = employees.slice(
+      (pageNum - 1) * pageSize,
+      pageNum * pageSize,
+    );
 
-      const departments = departmentList.recordset; // Danh sách phòng ban
+    const departments = departmentList.recordset; // Danh sách phòng ban
 
-      // Render view
-      res.render("branch/branch_employee_list", {
-        user: user,
-        branchId: branchId,
-        employees: paginatedEmployees,
-        totalEmployees: totalRecords,
-        departments: departments,
-        currentPage: pageNum,
-        totalPages: totalPages,
-        search, // Từ khóa tìm kiếm
-        departmentFilter, // Bộ phận lọc
-      });
-
+    // Render view
+    res.render("branch/branch_employee_list", {
+      user: user,
+      branchId: branchId,
+      employees: paginatedEmployees,
+      totalEmployees: totalRecords,
+      departments: departments,
+      currentPage: pageNum,
+      totalPages: totalPages,
+      search, // Từ khóa tìm kiếm
+      departmentFilter, // Bộ phận lọc
+    });
   } catch (error) {
     console.error("Error fetching employee branch details:", error);
     res.status(500).send("Internal server error.");
   }
 };
-
 
 export const employeeSearchController = async (req, res) => {
   const { branchId } = req.params;

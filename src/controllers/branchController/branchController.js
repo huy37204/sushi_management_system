@@ -30,7 +30,7 @@ export const branchController = async (req, res) => {
         dailyTotals: [],
         monthlyTotals: [],
         quarter: "",
-        sumAmount: 0
+        sumAmount: 0,
       });
     } else {
       // Nếu không tìm thấy BranchId cho manager, trả về lỗi hoặc chuyển hướng
@@ -91,7 +91,7 @@ export const getBranchRevenueByDate = async (req, res) => {
       dailyTotals: [],
       monthlyTotals: [],
       quarter: "",
-      sumAmount
+      sumAmount,
     });
   } catch (error) {
     console.error("Error fetching branch revenue by date:", error);
@@ -124,7 +124,7 @@ export const getBranchRevenueByMonth = async (req, res) => {
       if (!isNaN(invoiceDate)) {
         const day = new Date(invoice.ISSUE_DATE).getUTCDate(); // Lấy ngày (1-31)
         dailyTotals[day - 1] += parseFloat(invoice.FINAL_AMOUNT || 0); // Cộng giá trị hóa đơn vào ngày tương ứng
-        sumAmount +=  parseFloat(invoice.FINAL_AMOUNT || 0);
+        sumAmount += parseFloat(invoice.FINAL_AMOUNT || 0);
       } else {
         console.warn(`Invalid date found in invoice: ${invoice.ISSUE_DATE}`);
       }
@@ -200,7 +200,7 @@ export const getBranchRevenueByQuarter = async (req, res) => {
       monthlyTotals,
       dailyTotals: [],
       hourlyTotals: [],
-      sumAmount
+      sumAmount,
     });
   } catch (error) {
     console.error("Error fetching branch revenue by quarter:", error);
@@ -241,7 +241,7 @@ export const getBranchRevenueByYear = async (req, res) => {
       monthlyTotals,
       dailyTotals: [],
       hourlyTotals: [],
-      sumAmount
+      sumAmount,
     });
   } catch (error) {
     console.error("Error fetching branch revenue by year:", error);

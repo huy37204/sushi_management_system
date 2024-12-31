@@ -259,7 +259,9 @@
               class="w-[30%] mb-4 text-center rounded-md border border-dashed border-gray-200 p-4 mx-auto mt-5"
             >
               <div class="flex items-center justify-center mb-0.5">
-                <div class="text-xl font-semibold"><%= invoices.length  %> hoá đơn</div>
+                <div class="text-xl font-semibold">
+                  <%= invoices.length %> hoá đơn
+                </div>
                 <span
                   class="p-1 rounded text-[12px] font-semibold bg-emerald-500/10 text-emerald-500 leading-none ml-1"
                   >+<%= sumAmount.toLocaleString("vi-VN", {
@@ -350,7 +352,10 @@
                     </td>
                     <td class="py-2 px-4 border-b border-b-gray-50">
                       <span class="text-[13px] font-medium text-[#b4b4b4]">
-                        <%= new Date(invoice.ISSUE_DATE).toLocaleDateString("vi-VN") %>,   <%= new Date(invoice.ISSUE_TIME).toLocaleTimeString("vi-VN") %>
+                        <%= new
+                        Date(invoice.ISSUE_DATE).toLocaleDateString("vi-VN") %>,
+                        <%= new
+                        Date(invoice.ISSUE_TIME).toLocaleTimeString("vi-VN") %>
                       </span>
                     </td>
                     <td class="py-2 px-4 border-b border-b-gray-50 text-center">

@@ -14,7 +14,7 @@ export const getRevenuePage = async (req, res) => {
     res.render("company/company_food_revenue", {
       branches: branchesResult.recordset, // Send branches to the view
       message: null, // Optionally send any messages
-      revenue:"",
+      revenue: "",
       bestSellingData: "",
       leastSelling: "",
       leastSellingData: "",
@@ -32,7 +32,7 @@ export const getRevenuePage = async (req, res) => {
 // Controller to handle filtering and fetching revenue data
 export const getRevenueData = async (req, res) => {
   const { startDate, endDate, branchId } = req.body; // Lấy giá trị từ form gửi lên
-    console.log(branchId);
+  console.log(branchId);
   try {
     const pool = await connect();
 
@@ -68,7 +68,7 @@ export const getRevenueData = async (req, res) => {
           GROUP BY od.DISH_ID, D.DISH_NAME
           ORDER BY TOTAL_SALES DESC
         `);
-    
+
     const leastSellingResult = await pool
       .request()
       .input("startDate", sql.Date, startDate)
@@ -83,7 +83,7 @@ export const getRevenueData = async (req, res) => {
           ORDER BY TOTAL_SALES ASC
         `);
 
-        console.log(leastSellingResult.recordset);
+    console.log(leastSellingResult.recordset);
     // Render lại trang với dữ liệu doanh thu, chi nhánh, món bán chạy và bán chậm
     res.render("company/company_food_revenue", {
       branches: branchesResult.recordset, // Dữ liệu chi nhánh

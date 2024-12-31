@@ -2,42 +2,32 @@ import { sql } from "../../database/dbConnection.js";
 
 export const branchFormController = async (req, res) => {
   const { branchId } = req.params;
+  const pageNum = parseInt(req.query.pageNum, 10) || 1; // Trang hiện tại, mặc định là trang 1
+  const pageSize = 30; // Số bản ghi trên mỗi trang
   const user = req.user;
   const request = new sql.Request();
 
   request.input("branchId", sql.Char(4), branchId);
 
   try {
-    const result = await request.query(`
-        SELECT 
-            O.ORDER_ID, 
-            O.ORDER_DATE, 
-            O.ORDER_TYPE, 
-            O.ORDER_TIME,
-            CASE 
-                WHEN I.ORDER_ID IS NOT NULL THEN N'Đã thanh toán'
-                ELSE N'Chưa thanh toán'
-            END AS STATUS
-        FROM 
-            [ORDER_] O
-        LEFT JOIN 
-            [INVOICE] I ON O.ORDER_ID = I.ORDER_ID
-        WHERE 
-            O.BRANCH_ID = @branchId
-        ORDER BY 
-            O.ORDER_TYPE;
-    `);
+    const result = await request.execute(`getOrdersByBranch`);
+    const orders = result.recordset;
+    const totalRecords = orders.length; // Tổng số bản ghi
+    const totalPages = Math.ceil(totalRecords / pageSize);
 
-    // Kiá»ƒm tra náº¿u recordset tráº£ vá» cĂ³ káº¿t quáº£
+    const paginatedOrders = orders.slice(
+      (pageNum - 1) * pageSize,
+      pageNum * pageSize,
+    );
     if (result.recordset.length > 0) {
-      // Render dá»¯ liá»‡u
       res.render("branch/branch_order_form", {
         branchId: branchId,
-        orders: result.recordset,
+        orders: paginatedOrders,
         user: user,
+        currentPage: pageNum,
+        totalPages: totalPages,
       });
     } else {
-      // Náº¿u khĂ´ng cĂ³ dá»¯ liá»‡u, render trang vá»›i thĂ´ng bĂ¡o khĂ´ng tĂ¬m tháº¥y Ä‘Æ¡n hĂ ng
       res.render("branch/branch_order_form", {
         branchId,
         orders: [],
@@ -58,45 +48,19 @@ export const offlineOrderController = async (req, res) => {
   request.input("branchId", sql.Char(4), branchId);
 
   try {
-    // Truy váº¥n menu dá»¯ liá»‡u
-    const menuData = await request.query(`
-        SELECT 
-            MC.CATEGORY_NAME,
-            (
-                SELECT 
-                    D.DISH_ID,
-                    D.DISH_NAME,
-                    D.DISH_PRICE
-                FROM 
-                    DISH D
-                JOIN 
-                    DISH_AVAILABLE DA ON DA.BRANCH_ID = @branchId 
-                    AND DA.DISH_ID = D.DISH_ID 
-                    AND DA.IS_AVAILABLE = 1
-                WHERE 
-                    D.CATEGORY_NAME = MC.CATEGORY_NAME
-                FOR JSON PATH
-            ) AS DISHES
-        FROM 
-            (SELECT DISTINCT CATEGORY_NAME FROM DISH) MC
-        ORDER BY 
-            MC.CATEGORY_NAME;
-      `);
+    const menuData = await request.execute(`getMenuByBranch`);
 
-    // Truy váº¥n danh sĂ¡ch bĂ n
     const tablesData = await request.query(`
         SELECT TABLE_NUM, SEAT_AVAILABLE
         FROM TABLE_
-        WHERE BRANCH_ID = @branchId AND TABLE_STATUS = N'CĂ²n trá»‘ng'
+        WHERE BRANCH_ID = @branchId AND TABLE_STATUS = N'Còn trống'
       `);
 
-    // Xá»­ lĂ½ dá»¯ liá»‡u mĂ³n Äƒn
     const categoriesWithDishes = menuData.recordset.map((row) => ({
       categoryName: row.CATEGORY_NAME,
-      dishes: row.DISHES ? JSON.parse(row.DISHES) : [], // Xá»­ lĂ½ náº¿u DISHES null
+      dishes: row.DISHES ? JSON.parse(row.DISHES) : [],
     }));
 
-    // Kiá»ƒm tra káº¿t quáº£ danh sĂ¡ch bĂ n
     const tables = tablesData.recordset;
     if (!tables || tables.length === 0) {
       console.warn("No tables found for branch:", branchId);
@@ -120,10 +84,8 @@ export const createOfflineOrder = async (req, res) => {
   const user = req.user;
 
   try {
-    // Káº¿t ná»‘i tá»›i SQL Server
     await sql.connect();
 
-    // Láº¥y ORDER_ID lá»›n nháº¥t
     const requestOrderId = new sql.Request();
     const orderResult = await requestOrderId.query(`
         SELECT MAX(ORDER_ID) AS MaxOrderID 
@@ -134,7 +96,6 @@ export const createOfflineOrder = async (req, res) => {
     const numericPart = parseInt(maxOrderID.substring(1), 10) + 1;
     const newOrderID = `O${numericPart.toString().padStart(6, "0")}`;
 
-    // Láº¥y thĂ´ng tin CUSTOMER_ID
     const requestCustomer = new sql.Request();
     requestCustomer.input("phoneNumber", sql.VarChar(15), phoneNumber);
     const customerResult = await requestCustomer.query(`
@@ -144,18 +105,14 @@ export const createOfflineOrder = async (req, res) => {
       `);
 
     if (customerResult.recordset.length === 0) {
-      throw new Error(
-        "KhĂ´ng tĂ¬m tháº¥y khĂ¡ch hĂ ng vá»›i sá»‘ Ä‘iá»‡n thoáº¡i nĂ y.",
-      );
+      throw new Error("Không tìm thấy khách hàng nào.");
     }
     const customerId = customerResult.recordset[0].CUSTOMER_ID;
 
-    // NgĂ y vĂ  giá» hiá»‡n táº¡i
     const now = new Date();
     const date = now.toISOString().split("T")[0];
     const time = now.toISOString().split("T")[1].split(".")[0];
 
-    // ChĂ¨n dá»¯ liá»‡u vĂ o báº£ng [ORDER_]
     const requestOrder = new sql.Request();
     requestOrder.input("orderId", sql.Char(7), newOrderID);
     requestOrder.input("orderDate", sql.Date, date);
@@ -181,13 +138,12 @@ export const createOfflineOrder = async (req, res) => {
         VALUES (@orderId, @tableNum, @employeeId, @branchId)
       `);
 
-    // Xá»­ lĂ½ mĂ³n Äƒn
     if (!dishes || !dishes[0]?.id || !dishes[0]?.quantity) {
-      throw new Error("KhĂ´ng cĂ³ mĂ³n Äƒn há»£p lá»‡ Ä‘Æ°á»£c gá»­i.");
+      throw new Error("Không có món ăn.");
     }
     await requestOfflineOrder.query(`
         UPDATE TABLE_
-        SET TABLE_STATUS = N'Äang phá»¥c vá»¥'
+        SET TABLE_STATUS = N'Đang phục vụ'
         WHERE TABLE_NUM = @tableNum AND BRANCH_ID = @branchId
         `);
 
@@ -202,17 +158,14 @@ export const createOfflineOrder = async (req, res) => {
     }
 
     if (validDishes.length === 0) {
-      throw new Error(
-        "KhĂ´ng cĂ³ mĂ³n Äƒn nĂ o Ä‘Æ°á»£c chá»n hoáº·c sá»‘ lÆ°á»£ng khĂ´ng há»£p lá»‡.",
-      );
+      throw new Error("Lỗi tìm validDishes");
     }
 
-    // ChĂ¨n cĂ¡c mĂ³n Äƒn há»£p lá»‡ vĂ o ORDER_DISH
     const insertPromises = validDishes.map(async (dish) => {
       let { id, quantity } = dish;
 
       if (id.length < 4) {
-        id = id.padEnd(4, " "); // Chuáº©n hĂ³a ID mĂ³n Äƒn
+        id = id.padEnd(4, " ");
       } else if (id.length > 4) {
         id = id.substring(0, 4);
       }
@@ -228,15 +181,13 @@ export const createOfflineOrder = async (req, res) => {
         `);
     });
 
-    // Chá» táº¥t cáº£ cĂ¡c truy váº¥n hoĂ n táº¥t
     await Promise.all(insertPromises);
 
-    // Äiá»u hÆ°á»›ng tá»›i trang thĂ nh cĂ´ng
     res.redirect(`/branch/${branchId}/order-form`);
   } catch (error) {
     console.error("Error creating offline order:", error);
     res.status(500).json({
-      error: "Lá»—i khi táº¡o Ä‘Æ¡n hĂ ng offline",
+      error: "Lỗi khi tạo offline order",
       message: error.message,
     });
   }
@@ -252,7 +203,6 @@ export const updateOrderController = async (req, res) => {
   request.input("orderId", sql.Char(7), orderId);
 
   try {
-    // Truy váº¥n menu dá»¯ liá»‡u
     const menuData = await request.query(`
         SELECT 
           MC.CATEGORY_NAME,
@@ -287,7 +237,7 @@ export const updateOrderController = async (req, res) => {
     const tablesData = await request.query(`
         SELECT TABLE_NUM, SEAT_AVAILABLE
         FROM TABLE_
-        WHERE BRANCH_ID = @branchId AND TABLE_STATUS = N'CĂ²n trá»‘ng'
+        WHERE BRANCH_ID = @branchId AND TABLE_STATUS = N'Còn trống'
       `);
     const tables = tablesData.recordset;
 
@@ -316,14 +266,13 @@ export const updateOrderController = async (req, res) => {
           ? currentTableData.recordset[0]
           : null;
     }
-
+    console.log(currentTable);
     // Xử lý dữ liệu món ăn
     const categoriesWithDishes = menuData.recordset.map((row) => ({
       categoryName: row.CATEGORY_NAME,
       dishes: row.DISHES ? JSON.parse(row.DISHES) : [], // Xá»­ lĂ½ náº¿u DISHES null
     }));
 
-    // Render giao diá»‡n
     res.render("branch/update_order", {
       user,
       branchId,
@@ -348,35 +297,30 @@ export const updateOrderForm = async (req, res) => {
   const request = new sql.Request();
 
   try {
-
     for (let i = 0; i < dishes[0].id.length; i++) {
-      const dishId = dishes[0].id[i]; // Láº¥y id mĂ³n Äƒn
-      const quantity = parseInt(dishes[0].quantity[i], 10); 
+      const dishId = dishes[0].id[i];
+      const quantity = parseInt(dishes[0].quantity[i], 10);
       if (quantity === 0) {
- 
         await request
-          .input(`orderId${dishId}`, sql.Char(7), orderId) 
+          .input(`orderId${dishId}`, sql.Char(7), orderId)
           .input(`dishId${dishId}`, sql.Char(4), dishId)
           .query(
             `DELETE FROM order_dish WHERE ORDER_ID = @orderId${dishId} AND DISH_ID = @dishId${dishId}`,
           );
       } else {
-    
         const dish = await request
-          .input(`orderId${dishId}`, sql.Char(7), orderId) 
+          .input(`orderId${dishId}`, sql.Char(7), orderId)
           .input(`dishId${dishId}`, sql.Char(4), dishId)
           .query(
             `SELECT * FROM order_dish WHERE ORDER_ID = @orderId${dishId} AND DISH_ID = @dishId${dishId}`,
           );
         if (dish.recordset.length > 0) {
-
           await request
             .input(`quantity${dishId}`, sql.Int, quantity)
             .query(
               `UPDATE order_dish SET QUANTITY = @quantity${dishId} WHERE ORDER_ID = @orderId${dishId} AND DISH_ID = @dishId${dishId}`,
             );
         } else {
-      
           await request
             .input(`quantity${dishId}`, sql.Int, quantity)
             .query(
@@ -397,10 +341,9 @@ export const updateOrderForm = async (req, res) => {
            WHERE OORDER_ID = @orderId`,
         );
 
-      // Cáº­p nháº­t tráº¡ng thĂ¡i trong báº£ng TABLE_
       await request.input("tableNum1", sql.Int, tableNum).query(
         `UPDATE TABLE_ 
-           SET TABLE_STATUS = 'Äang phá»¥c vá»¥' 
+           SET TABLE_STATUS = 'Đang phục vụ' 
            WHERE TABLE_NUM = @tableNum1`,
       );
     } else if (orderType === "Offline") {
@@ -413,13 +356,12 @@ export const updateOrderForm = async (req, res) => {
            WHERE OFORDER_ID = @orderId`,
         );
 
-      // Cáº­p nháº­t tráº¡ng thĂ¡i trong báº£ng TABLE_
       await request
         .input("branchId", sql.Char(7), branchId)
         .input("tableNum1", sql.Int, tableNum)
         .query(
           `UPDATE TABLE_ 
-           SET TABLE_STATUS = 'Äang phá»¥c vá»¥' 
+           SET TABLE_STATUS = 'Đang phục vụ' 
            WHERE TABLE_NUM = @tableNum1 AND BRANCH_ID = @branchId`,
         );
     }
@@ -428,9 +370,7 @@ export const updateOrderForm = async (req, res) => {
     res.redirect(`/branch/${branchId}/order-form`);
   } catch (error) {
     console.error("Error updating order:", error);
-    res
-      .status(500)
-      .send("CĂ³ lá»—i xáº£y ra khi cáº­p nháº­t phiáº¿u Ä‘áº·t mĂ³n.");
+    res.status(500).send("Có lỗi khi cập nhật order");
   }
 };
 
@@ -463,7 +403,6 @@ export const payOrderForm = async (req, res) => {
     request.input("OrderType", sql.NVarChar, orderType);
     request.input("StaffRating", sql.Int, staff_rating || 0);
 
-    // Thá»±c thi thá»§ tá»¥c
     await request.execute("payOrder");
 
     // Tính `RATING_ID` mới
@@ -472,7 +411,7 @@ export const payOrderForm = async (req, res) => {
       FROM BRANCH_RATING 
       ORDER BY RATING_ID DESC
     `);
-    const lastRatingId = result.recordset[0]?.RATING_ID || "R000000"; // Náº¿u báº£ng rá»—ng, báº¯t Ä‘áº§u tá»« R000000
+    const lastRatingId = result.recordset[0]?.RATING_ID || "R000000";
     const newRatingId = `R${String(Number(lastRatingId.slice(1)) + 1).padStart(6, "0")}`;
 
     // ThĂªm cĂ¡c input cho Ä‘Ă¡nh giĂ¡
@@ -485,7 +424,6 @@ export const payOrderForm = async (req, res) => {
     request.input("RatingId", sql.Char(7), newRatingId);
 
     if (orderType === "Offline") {
-      // Láº¥y `INVOICE_ID` tá»« báº£ng INVOICE
       const invoiceQuery = await request.query(`
         SELECT INVOICE_ID 
         FROM INVOICE 
@@ -513,7 +451,6 @@ export const payOrderForm = async (req, res) => {
     // Điều hướng lại sau khi thanh toán
     res.redirect(`/branch/${branchId}/order-form`);
   } catch (error) {
-    // Xá»­ lĂ½ lá»—i
     console.error("Error executing payOrder:", error);
     res.status(500).send("Error processing the request.");
   }

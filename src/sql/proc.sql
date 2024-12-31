@@ -1,6 +1,100 @@
 USE SUSUSHISHI
 GO
+--Kịch bản 2: Đặt bàn, đặt trước món
+GO
+CREATE PROCEDURE createTableBooking
+    @quantity INT,
+    @branchId NVARCHAR(50),
+    @customerId NVARCHAR(50),
+    @orderType NVARCHAR(50) = 'Online' -- Loại đặt bàn (mặc định là 'Online')
+AS
+BEGIN
+    BEGIN TRY
+        -- Bắt đầu giao dịch
+        BEGIN TRANSACTION;
 
+        -- Lấy giá trị lớn nhất hiện tại của ORDER_ID
+        DECLARE @maxOrderID NVARCHAR(50);
+        SELECT @maxOrderID = MAX(ORDER_ID) 
+        FROM [ORDER_];
+
+        -- Xử lý giá trị của MaxOrderID
+        IF @maxOrderID IS NULL
+            SET @maxOrderID = 'O000000'; -- Nếu không có giá trị thì bắt đầu từ O000000
+        DECLARE @numericPart INT = CAST(SUBSTRING(@maxOrderID, 2, LEN(@maxOrderID) - 1) AS INT) + 1;
+        DECLARE @newOrderID NVARCHAR(50) = 'O' + RIGHT('000000' + CAST(@numericPart AS NVARCHAR), 6);
+
+        -- Lấy ngày và giờ hiện tại
+        DECLARE @currentDate DATE = GETDATE();
+        DECLARE @currentTime TIME = CONVERT(TIME, GETDATE());
+
+        -- Chèn dữ liệu vào bảng [ORDER_]
+        INSERT INTO [ORDER_] (ORDER_ID, ORDER_DATE, BRANCH_ID, CUSTOMER_ID, ORDER_TYPE, ORDER_TIME)
+        VALUES (@newOrderID, @currentDate, @branchId, @customerId, @orderType, @currentTime);
+
+        -- Chèn dữ liệu vào bảng ONLINE_ORDER
+        INSERT INTO ONLINE_ORDER (OORDER_ID, CUSTOMER_QUANTITY, BRANCH_ID, ARRIVAL_DATE, ARRIVAL_TIME)
+        VALUES (@newOrderID, @quantity, @branchId, @currentDate, @currentTime);
+
+        -- Cam kết giao dịch
+        COMMIT TRANSACTION;
+
+        -- Trả về thông tin thành công
+        SELECT 
+            @newOrderID AS newOrderID, 
+            'Success' AS Status;
+    END TRY
+    BEGIN CATCH
+        -- Xử lý lỗi và rút lại giao dịch
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        -- Trả về lỗi
+        DECLARE @errorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        RAISERROR(@errorMessage, 16, 1);
+    END CATCH
+END;
+GO
+
+GO
+CREATE PROCEDURE getDishesByCategory
+    @branchId NVARCHAR(50)
+AS
+BEGIN
+    BEGIN TRY
+        -- Truy vấn danh sách món ăn theo danh mục
+        SELECT 
+            MC.CATEGORY_NAME,
+            (
+                SELECT 
+                    D.DISH_ID,
+                    D.DISH_NAME,
+                    D.DISH_PRICE
+                FROM 
+                    DISH D
+                JOIN 
+                    DISH_AVAILABLE DA ON DA.BRANCH_ID = @branchId 
+                        AND DA.DISH_ID = D.DISH_ID 
+                        AND DA.IS_AVAILABLE = 1
+                WHERE 
+                    D.CATEGORY_NAME = MC.CATEGORY_NAME
+                FOR JSON PATH
+            ) AS DISHES
+        FROM 
+            (SELECT DISTINCT CATEGORY_NAME FROM DISH) MC
+        ORDER BY 
+            MC.CATEGORY_NAME;
+    END TRY
+    BEGIN CATCH
+        -- Xử lý lỗi
+        DECLARE @errorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        RAISERROR(@errorMessage, 16, 1);
+    END CATCH
+END;
+GO
+
+--Kết thúc Kịch bản 2: Đặt bàn, đặt trước món
+GO
 CREATE PROCEDURE getUserIdByAccount 
     @USERNAME NVARCHAR(50)
 AS
@@ -685,6 +779,66 @@ BEGIN
     WHERE MC.CUSTOMER_ID = @CustomerID; -- So sánh trực tiếp, không chuyển đổi kiểu
 END
 
+drop proc getOrdersByBranch
+GO
+CREATE PROCEDURE getOrdersByBranch
+    @branchId NVARCHAR(50)
+AS
+BEGIN
+    SELECT 
+        O.ORDER_ID, 
+        O.ORDER_DATE, 
+        O.ORDER_TYPE, 
+        O.ORDER_TIME,
+        CASE 
+            WHEN I.ORDER_ID IS NOT NULL THEN N'Đã thanh toán'
+            ELSE N'Chưa thanh toán'
+        END AS STATUS
+    FROM 
+        [ORDER_] O
+    LEFT JOIN 
+        [INVOICE] I ON O.ORDER_ID = I.ORDER_ID
+    WHERE 
+        O.BRANCH_ID = @branchId
+    ORDER BY 
+        CASE 
+            WHEN I.ORDER_ID IS NULL THEN 0 -- Chưa thanh toán lên đầu
+            ELSE 1 -- Đã thanh toán sau
+        END,
+        O.ORDER_DATE DESC; -- Sắp xếp theo ngày trong từng nhóm
+END;
+
+
+
+
+GO 
+CREATE PROCEDURE getMenuByBranch
+    @branchId NVARCHAR(50)
+AS
+BEGIN
+    SELECT 
+        MC.CATEGORY_NAME,
+        (
+            SELECT 
+                D.DISH_ID,
+                D.DISH_NAME,
+                D.DISH_PRICE
+            FROM 
+                DISH D
+            JOIN 
+                DISH_AVAILABLE DA ON DA.BRANCH_ID = @branchId 
+                AND DA.DISH_ID = D.DISH_ID 
+                AND DA.IS_AVAILABLE = 1
+            WHERE 
+                D.CATEGORY_NAME = MC.CATEGORY_NAME
+            FOR JSON PATH
+        ) AS DISHES
+    FROM 
+        (SELECT DISTINCT CATEGORY_NAME FROM DISH) MC
+    ORDER BY 
+        MC.CATEGORY_NAME;
+END;
+
 
 
 
@@ -697,7 +851,6 @@ SELECT * FROM INVOICE
 JOIN ORDER_ O ON O.ORDER_ID = INVOICE.ORDER_ID AND O.BRANCH_ID = 'B003'
 SELECT * FROM DISH WHERE DISH_ID = 'D015'
 select * from ORDER_DISH WHERE ORDER_ID = 'O012016'
-select * from ORDER_
 select * from DELIVERY_ORDER
 SELECT * FROM INVOICE
 select * from ACCOUNT A

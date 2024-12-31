@@ -40,7 +40,11 @@ import {
 const branchRouter = express.Router();
 const branchManager = "Quản lý chi nhánh";
 const employeeRole = "Nhân viên";
-branchRouter.get(PATH.BRANCH.HOME, verifyRole([branchManager, employeeRole]), branchController);
+branchRouter.get(
+  PATH.BRANCH.HOME,
+  verifyRole([branchManager, employeeRole]),
+  branchController,
+);
 
 branchRouter.post("/branch/:branchId/date-revenue", getBranchRevenueByDate);
 
@@ -105,7 +109,8 @@ branchRouter.get(
 branchRouter.post(PATH.BRANCH.INVOICE, getInvoice);
 
 branchRouter.get(
-  "/branch/:branchId/order-form/branch-rating", verifyRole([branchManager, employeeRole]),
+  "/branch/:branchId/order-form/branch-rating",
+  verifyRole([branchManager, employeeRole]),
   branchRatingControlller,
 );
 
