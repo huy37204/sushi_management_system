@@ -89,8 +89,24 @@ export const loginController = async (req, res) => {
     switch (user.ROLE) {
       case "Quản lý công ty":
         return res.redirect("/company");
-      case "Nhân viên":
-        return res.redirect("/employee");
+      case "Nhân viên": {
+        const branchRequest = new sql.Request();
+        branchRequest.input("userId", sql.NVarChar, user.Id);
+
+        const branchResult = await branchRequest.query(`
+          SELECT B.BRANCH_ID
+          FROM RESTAURANT_BRANCH B
+          JOIN DEPARTMENT D ON D.BRANCH_ID = B.BRANCH_ID
+          JOIN EMPLOYEE E ON E.DEPARTMENT_ID = D.DEPARTMENT_ID AND E.EMPLOYEE_ID = @userId
+        `);
+
+        if (branchResult.recordset.length > 0) {
+          const branchId = branchResult.recordset[0].BRANCH_ID;
+          return res.redirect(`/branch/${branchId}`);
+        } else {
+          return res.status(404).send("Branch not found");
+        }
+      }
       case "Khách hàng":
         return res.redirect("/");
       case "Quản lý chi nhánh": {
@@ -100,7 +116,8 @@ export const loginController = async (req, res) => {
         const branchResult = await branchRequest.query(`
           SELECT B.BRANCH_ID
           FROM RESTAURANT_BRANCH B
-          WHERE B.MANAGER_ID = @userId
+          JOIN DEPARTMENT D ON D.BRANCH_ID = B.BRANCH_ID
+          JOIN EMPLOYEE E ON E.DEPARTMENT_ID = D.DEPARTMENT_ID AND E.EMPLOYEE_ID = @userId
         `);
 
         if (branchResult.recordset.length > 0) {
