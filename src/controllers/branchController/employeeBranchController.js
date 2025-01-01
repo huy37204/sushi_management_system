@@ -2,40 +2,63 @@ import { sql, connect } from "../../database/dbConnection.js";
 
 export const employeeBranchController = async (req, res) => {
   const { branchId } = req.params;
-
+  const pageNum = parseInt(req.query.pageNum, 10) || 1; // Trang hiện tại, mặc định là trang 1
+  const pageSize = 30; // Số bản ghi trên mỗi trang
+  const search = req.query.search || ""; // Từ khóa tìm kiếm
+  const departmentFilter = req.query.department || "all"; // Bộ phận lọc (mặc định là "all")
   const user = req.user;
+
   const request = new sql.Request();
   request.input("branchId", sql.NVarChar, branchId);
 
   try {
-    const employeesList = await request.query(`
-        	SELECT *
-	FROM EMPLOYEE E
-	JOIN DEPARTMENT D ON D.DEPARTMENT_ID = E.DEPARTMENT_ID AND D.BRANCH_ID = @branchId
-        `);
+    // Truy vấn danh sách nhân viên
+    const employeesQuery = `
+      SELECT *
+      FROM EMPLOYEE E
+      JOIN DEPARTMENT D ON D.DEPARTMENT_ID = E.DEPARTMENT_ID
+      WHERE D.BRANCH_ID = @branchId
+        AND (@search = '' OR E.FULL_NAME LIKE '%' + @search + '%' OR E.EMPLOYEE_ID LIKE '%' + @search + '%')
+        AND (@department = 'all' OR D.DEPARTMENT_NAME = @department)
+    `;
+    request.input("search", sql.NVarChar, search);
+    request.input("department", sql.NVarChar, departmentFilter);
+
+    const employeesList = await request.query(employeesQuery);
+
+    // Truy vấn danh sách phòng ban
     const departmentList = await request.query(`
-        	SELECT *
-	FROM DEPARTMENT D
-	WHERE D.BRANCH_ID = @branchId
-        `);
+      SELECT *
+      FROM DEPARTMENT D
+      WHERE D.BRANCH_ID = @branchId
+    `);
 
-    // Kiểm tra nếu recordset trả về có kết quả
-    if (
-      employeesList.recordset.length > 0 &&
-      departmentList.recordset.length > 0
-    ) {
-      const employees = employeesList.recordset;
-      const departments = departmentList.recordset;
+    // Nếu có dữ liệu trả về
 
-      res.render("branch/branch_employee_list", {
-        user: user,
-        branchId: branchId,
-        employees: employees,
-        departments: departments,
-      });
-    } else {
-      res.status(404).send("Branch not found for the given branch.");
-    }
+    const employees = employeesList.recordset; // Danh sách toàn bộ nhân viên đã lọc
+    const totalRecords = employees.length; // Tổng số bản ghi
+    const totalPages = Math.ceil(totalRecords / pageSize); // Tổng số trang
+
+    // Cắt dữ liệu dựa trên trang hiện tại
+    const paginatedEmployees = employees.slice(
+      (pageNum - 1) * pageSize,
+      pageNum * pageSize,
+    );
+
+    const departments = departmentList.recordset; // Danh sách phòng ban
+
+    // Render view
+    res.render("branch/branch_employee_list", {
+      user: user,
+      branchId: branchId,
+      employees: paginatedEmployees,
+      totalEmployees: totalRecords,
+      departments: departments,
+      currentPage: pageNum,
+      totalPages: totalPages,
+      search, // Từ khóa tìm kiếm
+      departmentFilter, // Bộ phận lọc
+    });
   } catch (error) {
     console.error("Error fetching employee branch details:", error);
     res.status(500).send("Internal server error.");

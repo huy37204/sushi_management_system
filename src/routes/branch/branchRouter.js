@@ -22,7 +22,7 @@ import {
   payOrderForm,
   updateOrderController,
   updateOrderForm,
-} from "../../controllers/branchController/formController.js";
+} from "../../controllers/branchController/orderController.js";
 import {
   branchInvoiceController,
   getInvoice,
@@ -39,7 +39,12 @@ import {
 
 const branchRouter = express.Router();
 const branchManager = "Quản lý chi nhánh";
-branchRouter.get(PATH.BRANCH.HOME, verifyRole(branchManager), branchController);
+const employeeRole = "Nhân viên";
+branchRouter.get(
+  PATH.BRANCH.HOME,
+  verifyRole([branchManager, employeeRole]),
+  branchController,
+);
 
 branchRouter.post("/branch/:branchId/date-revenue", getBranchRevenueByDate);
 
@@ -54,13 +59,13 @@ branchRouter.post(
 
 branchRouter.get(
   PATH.BRANCH.EMPLOYEE_LIST,
-  verifyRole(branchManager),
+  verifyRole([branchManager, employeeRole]),
   employeeBranchController,
 );
 
 branchRouter.get(
   PATH.BRANCH.EMPLOYEE_SEARCH,
-  verifyRole(branchManager),
+  verifyRole([branchManager, employeeRole]),
   employeeSearchController,
 );
 
@@ -68,13 +73,13 @@ branchRouter.post(PATH.BRANCH.EMPLOYEE_SEARCH, getEmployeeRating);
 
 branchRouter.get(
   PATH.BRANCH.ORDER,
-  verifyRole(branchManager),
+  verifyRole([branchManager, employeeRole]),
   branchFormController,
 );
 
 branchRouter.get(
   "/branch/:branchId/order-form/offline-order",
-  verifyRole(branchManager),
+  verifyRole([branchManager, employeeRole]),
   offlineOrderController,
 );
 
@@ -85,7 +90,7 @@ branchRouter.post(
 
 branchRouter.get(
   "/branch/:branchId/order-form/update",
-  verifyRole(branchManager),
+  verifyRole([branchManager, employeeRole]),
   updateOrderController,
 );
 
@@ -97,7 +102,7 @@ branchRouter.post("/branch/:branchId/order-form/delete", deleteOrderForm);
 
 branchRouter.get(
   PATH.BRANCH.INVOICE,
-  verifyRole(branchManager),
+  verifyRole([branchManager, employeeRole]),
   branchInvoiceController,
 );
 
@@ -105,6 +110,7 @@ branchRouter.post(PATH.BRANCH.INVOICE, getInvoice);
 
 branchRouter.get(
   "/branch/:branchId/order-form/branch-rating",
+  verifyRole([branchManager, employeeRole]),
   branchRatingControlller,
 );
 
@@ -112,7 +118,7 @@ branchRouter.post("/branch/:branchId/order-form/branch-rating", payOrderForm);
 
 branchRouter.get(
   PATH.BRANCH.CUSTOMER_CARD,
-  verifyRole(branchManager),
+  verifyRole([branchManager, employeeRole]),
   customerCardBranchController,
 );
 

@@ -15,9 +15,8 @@ export const loginController = async (req, res) => {
     const request = new sql.Request();
     request.input("username", sql.NVarChar, username);
 
-    const result = await request.query(`
-      EXEC getUserIdByAccount @USERNAME = @username
-    `);
+    // Gọi stored procedure để lấy thông tin người dùng
+    const result = await request.execute("getUserIdByAccount");
 
     if (result.recordset.length === 0) {
       return res.status(401).json({ message: "Invalid username or password" });
@@ -35,6 +34,7 @@ export const loginController = async (req, res) => {
       role: user.ROLE,
       name: user.Name,
     };
+    
     if (user.ROLE === "Khách hàng") {
       req.session.user.startTime = new Date(); // Ghi lại thời gian bắt đầu phiên
       const historyRequest = new sql.Request();
@@ -47,27 +47,26 @@ export const loginController = async (req, res) => {
 
       console.log("Vietnam Time:", vietnamTime.toISOString());
       const dateAccessed = vietnamTime.toISOString().split("T")[0]; // Ngày (YYYY-MM-DD)
-      const timeAccessed = `${dateAccessed} ${vietnamTime.getHours()}:${vietnamTime.getMinutes()}:${vietnamTime.getSeconds()}`;
+      const timeAccessed = vietnamTime; // Lưu thẳng đối tượng Date
       console.log("Time Accessed (Vietnam Time):", timeAccessed);
 
       console.log("Date Accessed:", dateAccessed);
 
       historyRequest.input("customerId", sql.NVarChar, user.Id);
       historyRequest.input("dateAccessed", sql.Date, dateAccessed);
-      historyRequest.input("timeAccessed", sql.DateTime, vietnamTime);
+      historyRequest.input("timeAccessed", sql.DateTime, timeAccessed);
+      historyRequest.input("sessionDuration", sql.Int, 0); // Gửi thời gian phiên là 0
 
-      await historyRequest.query(`
-        INSERT INTO ONLINE_ACCESS_HISTORY (DATE_ACCESSED, TIME_ACCESSED, CUSTOMER_ID, SESSION_DURATION)
-        VALUES (@dateAccessed, @timeAccessed, @customerId, 0)
-      `);
+      // Gọi stored procedure để ghi nhận lịch sử truy cập
+      await historyRequest.execute("InsertOnlineAccessHistory");
     }
+
     // Lấy thông tin Membership Card
     const cardRequest = new sql.Request();
     cardRequest.input("customerId", sql.NVarChar, user.Id);
 
-    const cardResult = await cardRequest.query(`
-      EXEC getMembershipCardInfo @CustomerID = @customerId
-    `);
+    // Gọi stored procedure để lấy thông tin thẻ thành viên
+    const cardResult = await cardRequest.execute("getMembershipCardInfo");
 
     if (cardResult.recordset.length > 0) {
       const cardInfo = cardResult.recordset[0];
@@ -89,8 +88,24 @@ export const loginController = async (req, res) => {
     switch (user.ROLE) {
       case "Quản lý công ty":
         return res.redirect("/company");
-      case "Nhân viên":
-        return res.redirect("/employee");
+      case "Nhân viên": {
+        const branchRequest = new sql.Request();
+        branchRequest.input("userId", sql.NVarChar, user.Id);
+
+        const branchResult = await branchRequest.query(`
+          SELECT B.BRANCH_ID
+          FROM RESTAURANT_BRANCH B
+          JOIN DEPARTMENT D ON D.BRANCH_ID = B.BRANCH_ID
+          JOIN EMPLOYEE E ON E.DEPARTMENT_ID = D.DEPARTMENT_ID AND E.EMPLOYEE_ID = @userId
+        `);
+
+        if (branchResult.recordset.length > 0) {
+          const branchId = branchResult.recordset[0].BRANCH_ID;
+          return res.redirect(`/branch/${branchId}`);
+        } else {
+          return res.status(404).send("Branch not found");
+        }
+      }
       case "Khách hàng":
         return res.redirect("/");
       case "Quản lý chi nhánh": {
@@ -100,7 +115,8 @@ export const loginController = async (req, res) => {
         const branchResult = await branchRequest.query(`
           SELECT B.BRANCH_ID
           FROM RESTAURANT_BRANCH B
-          WHERE B.MANAGER_ID = @userId
+          JOIN DEPARTMENT D ON D.BRANCH_ID = B.BRANCH_ID
+          JOIN EMPLOYEE E ON E.DEPARTMENT_ID = D.DEPARTMENT_ID AND E.EMPLOYEE_ID = @userId
         `);
 
         if (branchResult.recordset.length > 0) {
@@ -241,30 +257,17 @@ export const registerUser = async (req, res) => {
 };
 export const updateSessionHistory = async (req, res) => {
   try {
-    // Calculate session duration in seconds
-
     const sessionEndTime = new Date();
     const sessionStartTime = new Date(req.user.startTime);
-    console.log(sessionEndTime);
-    console.log("Type of sessionStartTime:", typeof sessionStartTime);
     const sessionDuration = (sessionEndTime - sessionStartTime) / 1000; // Duration in seconds
     const customerId = req.user.id;
+
     const request = new sql.Request();
     request.input("customerId", sql.NVarChar, customerId);
     request.input("sessionDuration", sql.Int, sessionDuration);
-    console.log("aaaaaaaaaaaa");
-    console.log(sessionDuration);
-    await request.query(`
-      UPDATE ONLINE_ACCESS_HISTORY
-      SET SESSION_DURATION = @sessionDuration
-      WHERE CUSTOMER_ID = @customerId
-        AND DATE_ACCESSED = CONVERT(DATE, GETDATE())
-        AND TIME_ACCESSED = (
-            SELECT MAX(TIME_ACCESSED)
-            FROM ONLINE_ACCESS_HISTORY
-            WHERE CUSTOMER_ID = @customerId
-        )
-    `);
+
+    await request.execute("UpdateSessionHistory");
+
     console.log(`Session duration updated for customer ID: ${req.user.id}`);
   } catch (error) {
     console.error("Error updating session history:", error);
