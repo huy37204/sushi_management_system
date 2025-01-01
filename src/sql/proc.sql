@@ -120,7 +120,6 @@ GO
 CREATE PROC getMenuDropDownItem
 AS
 BEGIN
-    -- T?o b?ng t?m d? luu k?t qu?
     CREATE TABLE #CategoryDish (
         CATEGORY_NAME NVARCHAR(50),
         DISH_NAME NVARCHAR(50)
@@ -146,7 +145,6 @@ BEGIN
     GROUP BY 
         CATEGORY_NAME;
 
-    -- Xóa b?ng t?m
     DROP TABLE #CategoryDish;
 END;
 GO
@@ -194,29 +192,27 @@ BEGIN
     DECLARE @StartDate DATE;
     DECLARE @EndDate DATE;
 
-    -- Tính toán ph?m vi ngày c?a quý
     IF @Quarter = 1
     BEGIN
-        SET @StartDate = CAST(@Year AS VARCHAR) + '-01-01'; -- Ngày b?t d?u quý 1
-        SET @EndDate = CAST(@Year AS VARCHAR) + '-03-31'; -- Ngày k?t thúc quý 1
+        SET @StartDate = CAST(@Year AS VARCHAR) + '-01-01'; 
+        SET @EndDate = CAST(@Year AS VARCHAR) + '-03-31'; 
     END
     ELSE IF @Quarter = 2
     BEGIN
-        SET @StartDate = CAST(@Year AS VARCHAR) + '-04-01'; -- Ngày b?t d?u quý 2
-        SET @EndDate = CAST(@Year AS VARCHAR) + '-06-30'; -- Ngày k?t thúc quý 2
+        SET @StartDate = CAST(@Year AS VARCHAR) + '-04-01'; 
+        SET @EndDate = CAST(@Year AS VARCHAR) + '-06-30'; 
     END
     ELSE IF @Quarter = 3
     BEGIN
-        SET @StartDate = CAST(@Year AS VARCHAR) + '-07-01'; -- Ngày b?t d?u quý 3
-        SET @EndDate = CAST(@Year AS VARCHAR) + '-09-30'; -- Ngày k?t thúc quý 3
+        SET @StartDate = CAST(@Year AS VARCHAR) + '-07-01'; 
+        SET @EndDate = CAST(@Year AS VARCHAR) + '-09-30'; 
     END
     ELSE IF @Quarter = 4
     BEGIN
-        SET @StartDate = CAST(@Year AS VARCHAR) + '-10-01'; -- Ngày b?t d?u quý 4
-        SET @EndDate = CAST(@Year AS VARCHAR) + '-12-31'; -- Ngày k?t thúc quý 4
+        SET @StartDate = CAST(@Year AS VARCHAR) + '-10-01'; 
+        SET @EndDate = CAST(@Year AS VARCHAR) + '-12-31'; 
     END
 
-    -- Truy v?n các hóa don theo quý
     SELECT *
     FROM INVOICE I
     JOIN ORDER_ O ON I.ORDER_ID = O.ORDER_ID
@@ -281,7 +277,7 @@ BEGIN
 	WHERE E.EMPLOYEE_ID = @EmployeeId
 	GROUP BY E.EMPLOYEE_ID, E.FULL_NAME
 END
-
+SELECT * FROM EMPLOYEE
 
 
 EXEC getRatingByDate @DATE = '12-22-2018', @BranchId = 'B001', @EmployeeId = 'E014327'
@@ -313,66 +309,80 @@ CREATE PROC getRatingByQuarter
 	@EmployeeId CHAR(7)    -- Mã nhân viên
 AS
 BEGIN
-	-- Bi?n luu ph?m vi ngày
+	-- Biến lưu phạm vi ngày
 	DECLARE @StartDate DATE;
 	DECLARE @EndDate DATE;
 
-	-- Tính toán ph?m vi ngày c?a quý
+	-- Tính toán phạm vi ngày của quý
 	IF @Quarter = 1
 	BEGIN
-		SET @StartDate = CAST(@Year AS VARCHAR) + '-01-01'; -- Ngày b?t d?u quý 1
-		SET @EndDate = CAST(@Year AS VARCHAR) + '-03-31';   -- Ngày k?t thúc quý 1
+		SET @StartDate = CAST(@Year AS VARCHAR) + '-01-01'; -- Ngày bắt đầu quý 1
+		SET @EndDate = CAST(@Year AS VARCHAR) + '-03-31';   -- Ngày kết thúc quý 1
 	END
 	ELSE IF @Quarter = 2
 	BEGIN
-		SET @StartDate = CAST(@Year AS VARCHAR) + '-04-01'; -- Ngày b?t d?u quý 2
-		SET @EndDate = CAST(@Year AS VARCHAR) + '-06-30';   -- Ngày k?t thúc quý 2
+		SET @StartDate = CAST(@Year AS VARCHAR) + '-04-01'; -- Ngày bắt đầu quý 2
+		SET @EndDate = CAST(@Year AS VARCHAR) + '-06-30';   -- Ngày kết thúc quý 2
 	END
 	ELSE IF @Quarter = 3
 	BEGIN
-		SET @StartDate = CAST(@Year AS VARCHAR) + '-07-01'; -- Ngày b?t d?u quý 3
+		SET @StartDate = CAST(@Year AS VARCHAR) + '-07-01'; -- Ngày bắt đầu quý 3
 		SET @EndDate = CAST(@Year AS VARCHAR) + '-09-30';   -- Ngày k?t thúc quý 3
 	END
 	ELSE IF @Quarter = 4
 	BEGIN
-		SET @StartDate = CAST(@Year AS VARCHAR) + '-10-01'; -- Ngày b?t d?u quý 4
-		SET @EndDate = CAST(@Year AS VARCHAR) + '-12-31';   -- Ngày k?t thúc quý 4
+		SET @StartDate = CAST(@Year AS VARCHAR) + '-10-01'; -- Ngày bắt đầu quý 4
+		SET @EndDate = CAST(@Year AS VARCHAR) + '-12-31';   -- Ngày kết thúc quý 4
 	END
 
-	-- L?y d? li?u di?m trung bình trong ph?m vi quý
+	-- Lấy dữ liệu điểm trung bình trong phạm vi quý
 	SELECT 
-		E.EMPLOYEE_ID, 
-		E.FULL_NAME, 
-        AVG(CAST(OFO.EMPLYEE_RATING AS FLOAT)) AS AVERAGE_RATE 
+    E.EMPLOYEE_ID, 
+    E.FULL_NAME, 
+    ISNULL(AVG(CAST(OFO.EMPLYEE_RATING AS FLOAT)), 0) AS AVERAGE_RATE 
 	FROM EMPLOYEE E
-	JOIN OFFLINE_ORDER OFO ON OFO.EMPLOYEE_ID = E.EMPLOYEE_ID
-	JOIN ORDER_ O ON O.ORDER_ID = OFO.OFORDER_ID
+	LEFT JOIN OFFLINE_ORDER OFO ON OFO.EMPLOYEE_ID = E.EMPLOYEE_ID
+	LEFT JOIN ORDER_ O ON O.ORDER_ID = OFO.OFORDER_ID
 	JOIN DEPARTMENT D ON D.DEPARTMENT_ID = E.DEPARTMENT_ID AND D.BRANCH_ID = @BranchId
 	WHERE 
 		E.EMPLOYEE_ID = @EmployeeId
-		AND O.ORDER_DATE BETWEEN @StartDate AND @EndDate
+		AND (O.ORDER_DATE BETWEEN @StartDate AND @EndDate OR O.ORDER_DATE IS NULL)
 	GROUP BY 
 		E.EMPLOYEE_ID, 
 		E.FULL_NAME;
 END
 
+
 GO
 CREATE PROC getRatingByYear
-	@YEAR INT,
-	@BranchId CHAR(4),
-	@EmployeeId CHAR(7)
+    @YEAR INT,
+    @BranchId CHAR(4),
+    @EmployeeId CHAR(7)
 AS
 BEGIN
-	SELECT E.EMPLOYEE_ID, 
-           E.FULL_NAME, 
-           AVG(CAST(OFO.EMPLYEE_RATING AS FLOAT)) AS AVERAGE_RATE  -- Ép ki?u thành FLOAT
-	FROM EMPLOYEE E
-	JOIN OFFLINE_ORDER OFO ON OFO.EMPLOYEE_ID = E.EMPLOYEE_ID
-	JOIN ORDER_ O ON O.ORDER_ID = OFO.OFORDER_ID AND YEAR(O.ORDER_DATE) = @YEAR
-	JOIN DEPARTMENT D ON D.DEPARTMENT_ID = E.DEPARTMENT_ID AND D.BRANCH_ID = @BranchId
-	WHERE E.EMPLOYEE_ID = @EmployeeId
-	GROUP BY E.EMPLOYEE_ID, E.FULL_NAME
-END
+    SELECT 
+        E.EMPLOYEE_ID, 
+        E.FULL_NAME, 
+        ISNULL(AVG(CAST(OFO.EMPLYEE_RATING AS FLOAT)), 0) AS AVERAGE_RATE 
+    FROM EMPLOYEE E
+    LEFT JOIN OFFLINE_ORDER OFO 
+        ON OFO.EMPLOYEE_ID = E.EMPLOYEE_ID
+    LEFT JOIN ORDER_ O 
+        ON O.ORDER_ID = OFO.OFORDER_ID 
+        AND YEAR(O.ORDER_DATE) = @YEAR
+    JOIN DEPARTMENT D 
+        ON D.DEPARTMENT_ID = E.DEPARTMENT_ID 
+        AND D.BRANCH_ID = @BranchId
+    WHERE E.EMPLOYEE_ID = @EmployeeId
+    GROUP BY 
+        E.EMPLOYEE_ID, 
+        E.FULL_NAME;
+END;
+
+SELECT * FROM OFFLINE_ORDER OFO
+JOIN EMPLOYEE E ON E.EMPLOYEE_ID = OFO.EMPLOYEE_ID
+JOIN DEPARTMENT D ON D.DEPARTMENT_ID = E.DEPARTMENT_ID AND D.BRANCH_ID = 'B002'
+
 select * from ONLINE_ORDER WHERE OORDER_ID = 'O023963'
 GO
 
@@ -562,7 +572,7 @@ CREATE PROCEDURE getInvoiceByPhone
     @DATE DATE = NULL
 AS
 BEGIN
-    -- N?u c? CUSTOMER_PHONE và DATE d?u NULL, tr? v? r?ng
+    -- Nếu có CUSTOMER_PHONE và DATE d?u NULL, tr? v? r?ng
     IF @CUSTOMER_PHONE IS NULL AND @DATE IS NULL
     BEGIN
         -- Tr? v? b?ng tr?ng cho k?t qu? hóa don
@@ -591,14 +601,14 @@ BEGIN
     -- Bi?n d? luu Invoice ID duy nh?t
     DECLARE @InvoiceId CHAR(7);
 
-    -- Tìm khách hàng d?a trên s? di?n tho?i
+    -- Tìm khách hàng dựa trên số điện thoại
     DECLARE @CustomerId CHAR(7) = (
         SELECT CUSTOMER_ID 
         FROM CUSTOMER
         WHERE PHONE_NUMBER = @CUSTOMER_PHONE
     );
 
-    -- L?y hóa don phù h?p nh?t d?a trên CUSTOMER_ID và DATE
+    -- Lấy hóa don phù hợp nhất dựa trên CUSTOMER_ID và DATE
     SELECT I.INVOICE_ID, I.FINAL_AMOUNT, I.DISCOUNT_AMOUNT, I.ISSUE_DATE, I.ISSUE_TIME
     FROM INVOICE I
     LEFT JOIN [ORDER_] O ON O.ORDER_ID = I.ORDER_ID
@@ -607,7 +617,7 @@ BEGIN
         AND (@DATE IS NULL OR CAST(I.ISSUE_DATE AS DATE) = @DATE)
     ORDER BY I.ISSUE_DATE DESC, I.ISSUE_TIME DESC;
 
-    -- Danh sách món an c?a các hóa don
+    -- Danh sách món an của các hóa don
     SELECT 
         I.INVOICE_ID,
         OD.DISH_ID,
@@ -779,7 +789,6 @@ BEGIN
     WHERE MC.CUSTOMER_ID = @CustomerID; -- So sánh trực tiếp, không chuyển đổi kiểu
 END
 
-drop proc getOrdersByBranch
 GO
 CREATE PROCEDURE getOrdersByBranch
     @branchId NVARCHAR(50)
@@ -805,10 +814,11 @@ BEGIN
             WHEN I.ORDER_ID IS NULL THEN 0 -- Chưa thanh toán lên đầu
             ELSE 1 -- Đã thanh toán sau
         END,
-        O.ORDER_DATE DESC; -- Sắp xếp theo ngày trong từng nhóm
+        O.ORDER_DATE DESC,
+		O.ORDER_TIME DESC;
 END;
 
-
+select * from ORDER_
 
 
 GO 
@@ -839,6 +849,240 @@ BEGIN
         MC.CATEGORY_NAME;
 END;
 
+GO
+CREATE PROCEDURE UpdateEmployeeAndWorkHistory
+  @EmployeeId CHAR(7),
+  @FullName NVARCHAR(255),
+  @Gender NVARCHAR(50),
+  @DepartmentId CHAR(7),
+  @Dob DATE = NULL,
+  @TerminationDate DATE = NULL,
+  @StartDateWork DATE
+AS
+BEGIN
+  BEGIN TRY
+    BEGIN TRANSACTION;
+
+    -- Cập nhật thông tin nhân viên
+    UPDATE EMPLOYEE
+    SET 
+      FULL_NAME = @FullName,
+      GENDER = @Gender,
+      DEPARTMENT_ID = @DepartmentId,
+      DATE_OF_BIRTH = @Dob,
+      TERMINATION_DATE = @TerminationDate,
+      START_DATE_WORK = @StartDateWork
+    WHERE EMPLOYEE_ID = @EmployeeId;
+
+    -- Kiểm tra nếu bản ghi WORK_HISTORY với StartDateWork đã tồn tại
+    IF NOT EXISTS (
+      SELECT 1 
+      FROM WORK_HISTORY 
+      WHERE EMPLOYEE_ID = @EmployeeId AND BRANCH_START_DATE = @StartDateWork
+    )
+    BEGIN
+      -- Thêm bản ghi mới nếu không tồn tại
+      INSERT INTO WORK_HISTORY (BRANCH_START_DATE, BRANCH_END_DATE, EMPLOYEE_ID, BRANCH_ID)
+      VALUES (@StartDateWork, NULL, @EmployeeId, @DepartmentId);
+    END;
+
+    -- Nếu có TerminationDate
+    IF @TerminationDate IS NOT NULL
+    BEGIN
+      -- Cập nhật BRANCH_END_DATE cho bản ghi tương ứng
+      UPDATE WORK_HISTORY
+      SET BRANCH_END_DATE = @TerminationDate
+      WHERE EMPLOYEE_ID = @EmployeeId AND BRANCH_START_DATE = @StartDateWork;
+    END
+    ELSE
+    BEGIN
+      -- Nếu không có TerminationDate, đảm bảo BRANCH_END_DATE vẫn là NULL
+      UPDATE WORK_HISTORY
+      SET BRANCH_END_DATE = NULL
+      WHERE EMPLOYEE_ID = @EmployeeId AND BRANCH_START_DATE = @StartDateWork;
+    END;
+
+    COMMIT TRANSACTION;
+  END TRY
+  BEGIN CATCH
+    ROLLBACK TRANSACTION;
+    THROW;
+  END CATCH
+END;
+
+GO
+CREATE PROCEDURE getOrderDishForUpdate
+    @branchId CHAR(4),
+    @orderId CHAR(7)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        MC.CATEGORY_NAME,
+        (
+            SELECT 
+                D.DISH_ID,
+                D.DISH_NAME,
+                D.DISH_PRICE,
+                ISNULL(OD.QUANTITY, 0) AS QUANTITY
+            FROM 
+                DISH D
+            LEFT JOIN 
+                DISH_AVAILABLE DA 
+                ON DA.BRANCH_ID = @branchId 
+                AND DA.DISH_ID = D.DISH_ID 
+                AND DA.IS_AVAILABLE = 1
+            LEFT JOIN 
+                ORDER_DISH OD 
+                ON OD.DISH_ID = D.DISH_ID 
+                AND OD.ORDER_ID = @orderId
+            WHERE 
+                D.CATEGORY_NAME = MC.CATEGORY_NAME
+            FOR JSON PATH
+        ) AS DISHES
+    FROM 
+        (SELECT DISTINCT CATEGORY_NAME FROM DISH) MC
+    ORDER BY 
+        MC.CATEGORY_NAME;
+END;
+
+GO
+CREATE PROCEDURE UpdateOrderDish
+    @orderId CHAR(7),
+    @dishId CHAR(4),
+    @quantity INT
+AS
+BEGIN
+    IF @quantity = 0
+    BEGIN
+        DELETE FROM order_dish 
+        WHERE ORDER_ID = @orderId AND DISH_ID = @dishId;
+    END
+    ELSE
+    BEGIN
+        IF EXISTS (
+            SELECT 1 
+            FROM order_dish 
+            WHERE ORDER_ID = @orderId AND DISH_ID = @dishId
+        )
+        BEGIN
+            UPDATE order_dish
+            SET QUANTITY = @quantity
+            WHERE ORDER_ID = @orderId AND DISH_ID = @dishId;
+        END
+        ELSE
+        BEGIN
+            INSERT INTO order_dish (ORDER_ID, DISH_ID, QUANTITY)
+            VALUES (@orderId, @dishId, @quantity);
+        END
+    END
+END;
+
+GO
+CREATE PROCEDURE UpdateTableAndOrder
+    @orderId CHAR(7),
+    @tableNum INT,
+    @branchId CHAR(4),
+    @orderType NVARCHAR(10)
+AS
+BEGIN
+    IF @orderType = 'Online'
+    BEGIN
+        UPDATE ONLINE_ORDER 
+        SET TABLE_NUMBER = @tableNum 
+        WHERE OORDER_ID = @orderId;
+
+        UPDATE TABLE_
+        SET TABLE_STATUS = 'Đang phục vụ'
+        WHERE TABLE_NUM = @tableNum;
+    END
+    ELSE IF @orderType = 'Offline'
+    BEGIN
+        UPDATE OFFLINE_ORDER 
+        SET TABLE_NUMBER = @tableNum
+        WHERE OFORDER_ID = @orderId;
+
+        UPDATE TABLE_
+        SET TABLE_STATUS = 'Đang phục vụ'
+        WHERE TABLE_NUM = @tableNum AND BRANCH_ID = @branchId;
+    END
+END;
+
+
+
+
+
+GO
+CREATE PROCEDURE updateMembershipCardByYear
+AS
+BEGIN
+    -- Tạo bảng tạm để lưu trạng thái ban đầu của thẻ
+    CREATE TABLE #TempMembershipCard (
+        CARD_ID CHAR(7) PRIMARY KEY,
+        CARD_TYPE NVARCHAR(50),
+        POINTS INT,
+        DISCOUNT_AMOUNT INT
+    );
+
+    -- Sao chép dữ liệu ban đầu vào bảng tạm
+    INSERT INTO #TempMembershipCard (CARD_ID, CARD_TYPE, POINTS, DISCOUNT_AMOUNT)
+    SELECT CARD_ID, CARD_TYPE, POINTS, DISCOUNT_AMOUNT
+    FROM MEMBERSHIP_CARD;
+
+    -- Cập nhật từ 'Thẻ Gold' xuống 'Thẻ Silver' nếu POINTS < 100
+    UPDATE MEMBERSHIP_CARD
+    SET CARD_TYPE = N'Thẻ Silver',
+        POINTS = 0,
+        DISCOUNT_AMOUNT = 100000
+    FROM MEMBERSHIP_CARD MC
+    INNER JOIN #TempMembershipCard TMC ON MC.CARD_ID = TMC.CARD_ID
+    WHERE TMC.CARD_TYPE = N'Thẻ Gold'
+      AND TMC.POINTS < 100;
+
+    -- Cập nhật từ 'Thẻ Silver' xuống 'Thẻ Thành Viên' nếu POINTS < 50
+    -- Chỉ xét các thẻ Silver ban đầu, không xét các thẻ mới bị chuyển từ Gold
+    UPDATE MEMBERSHIP_CARD
+    SET CARD_TYPE = N'Thẻ Thành Viên',
+        DISCOUNT_AMOUNT = 50000,
+        POINTS = 0
+    FROM MEMBERSHIP_CARD MC
+    INNER JOIN #TempMembershipCard TMC ON MC.CARD_ID = TMC.CARD_ID
+    WHERE TMC.CARD_TYPE = N'Thẻ Silver'
+      AND TMC.POINTS < 50;
+
+    -- Cập nhật từ 'Thẻ Silver' lên 'Thẻ Gold' nếu POINTS >= 100
+    -- Chỉ xét các thẻ Silver ban đầu
+    UPDATE MEMBERSHIP_CARD
+    SET CARD_TYPE = N'Thẻ Gold',
+        DISCOUNT_AMOUNT = 200000, 
+        POINTS = 0
+    FROM MEMBERSHIP_CARD MC
+    INNER JOIN #TempMembershipCard TMC ON MC.CARD_ID = TMC.CARD_ID
+    WHERE TMC.CARD_TYPE = N'Thẻ Silver'
+      AND TMC.POINTS >= 100;
+
+    -- Cập nhật từ 'Thẻ Thành Viên' lên 'Thẻ Silver' nếu POINTS >= 100
+    UPDATE MEMBERSHIP_CARD
+    SET CARD_TYPE = N'Thẻ Silver',
+        POINTS = 0,
+        DISCOUNT_AMOUNT = 100000
+    FROM MEMBERSHIP_CARD MC
+    INNER JOIN #TempMembershipCard TMC ON MC.CARD_ID = TMC.CARD_ID
+    WHERE TMC.CARD_TYPE = N'Thẻ Thành Viên'
+      AND TMC.POINTS >= 100;
+
+    -- Cập nhật POINTS = 0 cho tất cả thẻ, trừ 'Thẻ Thành Viên'
+    UPDATE MEMBERSHIP_CARD
+    SET POINTS = 0
+    WHERE CARD_TYPE <> N'Thẻ Thành Viên';
+
+    -- Xóa bảng tạm sau khi xử lý
+    DROP TABLE #TempMembershipCard;
+END;
+
+EXEC updateMembershipCardByYear
+
 
 
 
@@ -846,7 +1090,7 @@ END;
 SELECT * FROM RESTAURANT_BRANCH
 SELECT * FROM TABLE_
 SELECT * FROM CUSTOMER JOIN MEMBERSHIP_CARD ON MEMBERSHIP_CARD.CUSTOMER_ID = CUSTOMER.CUSTOMER_ID
-SELECT * FROM MEMBERSHIP_CARD
+SELECT * FROM MEMBERSHIP_CARD where CARD_ID = 'C099891'
 SELECT * FROM INVOICE
 JOIN ORDER_ O ON O.ORDER_ID = INVOICE.ORDER_ID AND O.BRANCH_ID = 'B003'
 SELECT * FROM DISH WHERE DISH_ID = 'D015'
@@ -863,12 +1107,12 @@ SELECT * FROM ONLINE_ORDER
 SELECT * FROM DELIVERY_ORDER
 SELECT * FROM OFFLINE_ORDER
 SELECT * FROM ORDER_ O
-SELECT * FROM TABLE_ WHERE BRANCH_ID = 'B012' AND TABLE_STATUS = N'Còn tr?ng'
+SELECT * FROM TABLE_ WHERE BRANCH_ID = 'B012' AND TABLE_STATUS = N'Còn trống'
 SELECT * FROM EMPLOYEE WHERE FULL_NAME = N'Bác Hưng Lêê'
 SELECT * FROM ORDER_DISH
 SELECT * FROM DEPARTMENT
 select * from DISH
-SELECT * FROM WORK_HISTORY WHERE EMPLOYEE_ID = 'E000003'
+SELECT * FROM WORK_HISTORY WHERE EMPLOYEE_ID = 'E000002'
 SELECT * FROM EMPLOYEE WHERE EMPLOYEE_ID ='E000003'
 SELECT * FROM ONLINE_ACCESS_HISTORY WHERE CUSTOMER_ID = '100001C'
 select * from OFFLINE_ORDER OO JOIN ORDER_ O ON O.ORDER_ID = OO.OFORDER_ID AND EMPLOYEE_ID = 'E015020'

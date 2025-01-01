@@ -223,31 +223,19 @@ export const updateResource = async (req, res) => {
     // Kết nối cơ sở dữ liệu
     const request = new sql.Request();
 
-    // Thêm các tham số vào truy vấn
-    request.input("employeeId", sql.Char(7), employeeId);
-    request.input("fullName", sql.NVarChar(255), fullName);
-    request.input("gender", sql.NVarChar(50), gender);
-    request.input("departmentId", sql.Char(7), department);
-    request.input("dob", sql.Date, dob || null);
-    request.input("terminationDate", sql.Date, terminationDate || null);
-    request.input("startDateWork", sql.Date, startDateWork);
+    // Thêm các tham số vào thủ tục
+    request.input("EmployeeId", sql.Char(7), employeeId);
+    request.input("FullName", sql.NVarChar(255), fullName);
+    request.input("Gender", sql.NVarChar(50), gender);
+    request.input("DepartmentId", sql.Char(7), department);
+    request.input("Dob", sql.Date, dob || null);
+    request.input("TerminationDate", sql.Date, terminationDate || null);
+    request.input("StartDateWork", sql.Date, startDateWork);
 
-    // Cập nhật thông tin nhân viên
-    const updateQuery = `
-      UPDATE EMPLOYEE
-      SET 
-        FULL_NAME = @fullName,
-        GENDER = @gender,
-        DEPARTMENT_ID = @departmentId,
-        DATE_OF_BIRTH = @dob,
-        TERMINATION_DATE = @terminationDate,
-        START_DATE_WORK = @startDateWork
-      WHERE EMPLOYEE_ID = @employeeId
-    `;
+    // Gọi thủ tục
+    await request.execute("UpdateEmployeeAndWorkHistory");
 
-    await request.query(updateQuery);
-
-    // Chuyển hướng hoặc gửi phản hồi sau khi cập nhật thành công
+    // Chuyển hướng sau khi cập nhật thành công
     res.redirect(`/company/resource`);
   } catch (error) {
     console.error("Error updating employee:", error);

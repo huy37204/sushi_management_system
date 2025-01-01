@@ -88,8 +88,11 @@
                 </td>
                 <td class="border px-4 py-2">
                   <%= new Date(order.ORDER_TIME).toLocaleTimeString("vi-VN", {
-                  hour: "2-digit", minute: "2-digit", second: "2-digit" }) %>
+                    hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "Asia/Jakarta"
+                  }) %>
                 </td>
+                
+                
                 <td class="border px-4 py-2"><%= order.STATUS %></td>
                 <td class="border py-2">
                   <% if (order.STATUS === 'Chưa thanh toán') { %>

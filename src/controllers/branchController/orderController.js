@@ -110,8 +110,9 @@ export const createOfflineOrder = async (req, res) => {
     const customerId = customerResult.recordset[0].CUSTOMER_ID;
 
     const now = new Date();
-    const date = now.toISOString().split("T")[0];
     const time = now.toISOString().split("T")[1].split(".")[0];
+    now.setHours(now.getHours() + 7);
+    const date = now.toISOString().split("T")[0];
 
     const requestOrder = new sql.Request();
     requestOrder.input("orderId", sql.Char(7), newOrderID);
@@ -203,35 +204,7 @@ export const updateOrderController = async (req, res) => {
   request.input("orderId", sql.Char(7), orderId);
 
   try {
-    const menuData = await request.query(`
-        SELECT 
-          MC.CATEGORY_NAME,
-          (
-            SELECT 
-              D.DISH_ID,
-              D.DISH_NAME,
-              D.DISH_PRICE,
-              ISNULL(OD.QUANTITY, 0) AS QUANTITY
-            FROM 
-              DISH D
-            LEFT JOIN 
-              DISH_AVAILABLE DA 
-              ON DA.BRANCH_ID = @branchId 
-              AND DA.DISH_ID = D.DISH_ID 
-              AND DA.IS_AVAILABLE = 1
-            LEFT JOIN 
-              ORDER_DISH OD 
-              ON OD.DISH_ID = D.DISH_ID 
-              AND OD.ORDER_ID = @orderId
-            WHERE 
-              D.CATEGORY_NAME = MC.CATEGORY_NAME
-            FOR JSON PATH
-          ) AS DISHES
-        FROM 
-          (SELECT DISTINCT CATEGORY_NAME FROM DISH) MC
-        ORDER BY 
-          MC.CATEGORY_NAME;
-      `);
+    const menuData = await request.execute(`getOrderDishForUpdate`);
 
     // Truy vấn bàn trống
     const tablesData = await request.query(`
@@ -241,7 +214,6 @@ export const updateOrderController = async (req, res) => {
       `);
     const tables = tablesData.recordset;
 
-    // Truy váº¥n bĂ n hiá»‡n táº¡i cá»§a order náº¿u lĂ  Offline hoáº·c Online
     let currentTable = null;
     if (orderType === "Offline") {
       const currentTableData = await request.query(`
@@ -270,7 +242,7 @@ export const updateOrderController = async (req, res) => {
     // Xử lý dữ liệu món ăn
     const categoriesWithDishes = menuData.recordset.map((row) => ({
       categoryName: row.CATEGORY_NAME,
-      dishes: row.DISHES ? JSON.parse(row.DISHES) : [], // Xá»­ lĂ½ náº¿u DISHES null
+      dishes: row.DISHES ? JSON.parse(row.DISHES) : [], 
     }));
 
     res.render("branch/update_order", {
@@ -294,77 +266,30 @@ export const updateOrderForm = async (req, res) => {
   const branchId = req.params.branchId; // Lấy branchId từ URL
   const { orderId, tableNum, orderType } = req.body; // Lấy orderId, tableNum, orderType từ form
   const dishes = req.body.dishes || { id: [], quantity: [] }; // Đảm bảo có giá trị mặc định cho dishes
-  const request = new sql.Request();
 
   try {
+    // Cập nhật thông tin các món ăn trong order
     for (let i = 0; i < dishes[0].id.length; i++) {
       const dishId = dishes[0].id[i];
       const quantity = parseInt(dishes[0].quantity[i], 10);
-      if (quantity === 0) {
-        await request
-          .input(`orderId${dishId}`, sql.Char(7), orderId)
-          .input(`dishId${dishId}`, sql.Char(4), dishId)
-          .query(
-            `DELETE FROM order_dish WHERE ORDER_ID = @orderId${dishId} AND DISH_ID = @dishId${dishId}`,
-          );
-      } else {
-        const dish = await request
-          .input(`orderId${dishId}`, sql.Char(7), orderId)
-          .input(`dishId${dishId}`, sql.Char(4), dishId)
-          .query(
-            `SELECT * FROM order_dish WHERE ORDER_ID = @orderId${dishId} AND DISH_ID = @dishId${dishId}`,
-          );
-        if (dish.recordset.length > 0) {
-          await request
-            .input(`quantity${dishId}`, sql.Int, quantity)
-            .query(
-              `UPDATE order_dish SET QUANTITY = @quantity${dishId} WHERE ORDER_ID = @orderId${dishId} AND DISH_ID = @dishId${dishId}`,
-            );
-        } else {
-          await request
-            .input(`quantity${dishId}`, sql.Int, quantity)
-            .query(
-              `INSERT INTO order_dish (ORDER_ID, DISH_ID, QUANTITY) VALUES (@orderId${dishId}, @dishId${dishId}, @quantity${dishId})`,
-            );
-        }
-      }
+
+      // Tạo request mới cho mỗi món ăn
+      const dishRequest = new sql.Request();
+      await dishRequest
+        .input("orderId", sql.Char(7), orderId)
+        .input("dishId", sql.Char(4), dishId)
+        .input("quantity", sql.Int, quantity)
+        .execute("UpdateOrderDish");
     }
 
-    // Cập nhật TABLE_NUMBER trong ONLINE_ORDER hoặc OFFLINE_ORDER
-    if (orderType === "Online") {
-      await request
-        .input("orderId", sql.Char(7), orderId)
-        .input("tableNum", sql.Int, tableNum)
-        .query(
-          `UPDATE ONLINE_ORDER 
-           SET TABLE_NUMBER = @tableNum 
-           WHERE OORDER_ID = @orderId`,
-        );
-
-      await request.input("tableNum1", sql.Int, tableNum).query(
-        `UPDATE TABLE_ 
-           SET TABLE_STATUS = 'Đang phục vụ' 
-           WHERE TABLE_NUM = @tableNum1`,
-      );
-    } else if (orderType === "Offline") {
-      await request
-        .input("orderId", sql.Char(7), orderId)
-        .input("tableNum", sql.Int, tableNum)
-        .query(
-          `UPDATE OFFLINE_ORDER 
-           SET TABLE_NUMBER = @tableNum
-           WHERE OFORDER_ID = @orderId`,
-        );
-
-      await request
-        .input("branchId", sql.Char(7), branchId)
-        .input("tableNum1", sql.Int, tableNum)
-        .query(
-          `UPDATE TABLE_ 
-           SET TABLE_STATUS = 'Đang phục vụ' 
-           WHERE TABLE_NUM = @tableNum1 AND BRANCH_ID = @branchId`,
-        );
-    }
+    // Cập nhật TABLE_NUMBER và trạng thái bàn
+    const tableRequest = new sql.Request();
+    await tableRequest
+      .input("orderId", sql.Char(7), orderId)
+      .input("tableNum", sql.Int, tableNum)
+      .input("branchId", sql.Char(4), branchId)
+      .input("orderType", sql.NVarChar(10), orderType)
+      .execute("UpdateTableAndOrder");
 
     // Sau khi xử lý xong, chuyển hướng người dùng hoặc gửi phản hồi
     res.redirect(`/branch/${branchId}/order-form`);
@@ -373,6 +298,8 @@ export const updateOrderForm = async (req, res) => {
     res.status(500).send("Có lỗi khi cập nhật order");
   }
 };
+
+
 
 export const branchRatingControlller = async (req, res) => {
   const { branchId } = req.params;

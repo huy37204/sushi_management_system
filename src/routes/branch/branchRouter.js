@@ -22,7 +22,7 @@ import {
   payOrderForm,
   updateOrderController,
   updateOrderForm,
-} from "../../controllers/branchController/formController.js";
+} from "../../controllers/branchController/orderController.js";
 import {
   branchInvoiceController,
   getInvoice,
