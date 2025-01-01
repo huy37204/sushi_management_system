@@ -6,15 +6,15 @@ export const getRevenuePage = async (req, res) => {
   try {
     const pool = await connect();
     console.log("Before database query");
-    // Query to get the list of branches
-    const branchesResult = await pool
-      .request()
-      .query(`SELECT BRANCH_ID, BRANCH_NAME FROM RESTAURANT_BRANCH`);
+
+    // Call the GetBranches stored procedure
+    const branchesResult = await pool.request().execute("GetBranches");
+
     // Render the page with the branch list
     res.render("company/company_food_revenue", {
       branches: branchesResult.recordset, // Send branches to the view
       message: null, // Optionally send any messages
-      revenue:"",
+      revenue: "",
       bestSellingData: "",
       leastSelling: "",
       leastSellingData: "",
@@ -24,7 +24,7 @@ export const getRevenuePage = async (req, res) => {
       message: "",
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching revenue page:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -32,58 +32,38 @@ export const getRevenuePage = async (req, res) => {
 // Controller to handle filtering and fetching revenue data
 export const getRevenueData = async (req, res) => {
   const { startDate, endDate, branchId } = req.body; // Lấy giá trị từ form gửi lên
-    console.log(branchId);
+  console.log(branchId);
   try {
     const pool = await connect();
 
     // Truy vấn chi nhánh
-    const branchesResult = await pool
-      .request()
-      .query("SELECT BRANCH_ID, BRANCH_NAME FROM RESTAURANT_BRANCH");
+    const branchesResult = await pool.request().execute("GetBranches");
 
-    // Truy vấn doanh thu và món ăn
+    // Truy vấn doanh thu
     const revenueResult = await pool
       .request()
       .input("startDate", sql.Date, startDate)
       .input("endDate", sql.Date, endDate)
-      .input("branchId", sql.Char(4), branchId).query(`
-          SELECT od.DISH_ID, D.DISH_NAME, SUM(od.QUANTITY) AS TOTAL_SALES
-          FROM ORDER_DISH od
-          JOIN DISH D ON D.DISH_ID = od.DISH_ID
-          JOIN ORDER_ O ON O.ORDER_ID = od.ORDER_ID AND O.BRANCH_ID = @branchId
-          WHERE O.ORDER_DATE BETWEEN @startDate AND @endDate
-          GROUP BY od.DISH_ID, D.DISH_NAME
-        `);
-    console.log(startDate, endDate);
+      .input("branchId", sql.Char(4), branchId)
+      .execute("GetRevenueData");
+
+    // Truy vấn món bán chạy
     const bestSellingResult = await pool
       .request()
       .input("startDate", sql.Date, startDate)
       .input("endDate", sql.Date, endDate)
-      .input("branchId", sql.Char(4), branchId).query(`
-          SELECT TOP 3 od.DISH_ID, D.DISH_NAME, SUM(od.QUANTITY) AS TOTAL_SALES
-          FROM ORDER_DISH od
-          JOIN DISH D ON D.DISH_ID = od.DISH_ID
-          JOIN ORDER_ O ON O.ORDER_ID = od.ORDER_ID AND O.BRANCH_ID = @branchId
-          WHERE O.ORDER_DATE BETWEEN @startDate AND @endDate
-          GROUP BY od.DISH_ID, D.DISH_NAME
-          ORDER BY TOTAL_SALES DESC
-        `);
-    
+      .input("branchId", sql.Char(4), branchId)
+      .execute("GetBestSellingDishes");
+
+    // Truy vấn món bán chậm
     const leastSellingResult = await pool
       .request()
       .input("startDate", sql.Date, startDate)
       .input("endDate", sql.Date, endDate)
-      .input("branchId", sql.Char(4), branchId).query(`
-          SELECT TOP 3 od.DISH_ID, D.DISH_NAME, SUM(od.QUANTITY) AS TOTAL_SALES
-          FROM ORDER_DISH od
-          JOIN DISH D ON D.DISH_ID = od.DISH_ID
-          JOIN ORDER_ O ON O.ORDER_ID = od.ORDER_ID AND O.BRANCH_ID = @branchId
-          WHERE O.ORDER_DATE BETWEEN @startDate AND @endDate
-          GROUP BY od.DISH_ID, D.DISH_NAME
-          ORDER BY TOTAL_SALES ASC
-        `);
+      .input("branchId", sql.Char(4), branchId)
+      .execute("GetLeastSellingDishes");
 
-        console.log(leastSellingResult.recordset);
+    console.log(leastSellingResult.recordset);
     // Render lại trang với dữ liệu doanh thu, chi nhánh, món bán chạy và bán chậm
     res.render("company/company_food_revenue", {
       branches: branchesResult.recordset, // Dữ liệu chi nhánh
