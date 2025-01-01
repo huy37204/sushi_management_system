@@ -2,6 +2,15 @@ import { PATH } from "../../config/path.js";
 import express from "express";
 import { verifyRole } from "../../middlewares/authMiddlewares.js";
 import {
+  updateSalaries,
+  getSalaries
+} from "../../controllers/company/UpdateSalary.js"; // Adjust the import path
+import {
+  getRevenuePage,
+  getRevenueData,
+} from "../../controllers/company/statisticDish.js"; // Adjust the import path
+
+import {
   companyController,
   getCompanyRevenueByDate,
   getCompanyRevenueByMonth,
@@ -18,14 +27,6 @@ import {
   transferResource,
   updateResource,
 } from "../../controllers/companyController/resourceController.js";
-import {
-  getSalaries,
-  updateSalaries,
-} from "../../controllers/company/UpdateSalary.js"; // Adjust the import path
-import {
-  getRevenuePage,
-  getRevenueData,
-} from "../../controllers/company/statisticDish.js"; // Adjust the import path
 
 const companyRouter = express.Router();
 const companyRole = "Quản lý công ty";

@@ -238,7 +238,6 @@ export const updateOrderController = async (req, res) => {
           ? currentTableData.recordset[0]
           : null;
     }
-    console.log(currentTable);
     // Xử lý dữ liệu món ăn
     const categoriesWithDishes = menuData.recordset.map((row) => ({
       categoryName: row.CATEGORY_NAME,
