@@ -60,7 +60,6 @@ companyRouter.post(
   getCompanyRevenueByYear,
 );
 
-
 companyRouter.get(
   PATH.COMPANY.RESOURCE,
   verifyRole(companyRole),

@@ -29,57 +29,25 @@ export const orderTableController = async (req, res) => {
 export const createTableBooking = async (req, res) => {
   try {
     const { quantity, branch } = req.body;
+    const customerId = req.user.id;
 
     // Lấy kết nối cơ sở dữ liệu
     const request = new sql.Request();
 
-    // Bắt đầu giao dịch để tránh xung đột trong môi trường nhiều yêu cầu đồng thời
-    const transaction = new sql.Transaction();
-    await transaction.begin();
-
+    const result = await request
+      .input("quantity", sql.Int, quantity)
+      .input("branchId", sql.NVarChar, branch)
+      .input("customerId", sql.NVarChar, customerId)
+      .execute("createTableBooking");
     // Lấy giá trị lớn nhất hiện tại của ORDER_ID
-    const result = await transaction.request().query(`
-      SELECT MAX(ORDER_ID) AS MaxOrderID 
-      FROM [ORDER_]
-    `);
 
-    // Xử lý giá trị của MaxOrderID
-    let maxOrderID = result.recordset[0].MaxOrderID || "O000000"; // Nếu không có giá trị thì bắt đầu từ O0000000
-    const numericPart = parseInt(maxOrderID.substring(1)) + 1; // Tăng phần số lên 1
-    const newOrderID = `O${numericPart.toString().padStart(6, "0")}`; // Tạo ORDER_ID mới
-
-    // Lấy ngày và giờ hiện tại
-    const now = new Date();
-    const date = now.toISOString().split("T")[0]; // Định dạng YYYY-MM-DD
-    const time = now.toISOString().split("T")[1].split(".")[0]; // Định dạng HH:MM:SS
-
-    // Chèn dữ liệu vào bảng [ORDER_]
-    await transaction.request().query(`
-      INSERT INTO [ORDER_] (ORDER_ID, ORDER_DATE, BRANCH_ID, CUSTOMER_ID, ORDER_TYPE, ORDER_TIME)
-      VALUES ('${newOrderID}', '${date}', '${branch}', '${req.user.id}', 'Online', '${time}')
-    `);
-
-    // Chèn dữ liệu vào bảng ONLINE_ORDER
-    await transaction.request().query(`
-      INSERT INTO ONLINE_ORDER (OORDER_ID, CUSTOMER_QUANTITY, BRANCH_ID, ARRIVAL_DATE, ARRIVAL_TIME)
-      VALUES ('${newOrderID}', ${quantity}, '${branch}', '${date}', '${time}')
-    `);
-
-    // Cam kết giao dịch
-    await transaction.commit();
-
+    const { newOrderID } = result.recordset[0];
     // Phản hồi thành công
     res.redirect(
       `/table-booking/pre-order?orderId=${newOrderID}&branchId=${branch}`,
     );
   } catch (error) {
     console.error(error);
-
-    // Rút lại giao dịch nếu có lỗi
-    if (transaction) {
-      await transaction.rollback();
-    }
-
     res.status(500).json({
       message: "Error creating order",
       error: error.message,
@@ -95,27 +63,7 @@ export const preorderController = async (req, res) => {
     request.input("branchId", sql.VarChar, branchId);
 
     // Lấy dữ liệu menu đã nhóm theo CATEGORY_NAME
-    const menuData = await request.query(`
-            SELECT 
-                MC.CATEGORY_NAME,
-                (
-                    SELECT 
-                        D.DISH_ID,
-                        D.DISH_NAME,
-                        D.DISH_PRICE
-                    FROM 
-                        DISH D
-                    JOIN 
-                        DISH_AVAILABLE DA ON DA.BRANCH_ID = @branchId AND DA.DISH_ID = D.DISH_ID AND DA.IS_AVAILABLE = 1
-                    WHERE 
-                        D.CATEGORY_NAME = MC.CATEGORY_NAME
-                    FOR JSON PATH
-                ) AS DISHES
-            FROM 
-                (SELECT DISTINCT CATEGORY_NAME FROM DISH) MC
-            ORDER BY 
-                MC.CATEGORY_NAME;
-        `);
+    const menuData = await request.execute("getDishesByCategory");
 
     // Chuyển dữ liệu JSON trả về thành cấu trúc mảng
     const categoriesWithDishes = menuData.recordset.map((row) => ({
