@@ -1227,14 +1227,8 @@ input:checked + .toggle-bg {
 .ml-\[22px\] {
   margin-left: 22px;
 }
-.ml-\[22px\] {
-  margin-left: 22px;
-}
 .ml-\[30\%\] {
   margin-left: 30%;
-}
-.ml-\[5\%\] {
-  margin-left: 5%;
 }
 .ml-\[5\%\] {
   margin-left: 5%;
@@ -1465,9 +1459,6 @@ input:checked + .toggle-bg {
 }
 .w-\[120px\] {
   width: 120px;
-}
-.w-\[150px\] {
-  width: 150px;
 }
 .w-\[150px\] {
   width: 150px;
@@ -1914,10 +1905,6 @@ input:checked + .toggle-bg {
   --tw-bg-opacity: 1;
   background-color: rgb(8 120 255 / var(--tw-bg-opacity, 1));
 }
-.bg-\[\#0878FF\] {
-  --tw-bg-opacity: 1;
-  background-color: rgb(8 120 255 / var(--tw-bg-opacity, 1));
-}
 .bg-\[\#0879BF\] {
   --tw-bg-opacity: 1;
   background-color: rgb(8 121 191 / var(--tw-bg-opacity, 1));
@@ -1997,10 +1984,6 @@ input:checked + .toggle-bg {
 .bg-\[\#fa2a2a\] {
   --tw-bg-opacity: 1;
   background-color: rgb(250 42 42 / var(--tw-bg-opacity, 1));
-}
-.bg-\[\#fd7272\] {
-  --tw-bg-opacity: 1;
-  background-color: rgb(253 114 114 / var(--tw-bg-opacity, 1));
 }
 .bg-\[\#fd7272\] {
   --tw-bg-opacity: 1;
@@ -2298,10 +2281,6 @@ input:checked + .toggle-bg {
 .py-6 {
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
-}
-.py-7 {
-  padding-top: 1.75rem;
-  padding-bottom: 1.75rem;
 }
 .py-7 {
   padding-top: 1.75rem;
@@ -2743,9 +2722,7 @@ input:checked + .toggle-bg {
   background-color: rgb(45 163 106 / var(--tw-bg-opacity, 1));
 }
 .hover\:bg-\[\#4a9bfd\]:hover {
-.hover\:bg-\[\#4a9bfd\]:hover {
   --tw-bg-opacity: 1;
-  background-color: rgb(74 155 253 / var(--tw-bg-opacity, 1));
   background-color: rgb(74 155 253 / var(--tw-bg-opacity, 1));
 }
 .hover\:bg-\[\#4bdfae\]:hover {
@@ -2787,10 +2764,6 @@ input:checked + .toggle-bg {
 .hover\:bg-\[\#f88ea0\]:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(248 142 160 / var(--tw-bg-opacity, 1));
-}
-.hover\:bg-\[\#fd6161\]:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(253 97 97 / var(--tw-bg-opacity, 1));
 }
 .hover\:bg-\[\#fd6161\]:hover {
   --tw-bg-opacity: 1;
