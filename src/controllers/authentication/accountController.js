@@ -34,7 +34,7 @@ export const loginController = async (req, res) => {
       role: user.ROLE,
       name: user.Name,
     };
-
+    
     if (user.ROLE === "Khách hàng") {
       req.session.user.startTime = new Date(); // Ghi lại thời gian bắt đầu phiên
       const historyRequest = new sql.Request();
@@ -198,6 +198,7 @@ export const registerUser = async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     // Tạo request để chèn dữ liệu vào bảng CUSTOMER
+
     const insertCustomerRequest = new sql.Request();
     insertCustomerRequest.input("customer_id", sql.VarChar, newCustomerId);
     insertCustomerRequest.input("name", sql.NVarChar, name);

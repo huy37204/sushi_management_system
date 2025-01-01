@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <link rel="preconnect" href="https://fonts.bunny.net" />
+    <link
+      href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/branch_home.css" />
+    <link rel="stylesheet" href="/css/output.css" />
+
+    <title>Thêm nhân viên</title>
+  </head>
+  <body class="text-gray-800 font-inter">
+    <!--sidenav -->
+    <%- include('../partials/company/company_side_nav') %>
+    <!-- end sidenav -->
+
+    <main
+      class="w-full md:w-[calc(100%-256px)] md:ml-64 bg-gray-200 min-h-screen transition-all main"
+    >
+      <!-- Navbar -->
+      <%- include('../partials/company/company_navbar') %>
+      <!-- End Navbar -->
+
+      <!-- Content -->
+      <!-- Content -->
+      <div class="ml-[5%] mt-10">
+        <!-- Title -->
+        <div class="text-[30px] font-semibold text-[#374151] mb-5">
+          Thêm nhân viên
+        </div>
+
+        <!-- Form thêm nhân viên -->
+        <form
+          action="/company/resource/add?branchId=<%= branchId %>"
+          method="POST"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Họ và tên -->
+            <div>
+              <label for="fullName" class="block text-gray-700 font-medium mb-2"
+                >Họ và tên</label
+              >
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                class="block w-full p-2 border rounded-md"
+                required
+              />
+            </div>
+
+            <!-- Giới tính -->
+            <div>
+              <label for="gender" class="block text-gray-700 font-medium mb-2"
+                >Giới tính</label
+              >
+              <select
+                id="gender"
+                name="gender"
+                class="block w-full p-2 border rounded-md"
+                required
+              >
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <!-- Ngày sinh -->
+            <div>
+              <label for="dob" class="block text-gray-700 font-medium mb-2"
+                >Ngày sinh</label
+              >
+              <input
+                type="date"
+                id="dob"
+                name="dob"
+                class="block w-full p-2 border rounded-md"
+                required
+              />
+            </div>
+
+            <!-- Bộ phận -->
+            <div>
+              <label
+                for="departmentId"
+                class="block text-gray-700 font-medium mb-2"
+                >Bộ phận</label
+              >
+              <select
+                id="departmentId"
+                name="departmentId"
+                class="block w-full p-2 border rounded-md"
+                required
+              >
+                <% departments.forEach(department => { %>
+                <option value="<%= department.DEPARTMENT_ID %>">
+                  <%= department.DEPARTMENT_NAME %>
+                </option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <!-- Ngày bắt đầu làm việc -->
+            <div>
+              <label
+                for="startDayWork"
+                class="block text-gray-700 font-medium mb-2"
+                >Ngày bắt đầu làm việc</label
+              >
+              <input
+                type="date"
+                id="startDayWork"
+                name="startDayWork"
+                class="block w-full p-2 border rounded-md"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="mt-6 flex mx-auto">
+            <button
+              type="submit"
+              class="bg-indigo-600 text-white px-9 py-2 rounded-lg hover:bg-indigo-700"
+            >
+              Thêm nhân viên
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- End Content -->
+    </main>
+
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/popper.js"></script>
+  </body>
+</html>

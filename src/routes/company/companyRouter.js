@@ -9,34 +9,112 @@ import {
   getRevenuePage,
   getRevenueData,
 } from "../../controllers/company/statisticDish.js"; // Adjust the import path
+
+import {
+  companyController,
+  getCompanyRevenueByDate,
+  getCompanyRevenueByMonth,
+  getCompanyRevenueByQuarter,
+  getCompanyRevenueByYear,
+} from "../../controllers/companyController/companyController.js";
+import {
+  addResource,
+  addResourceController,
+  deleteResource,
+  resourceController,
+  resourceTransferController,
+  resourceUpdateController,
+  transferResource,
+  updateResource,
+} from "../../controllers/companyController/resourceController.js";
+import{
+getSalaries,
+updateSalaries,
+} from "../../controllers/company/UpdateSalary.js"; // Adjust the import path
+import {
+getRevenuePage,
+getRevenueData,
+} from "../../controllers/company/statisticDish.js"; // Adjust the import path
+
 const companyRouter = express.Router();
 const companyRole = "Quản lý công ty";
-companyRouter.get(PATH.HOME, verifyRole(companyRole), (req, res) => {
-  res.render("company/company_home");
-});
+companyRouter.get(
+  PATH.COMPANY.HOME,
+  verifyRole(companyRole),
+  companyController,
+);
+
+companyRouter.post(
+  "/company/date-revenue",
+  verifyRole(companyRole),
+  getCompanyRevenueByDate,
+);
+
+companyRouter.post(
+  "/company/month-revenue",
+  verifyRole(companyRole),
+  getCompanyRevenueByMonth,
+);
+
+companyRouter.post(
+  "/company/quarter-revenue",
+  verifyRole(companyRole),
+  getCompanyRevenueByQuarter,
+);
+
+companyRouter.post(
+  "/company/year-revenue",
+  verifyRole(companyRole),
+  getCompanyRevenueByYear,
+);
+
 
 companyRouter.get(
   PATH.COMPANY.RESOURCE,
   verifyRole(companyRole),
-  (req, res) => {
-    res.render("company/company_resource");
-  },
+  resourceController,
 );
 
 companyRouter.get(
   PATH.COMPANY.RESOURCE_TRANSFER,
   verifyRole(companyRole),
-  (req, res) => {
-    res.render("company/company_resource_transfer");
-  },
+  resourceTransferController,
+);
+
+companyRouter.post(
+  PATH.COMPANY.RESOURCE_TRANSFER,
+  verifyRole(companyRole),
+  transferResource,
 );
 
 companyRouter.get(
   PATH.COMPANY.RESOURCE_UPDATE,
   verifyRole(companyRole),
-  (req, res) => {
-    res.render("company/company_resource_update");
-  },
+  resourceUpdateController,
+);
+
+companyRouter.post(
+  PATH.COMPANY.RESOURCE_UPDATE,
+  verifyRole(companyRole),
+  updateResource,
+);
+
+companyRouter.post(
+  "/company/resource/delete",
+  verifyRole(companyRole),
+  deleteResource,
+);
+
+companyRouter.get(
+  "/company/resource/add",
+  verifyRole(companyRole),
+  addResourceController,
+);
+
+companyRouter.post(
+  "/company/resource/add",
+  verifyRole(companyRole),
+  addResource,
 );
 
 // Route for getting salaries by branch ID

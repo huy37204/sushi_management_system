@@ -283,7 +283,7 @@ export const updateOrderController = async (req, res) => {
           MC.CATEGORY_NAME;
       `);
 
-    // Truy váº¥n bĂ n trá»‘ng
+    // Truy vấn bàn trống
     const tablesData = await request.query(`
         SELECT TABLE_NUM, SEAT_AVAILABLE
         FROM TABLE_
@@ -317,7 +317,7 @@ export const updateOrderController = async (req, res) => {
           : null;
     }
 
-    // Xá»­ lĂ½ dá»¯ liá»‡u mĂ³n Äƒn
+    // Xử lý dữ liệu món ăn
     const categoriesWithDishes = menuData.recordset.map((row) => ({
       categoryName: row.CATEGORY_NAME,
       dishes: row.DISHES ? JSON.parse(row.DISHES) : [], // Xá»­ lĂ½ náº¿u DISHES null
@@ -342,41 +342,40 @@ export const updateOrderController = async (req, res) => {
 };
 
 export const updateOrderForm = async (req, res) => {
-  const branchId = req.params.branchId; // Láº¥y branchId tá»« URL
-  const { orderId, tableNum, orderType } = req.body; // Láº¥y orderId, tableNum, orderType tá»« form
-  const dishes = req.body.dishes || { id: [], quantity: [] }; // Äáº£m báº£o cĂ³ giĂ¡ trá»‹ máº·c Ä‘á»‹nh cho dishes
+  const branchId = req.params.branchId; // Lấy branchId từ URL
+  const { orderId, tableNum, orderType } = req.body; // Lấy orderId, tableNum, orderType từ form
+  const dishes = req.body.dishes || { id: [], quantity: [] }; // Đảm bảo có giá trị mặc định cho dishes
   const request = new sql.Request();
 
   try {
-    // Láº·p qua máº£ng id vĂ  quantity
+
     for (let i = 0; i < dishes[0].id.length; i++) {
       const dishId = dishes[0].id[i]; // Láº¥y id mĂ³n Äƒn
-      const quantity = parseInt(dishes[0].quantity[i], 10); // Láº¥y sá»‘ lÆ°á»£ng mĂ³n Äƒn, chuyá»ƒn thĂ nh sá»‘ nguyĂªn
+      const quantity = parseInt(dishes[0].quantity[i], 10); 
       if (quantity === 0) {
-        // Náº¿u sá»‘ lÆ°á»£ng = 0, xĂ³a mĂ³n khá»i báº£ng order_dish
+ 
         await request
-          .input(`orderId${dishId}`, sql.Char(7), orderId) // Äá»•i tĂªn tham sá»‘
+          .input(`orderId${dishId}`, sql.Char(7), orderId) 
           .input(`dishId${dishId}`, sql.Char(4), dishId)
           .query(
             `DELETE FROM order_dish WHERE ORDER_ID = @orderId${dishId} AND DISH_ID = @dishId${dishId}`,
           );
       } else {
-        // Kiá»ƒm tra xem mĂ³n Äƒn Ä‘Ă£ tá»“n táº¡i trong order_dish chÆ°a
+    
         const dish = await request
-          .input(`orderId${dishId}`, sql.Char(7), orderId) // Äá»•i tĂªn tham sá»‘
+          .input(`orderId${dishId}`, sql.Char(7), orderId) 
           .input(`dishId${dishId}`, sql.Char(4), dishId)
           .query(
             `SELECT * FROM order_dish WHERE ORDER_ID = @orderId${dishId} AND DISH_ID = @dishId${dishId}`,
           );
         if (dish.recordset.length > 0) {
-          // Náº¿u Ä‘Ă£ tá»“n táº¡i, cáº­p nháº­t sá»‘ lÆ°á»£ng
           await request
             .input(`quantity${dishId}`, sql.Int, quantity)
             .query(
               `UPDATE order_dish SET QUANTITY = @quantity${dishId} WHERE ORDER_ID = @orderId${dishId} AND DISH_ID = @dishId${dishId}`,
             );
         } else {
-          // Náº¿u chÆ°a tá»“n táº¡i, thĂªm má»›i mĂ³n Äƒn
+      
           await request
             .input(`quantity${dishId}`, sql.Int, quantity)
             .query(
@@ -386,7 +385,7 @@ export const updateOrderForm = async (req, res) => {
       }
     }
 
-    // Cáº­p nháº­t TABLE_NUMBER trong ONLINE_ORDER hoáº·c OFFLINE_ORDER
+    // Cập nhật TABLE_NUMBER trong ONLINE_ORDER hoặc OFFLINE_ORDER
     if (orderType === "Online") {
       await request
         .input("orderId", sql.Char(7), orderId)
@@ -424,7 +423,7 @@ export const updateOrderForm = async (req, res) => {
         );
     }
 
-    // Sau khi xá»­ lĂ½ xong, chuyá»ƒn hÆ°á»›ng ngÆ°á»i dĂ¹ng hoáº·c gá»­i pháº£n há»“i
+    // Sau khi xử lý xong, chuyển hướng người dùng hoặc gửi phản hồi
     res.redirect(`/branch/${branchId}/order-form`);
   } catch (error) {
     console.error("Error updating order:", error);
@@ -457,7 +456,7 @@ export const payOrderForm = async (req, res) => {
   try {
     const request = new sql.Request();
 
-    // ThĂªm cĂ¡c input cho thá»§ tá»¥c
+    // Thêm các input cho thủ tục
     request.input("OrderId", sql.Char(7), orderId);
     request.input("BranchId", sql.Char(7), branchId);
     request.input("OrderType", sql.NVarChar, orderType);
@@ -466,7 +465,7 @@ export const payOrderForm = async (req, res) => {
     // Thá»±c thi thá»§ tá»¥c
     await request.execute("payOrder");
 
-    // TĂ­nh `RATING_ID` má»›i
+    // Tính `RATING_ID` mới
     const result = await request.query(`
       SELECT TOP 1 RATING_ID 
       FROM BRANCH_RATING 
@@ -510,7 +509,7 @@ export const payOrderForm = async (req, res) => {
       }
     }
 
-    // Äiá»u hÆ°á»›ng láº¡i sau khi thanh toĂ¡n
+    // Điều hướng lại sau khi thanh toán
     res.redirect(`/branch/${branchId}/order-form`);
   } catch (error) {
     // Xá»­ lĂ½ lá»—i

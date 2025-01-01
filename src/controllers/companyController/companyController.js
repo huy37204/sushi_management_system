@@ -1,28 +1,25 @@
 import { sql, connect } from "../../database/dbConnection.js";
-
-export const branchController = async (req, res) => {
+export const companyController = async (req, res) => {
+  const { branchId } = req.query;
   const user = req.user;
   const request = new sql.Request();
-
-  // Truyền tham số `userId` vào câu truy vấn SQL
-  request.input("userId", sql.NVarChar, user.id);
 
   // Thực hiện truy vấn lấy thông tin BranchId
   try {
     const result = await request.query(`
-      SELECT B.BRANCH_ID
-      FROM RESTAURANT_BRANCH B
-      WHERE B.MANAGER_ID = @userId
-    `);
+        SELECT B.BRANCH_ID, B.BRANCH_NAME
+        FROM RESTAURANT_BRANCH B
+      `);
 
     // Kiểm tra nếu recordset trả về có kết quả
     if (result.recordset.length > 0) {
-      const branchId = result.recordset[0].BRANCH_ID; // Truyền giá trị BRANCH_ID
+      const branches = result.recordset; // Truyền giá trị BRANCH_ID
 
       // Render dữ liệu
-      res.render("branch/branch_home", {
+      res.render("company/company_home", {
+        branchId: branchId || null,
         user: user,
-        branchId: branchId,
+        branches,
         type: "",
         invoices: [],
         hourlyTotals: [],
@@ -40,10 +37,9 @@ export const branchController = async (req, res) => {
   }
 };
 
-export const getBranchRevenueByDate = async (req, res) => {
+export const getCompanyRevenueByDate = async (req, res) => {
   try {
-    const { selectDate } = req.body;
-    const { branchId } = req.params;
+    const { selectDate, branchId } = req.body;
 
     const request = new sql.Request();
     request.input("DATE", sql.Date, selectDate);
@@ -79,8 +75,14 @@ export const getBranchRevenueByDate = async (req, res) => {
       }
     });
 
+    const result = await request.query(`
+        SELECT B.BRANCH_ID, B.BRANCH_NAME
+        FROM RESTAURANT_BRANCH B
+      `);
+    const branches = result.recordset;
     // Render ra view branch_home với dữ liệu
-    res.render("branch/branch_home", {
+    res.render("company/company_home", {
+      branches,
       branchId,
       invoices,
       type: "date-revenue",
@@ -90,15 +92,14 @@ export const getBranchRevenueByDate = async (req, res) => {
       quarter: "",
     });
   } catch (error) {
-    console.error("Error fetching branch revenue by date:", error);
-    res.status(500).send("Error fetching branch revenue by date");
+    console.error("Error fetching branch company by date:", error);
+    res.status(500).send("Error fetching company revenue by date");
   }
 };
 
-export const getBranchRevenueByMonth = async (req, res) => {
+export const getCompanyRevenueByMonth = async (req, res) => {
   try {
-    const { year, month } = req.body;
-    const { branchId } = req.params;
+    const { year, month, branchId } = req.body;
 
     const request = new sql.Request();
     request.input("Year", sql.Int, year);
@@ -125,9 +126,15 @@ export const getBranchRevenueByMonth = async (req, res) => {
         console.warn(`Invalid date found in invoice: ${invoice.ISSUE_DATE}`);
       }
     });
+    const result = await request.query(`
+        SELECT B.BRANCH_ID, B.BRANCH_NAME
+        FROM RESTAURANT_BRANCH B
+      `);
+    const branches = result.recordset;
 
     // Trả về trang kết quả
-    res.render("branch/branch_home", {
+    res.render("company/company_home", {
+      branches,
       branchId,
       invoices,
       type: "month-revenue",
@@ -142,10 +149,9 @@ export const getBranchRevenueByMonth = async (req, res) => {
   }
 };
 
-export const getBranchRevenueByQuarter = async (req, res) => {
+export const getCompanyRevenueByQuarter = async (req, res) => {
   try {
-    const { year, quarter } = req.body;
-    const { branchId } = req.params;
+    const { year, quarter, branchId } = req.body;
 
     const request = new sql.Request();
     request.input("Year", sql.Int, year);
@@ -185,8 +191,14 @@ export const getBranchRevenueByQuarter = async (req, res) => {
         console.warn(`Invalid date found in invoice: ${invoice.ISSUE_DATE}`);
       }
     });
+    const result = await request.query(`
+        SELECT B.BRANCH_ID, B.BRANCH_NAME
+        FROM RESTAURANT_BRANCH B
+      `);
+    const branches = result.recordset;
 
-    res.render("branch/branch_home", {
+    res.render("company/company_home", {
+      branches,
       branchId,
       invoices,
       type: "quarter-revenue",
@@ -201,10 +213,9 @@ export const getBranchRevenueByQuarter = async (req, res) => {
   }
 };
 
-export const getBranchRevenueByYear = async (req, res) => {
+export const getCompanyRevenueByYear = async (req, res) => {
   try {
-    const { year } = req.body;
-    const { branchId } = req.params;
+    const { year, branchId } = req.body;
 
     const request = new sql.Request();
     request.input("Year", sql.Int, year);
@@ -225,7 +236,14 @@ export const getBranchRevenueByYear = async (req, res) => {
         monthlyTotals[month] += parseFloat(invoice.FINAL_AMOUNT || 0);
       }
     });
-    res.render("branch/branch_home", {
+
+    const result = await request.query(`
+        SELECT B.BRANCH_ID, B.BRANCH_NAME
+        FROM RESTAURANT_BRANCH B
+      `);
+    const branches = result.recordset;
+    res.render("company/company_home", {
+      branches,
       branchId,
       invoices,
       type: "year-revenue",
