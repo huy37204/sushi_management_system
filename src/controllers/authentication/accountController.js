@@ -270,6 +270,7 @@ export const updateSessionHistory = async (req, res) => {
     await request.execute("UpdateSessionHistory");
 
     console.log(`Session duration updated for customer ID: ${req.user.id}`);
+    console.log(`Session duration updated: ${sessionDuration}`);
   } catch (error) {
     console.error("Error updating session history:", error);
     throw new Error("Error updating session history.");
