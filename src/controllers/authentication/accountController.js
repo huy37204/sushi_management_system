@@ -46,7 +46,6 @@ export const loginController = async (req, res) => {
       ); // Cộng thêm 7 giờ và 1 phút
 
       console.log("Vietnam Time:", vietnamTime.toISOString());
-
       const dateAccessed = vietnamTime.toISOString().split("T")[0]; // Ngày (YYYY-MM-DD)
       const timeAccessed = vietnamTime; // Lưu thẳng đối tượng Date
       console.log("Time Accessed (Vietnam Time):", timeAccessed);
