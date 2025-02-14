@@ -110,8 +110,8 @@ export const createOfflineOrder = async (req, res) => {
     const customerId = customerResult.recordset[0].CUSTOMER_ID;
 
     const now = new Date();
-    now.setHours(now.getHours() + 7);
     const time = now.toISOString().split("T")[1].split(".")[0];
+    now.setHours(now.getHours() + 7);
     const date = now.toISOString().split("T")[0];
 
     const requestOrder = new sql.Request();
@@ -282,17 +282,13 @@ export const updateOrderForm = async (req, res) => {
     }
 
     // Cập nhật TABLE_NUMBER và trạng thái bàn
-    console.log(tableNum);
-    if (orderType === 'Online' && tableNum !== undefined) {
-      console.log('a');
-      const tableRequest = new sql.Request();
-      await tableRequest
-        .input("orderId", sql.Char(7), orderId)
-        .input("tableNum", sql.Int, tableNum)
-        .input("branchId", sql.Char(4), branchId)
-        .input("orderType", sql.NVarChar, orderType)
-        .execute("UpdateTableAndOrder");
-    }
+    const tableRequest = new sql.Request();
+    await tableRequest
+      .input("orderId", sql.Char(7), orderId)
+      .input("tableNum", sql.Int, tableNum)
+      .input("branchId", sql.Char(4), branchId)
+      .input("orderType", sql.NVarChar(10), orderType)
+      .execute("UpdateTableAndOrder");
 
     // Sau khi xử lý xong, chuyển hướng người dùng hoặc gửi phản hồi
     res.redirect(`/branch/${branchId}/order-form`);

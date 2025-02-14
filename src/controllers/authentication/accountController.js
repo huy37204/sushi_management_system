@@ -57,7 +57,6 @@ export const loginController = async (req, res) => {
       historyRequest.input("sessionDuration", sql.Int, 0); // Gửi thời gian phiên là 0
 
       // Gọi stored procedure để ghi nhận lịch sử truy cập
-      console.log(dateAccessed)
       await historyRequest.execute("InsertOnlineAccessHistory");
     }
 
@@ -269,6 +268,7 @@ export const updateSessionHistory = async (req, res) => {
     await request.execute("UpdateSessionHistory");
 
     console.log(`Session duration updated for customer ID: ${req.user.id}`);
+    console.log(`Session duration updated: ${sessionDuration}`);
   } catch (error) {
     console.error("Error updating session history:", error);
     throw new Error("Error updating session history.");

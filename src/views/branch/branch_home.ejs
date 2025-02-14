@@ -353,9 +353,15 @@
                     <td class="py-2 px-4 border-b border-b-gray-50">
                       <span class="text-[13px] font-medium text-[#b4b4b4]">
                         <%= new
+<<<<<<< HEAD
                         Date(invoice.ISSUE_DATE).toISOString().split("T")[0] %>,
                         <%= new
                         Date(invoice.ISSUE_TIME).toISOString().split("T")[1].substring(0, 8) %>
+=======
+                        Date(invoice.ISSUE_DATE).toLocaleDateString("vi-VN") %>,
+                        <%= new
+                        Date(invoice.ISSUE_TIME).toLocaleTimeString("vi-VN") %>
+>>>>>>> 4cfa6cfb6a9411b58b87f9686b1a93facdbbb067
                       </span>
                     </td>
                     <td class="py-2 px-4 border-b border-b-gray-50 text-center">

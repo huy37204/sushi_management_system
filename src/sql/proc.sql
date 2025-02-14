@@ -817,6 +817,7 @@ BEGIN
         O.ORDER_DATE DESC,
 		O.ORDER_TIME DESC;
 END;
+<<<<<<< HEAD
 
 select * from ORDER_
 
@@ -1169,3 +1170,324 @@ BEGIN
         SELECT 0 AS Success, ERROR_MESSAGE() AS ErrorMessage;
     END CATCH
 END;
+=======
+
+select * from ORDER_
+
+
+GO 
+CREATE PROCEDURE getMenuByBranch
+    @branchId NVARCHAR(50)
+AS
+BEGIN
+    SELECT 
+        MC.CATEGORY_NAME,
+        (
+            SELECT 
+                D.DISH_ID,
+                D.DISH_NAME,
+                D.DISH_PRICE
+            FROM 
+                DISH D
+            JOIN 
+                DISH_AVAILABLE DA ON DA.BRANCH_ID = @branchId 
+                AND DA.DISH_ID = D.DISH_ID 
+                AND DA.IS_AVAILABLE = 1
+            WHERE 
+                D.CATEGORY_NAME = MC.CATEGORY_NAME
+            FOR JSON PATH
+        ) AS DISHES
+    FROM 
+        (SELECT DISTINCT CATEGORY_NAME FROM DISH) MC
+    ORDER BY 
+        MC.CATEGORY_NAME;
+END;
+
+GO
+CREATE PROCEDURE UpdateEmployeeAndWorkHistory
+  @EmployeeId CHAR(7),
+  @FullName NVARCHAR(255),
+  @Gender NVARCHAR(50),
+  @DepartmentId CHAR(7),
+  @Dob DATE = NULL,
+  @TerminationDate DATE = NULL,
+  @StartDateWork DATE
+AS
+BEGIN
+  BEGIN TRY
+    BEGIN TRANSACTION;
+
+    -- Cập nhật thông tin nhân viên
+    UPDATE EMPLOYEE
+    SET 
+      FULL_NAME = @FullName,
+      GENDER = @Gender,
+      DEPARTMENT_ID = @DepartmentId,
+      DATE_OF_BIRTH = @Dob,
+      TERMINATION_DATE = @TerminationDate,
+      START_DATE_WORK = @StartDateWork
+    WHERE EMPLOYEE_ID = @EmployeeId;
+
+    -- Kiểm tra nếu bản ghi WORK_HISTORY với StartDateWork đã tồn tại
+    IF NOT EXISTS (
+      SELECT 1 
+      FROM WORK_HISTORY 
+      WHERE EMPLOYEE_ID = @EmployeeId AND BRANCH_START_DATE = @StartDateWork
+    )
+    BEGIN
+      -- Thêm bản ghi mới nếu không tồn tại
+      INSERT INTO WORK_HISTORY (BRANCH_START_DATE, BRANCH_END_DATE, EMPLOYEE_ID, BRANCH_ID)
+      VALUES (@StartDateWork, NULL, @EmployeeId, @DepartmentId);
+    END;
+
+    -- Nếu có TerminationDate
+    IF @TerminationDate IS NOT NULL
+    BEGIN
+      -- Cập nhật BRANCH_END_DATE cho bản ghi tương ứng
+      UPDATE WORK_HISTORY
+      SET BRANCH_END_DATE = @TerminationDate
+      WHERE EMPLOYEE_ID = @EmployeeId AND BRANCH_START_DATE = @StartDateWork;
+    END
+    ELSE
+    BEGIN
+      -- Nếu không có TerminationDate, đảm bảo BRANCH_END_DATE vẫn là NULL
+      UPDATE WORK_HISTORY
+      SET BRANCH_END_DATE = NULL
+      WHERE EMPLOYEE_ID = @EmployeeId AND BRANCH_START_DATE = @StartDateWork;
+    END;
+
+    COMMIT TRANSACTION;
+  END TRY
+  BEGIN CATCH
+    ROLLBACK TRANSACTION;
+    THROW;
+  END CATCH
+END;
+
+GO
+CREATE PROCEDURE getOrderDishForUpdate
+    @branchId CHAR(4),
+    @orderId CHAR(7)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        MC.CATEGORY_NAME,
+        (
+            SELECT 
+                D.DISH_ID,
+                D.DISH_NAME,
+                D.DISH_PRICE,
+                ISNULL(OD.QUANTITY, 0) AS QUANTITY
+            FROM 
+                DISH D
+            LEFT JOIN 
+                DISH_AVAILABLE DA 
+                ON DA.BRANCH_ID = @branchId 
+                AND DA.DISH_ID = D.DISH_ID 
+                AND DA.IS_AVAILABLE = 1
+            LEFT JOIN 
+                ORDER_DISH OD 
+                ON OD.DISH_ID = D.DISH_ID 
+                AND OD.ORDER_ID = @orderId
+            WHERE 
+                D.CATEGORY_NAME = MC.CATEGORY_NAME
+            FOR JSON PATH
+        ) AS DISHES
+    FROM 
+        (SELECT DISTINCT CATEGORY_NAME FROM DISH) MC
+    ORDER BY 
+        MC.CATEGORY_NAME;
+END;
+
+GO
+CREATE PROCEDURE UpdateOrderDish
+    @orderId CHAR(7),
+    @dishId CHAR(4),
+    @quantity INT
+AS
+BEGIN
+    IF @quantity = 0
+    BEGIN
+        DELETE FROM order_dish 
+        WHERE ORDER_ID = @orderId AND DISH_ID = @dishId;
+    END
+    ELSE
+    BEGIN
+        IF EXISTS (
+            SELECT 1 
+            FROM order_dish 
+            WHERE ORDER_ID = @orderId AND DISH_ID = @dishId
+        )
+        BEGIN
+            UPDATE order_dish
+            SET QUANTITY = @quantity
+            WHERE ORDER_ID = @orderId AND DISH_ID = @dishId;
+        END
+        ELSE
+        BEGIN
+            INSERT INTO order_dish (ORDER_ID, DISH_ID, QUANTITY)
+            VALUES (@orderId, @dishId, @quantity);
+        END
+    END
+END;
+
+GO
+CREATE PROCEDURE UpdateTableAndOrder
+    @orderId CHAR(7),
+    @tableNum INT,
+    @branchId CHAR(4),
+    @orderType NVARCHAR(10)
+AS
+BEGIN
+    IF @orderType = 'Online'
+    BEGIN
+        UPDATE ONLINE_ORDER 
+        SET TABLE_NUMBER = @tableNum 
+        WHERE OORDER_ID = @orderId;
+
+        UPDATE TABLE_
+        SET TABLE_STATUS = 'Đang phục vụ'
+        WHERE TABLE_NUM = @tableNum;
+    END
+    ELSE IF @orderType = 'Offline'
+    BEGIN
+        UPDATE OFFLINE_ORDER 
+        SET TABLE_NUMBER = @tableNum
+        WHERE OFORDER_ID = @orderId;
+
+        UPDATE TABLE_
+        SET TABLE_STATUS = 'Đang phục vụ'
+        WHERE TABLE_NUM = @tableNum AND BRANCH_ID = @branchId;
+    END
+END;
+
+
+
+
+
+GO
+CREATE PROCEDURE updateMembershipCardByYear
+AS
+BEGIN
+    -- Tạo bảng tạm để lưu trạng thái ban đầu của thẻ
+    CREATE TABLE #TempMembershipCard (
+        CARD_ID CHAR(7) PRIMARY KEY,
+        CARD_TYPE NVARCHAR(50),
+        POINTS INT,
+        DISCOUNT_AMOUNT INT
+    );
+
+    -- Sao chép dữ liệu ban đầu vào bảng tạm
+    INSERT INTO #TempMembershipCard (CARD_ID, CARD_TYPE, POINTS, DISCOUNT_AMOUNT)
+    SELECT CARD_ID, CARD_TYPE, POINTS, DISCOUNT_AMOUNT
+    FROM MEMBERSHIP_CARD;
+
+    -- Cập nhật từ 'Thẻ Gold' xuống 'Thẻ Silver' nếu POINTS < 100
+    UPDATE MEMBERSHIP_CARD
+    SET CARD_TYPE = N'Thẻ Silver',
+        POINTS = 0,
+        DISCOUNT_AMOUNT = 100000
+    FROM MEMBERSHIP_CARD MC
+    INNER JOIN #TempMembershipCard TMC ON MC.CARD_ID = TMC.CARD_ID
+    WHERE TMC.CARD_TYPE = N'Thẻ Gold'
+      AND TMC.POINTS < 100;
+
+    -- Cập nhật từ 'Thẻ Silver' xuống 'Thẻ Thành Viên' nếu POINTS < 50
+    -- Chỉ xét các thẻ Silver ban đầu, không xét các thẻ mới bị chuyển từ Gold
+    UPDATE MEMBERSHIP_CARD
+    SET CARD_TYPE = N'Thẻ Thành Viên',
+        DISCOUNT_AMOUNT = 50000,
+        POINTS = 0
+    FROM MEMBERSHIP_CARD MC
+    INNER JOIN #TempMembershipCard TMC ON MC.CARD_ID = TMC.CARD_ID
+    WHERE TMC.CARD_TYPE = N'Thẻ Silver'
+      AND TMC.POINTS < 50;
+
+    -- Cập nhật từ 'Thẻ Silver' lên 'Thẻ Gold' nếu POINTS >= 100
+    -- Chỉ xét các thẻ Silver ban đầu
+    UPDATE MEMBERSHIP_CARD
+    SET CARD_TYPE = N'Thẻ Gold',
+        DISCOUNT_AMOUNT = 200000, 
+        POINTS = 0
+    FROM MEMBERSHIP_CARD MC
+    INNER JOIN #TempMembershipCard TMC ON MC.CARD_ID = TMC.CARD_ID
+    WHERE TMC.CARD_TYPE = N'Thẻ Silver'
+      AND TMC.POINTS >= 100;
+
+    -- Cập nhật từ 'Thẻ Thành Viên' lên 'Thẻ Silver' nếu POINTS >= 100
+    UPDATE MEMBERSHIP_CARD
+    SET CARD_TYPE = N'Thẻ Silver',
+        POINTS = 0,
+        DISCOUNT_AMOUNT = 100000
+    FROM MEMBERSHIP_CARD MC
+    INNER JOIN #TempMembershipCard TMC ON MC.CARD_ID = TMC.CARD_ID
+    WHERE TMC.CARD_TYPE = N'Thẻ Thành Viên'
+      AND TMC.POINTS >= 100;
+
+    -- Cập nhật POINTS = 0 cho tất cả thẻ, trừ 'Thẻ Thành Viên'
+    UPDATE MEMBERSHIP_CARD
+    SET POINTS = 0
+    WHERE CARD_TYPE <> N'Thẻ Thành Viên';
+
+    -- Xóa bảng tạm sau khi xử lý
+    DROP TABLE #TempMembershipCard;
+END;
+
+EXEC updateMembershipCardByYear
+
+
+
+
+
+SELECT * FROM RESTAURANT_BRANCH
+SELECT * FROM TABLE_
+SELECT * FROM CUSTOMER JOIN MEMBERSHIP_CARD ON MEMBERSHIP_CARD.CUSTOMER_ID = CUSTOMER.CUSTOMER_ID
+SELECT * FROM MEMBERSHIP_CARD where CARD_ID = 'C099891'
+SELECT * FROM INVOICE
+JOIN ORDER_ O ON O.ORDER_ID = INVOICE.ORDER_ID AND O.BRANCH_ID = 'B003'
+SELECT * FROM DISH WHERE DISH_ID = 'D015'
+select * from ORDER_DISH WHERE ORDER_ID = 'O012016'
+select * from DELIVERY_ORDER
+SELECT * FROM INVOICE
+select * from ACCOUNT A
+select * from RESTAURANT_BRANCH
+select * from invoice WHERE YEAR(ISSUE_DATE) = '1997'
+SELECT * FROM EMPLOYEE
+SELECT * FROM BRANCH_RATING JOIN OFFLINE_ORDER OFO ON OFO.BRANCH_ID = BRANCH_RATING.BRANCH_ID AND OFO.EMPLOYEE_ID = 'E014327' AND YEAR(BRANCH_RATING.RATING_DATE) = 2022
+SELECT * FROM OFFLINE_ORDER OFO JOIN ORDER_ O ON O.ORDER_ID = OFO.OFORDER_ID AND YEAR(O.ORDER_DATE) = '2024' ORDER BY OFO.EMPLOYEE_ID
+SELECT * FROM ONLINE_ORDER
+SELECT * FROM DELIVERY_ORDER
+SELECT * FROM OFFLINE_ORDER
+SELECT * FROM ORDER_ O
+SELECT * FROM TABLE_ WHERE BRANCH_ID = 'B012' AND TABLE_STATUS = N'Còn trống'
+SELECT * FROM EMPLOYEE WHERE FULL_NAME = N'Bác Hưng Lêê'
+SELECT * FROM ORDER_DISH
+SELECT * FROM DEPARTMENT
+select * from DISH
+SELECT * FROM WORK_HISTORY WHERE EMPLOYEE_ID = 'E000002'
+SELECT * FROM EMPLOYEE WHERE EMPLOYEE_ID ='E000003'
+SELECT * FROM ONLINE_ACCESS_HISTORY WHERE CUSTOMER_ID = '100001C'
+select * from OFFLINE_ORDER OO JOIN ORDER_ O ON O.ORDER_ID = OO.OFORDER_ID AND EMPLOYEE_ID = 'E015020'
+SELECT * FROM ACCOUNT
+SELECT E.EMPLOYEE_ID, E.FULL_NAME,  AVG(CAST(OFO.EMPLYEE_RATING AS FLOAT)) AS AVERAGE_RATE 
+	FROM EMPLOYEE E
+	JOIN OFFLINE_ORDER OFO ON OFO.EMPLOYEE_ID = E.EMPLOYEE_ID
+	JOIN ORDER_ O ON O.ORDER_ID = OFO.OFORDER_ID AND YEAR(O.ORDER_DATE) = 2024
+	JOIN DEPARTMENT D ON D.DEPARTMENT_ID = E.DEPARTMENT_ID AND D.BRANCH_ID = 'B012'
+	WHERE E.EMPLOYEE_ID = 'E000012'
+	GROUP BY E.EMPLOYEE_ID, E.FULL_NAME
+
+
+	SELECT DISTINCT
+              D.DEPARTMENT_ID,
+              D.DEPARTMENT_NAME,
+              E.SALARY
+            FROM DEPARTMENT D
+            JOIN RESTAURANT_BRANCH RB ON RB.BRANCH_ID = D.BRANCH_ID
+            JOIN EMPLOYEE E ON E.DEPARTMENT_ID = D.DEPARTMENT_ID
+            WHERE RB.BRANCH_ID = 'B001'
+            GROUP BY D.DEPARTMENT_ID, D.DEPARTMENT_NAME,E.SALARY
+select * from customer
+>>>>>>> 4cfa6cfb6a9411b58b87f9686b1a93facdbbb067

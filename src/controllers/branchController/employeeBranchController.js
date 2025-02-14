@@ -7,6 +7,7 @@ export const employeeBranchController = async (req, res) => {
   const search = req.query.search || ""; // Từ khóa tìm kiếm
   const departmentFilter = req.query.department || "all"; // Bộ phận lọc (mặc định là "all")
   const user = req.user;
+
   const request = new sql.Request();
   request.input("branchId", sql.NVarChar, branchId);
 
@@ -33,6 +34,7 @@ export const employeeBranchController = async (req, res) => {
     `);
 
     // Nếu có dữ liệu trả về
+
     const employees = employeesList.recordset; // Danh sách toàn bộ nhân viên đã lọc
     const totalRecords = employees.length; // Tổng số bản ghi
     const totalPages = Math.ceil(totalRecords / pageSize); // Tổng số trang
