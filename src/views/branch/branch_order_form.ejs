@@ -87,9 +87,8 @@
                   <%= new Date(order.ORDER_DATE).toLocaleDateString("vi-VN") %>
                 </td>
                 <td class="border px-4 py-2">
-                  <%= new Date(order.ORDER_TIME).toLocaleTimeString("vi-VN", {
-                    hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "Asia/Jakarta"
-                  }) %>
+                  <%= order.ORDER_TIME.toISOString().split("T")[1].substring(0, 8) %>
+
                 </td>
                 
                 

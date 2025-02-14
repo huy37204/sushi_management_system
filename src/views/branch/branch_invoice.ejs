@@ -107,12 +107,10 @@
               <tr>
                 <td class="border px-4 py-2"><%= invoice.INVOICE_ID %></td>
                 <td class="border px-4 py-2 text-center">
-                  <%= new Date(invoice.ISSUE_DATE).toLocaleDateString("vi-VN")
-                  %>
+                  <%= new Date(invoice.ISSUE_DATE).toISOString().split("T")[0] %>
                 </td>
                 <td class="border px-4 py-2 text-center">
-                  <%= new Date(invoice.ISSUE_TIME).toLocaleTimeString("vi-VN", {
-                  hour: '2-digit', minute: '2-digit', second: '2-digit' }) %>
+                  <%= new Date(invoice.ISSUE_TIME).toISOString().split("T")[1].substring(0, 8) %>
                 </td>
                 <td class="border px-4 py-2 text-center">
                   <%= new Intl.NumberFormat("vi-VN", { style: "currency",

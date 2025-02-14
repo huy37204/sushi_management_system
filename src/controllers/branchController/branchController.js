@@ -60,21 +60,18 @@ export const getBranchRevenueByDate = async (req, res) => {
     const hourlyTotals = Array(8).fill(0); // 8 khoảng: 0-3, 3-6, ..., 21-24
 
     let sumAmount = 0;
-    invoices.forEach((invoice) => {
-      let hour;
 
-      // Kiểm tra và chuyển đổi ISSUE_TIME
-      if (invoice.ISSUE_TIME instanceof Date) {
-        // Nếu ISSUE_TIME là kiểu Date, lấy giờ bằng getHours()
-        hour = invoice.ISSUE_TIME.getHours();
-      } else if (typeof invoice.ISSUE_TIME === "string") {
-        // Nếu ISSUE_TIME là chuỗi, dùng split để lấy giờ
-        [hour] = invoice.ISSUE_TIME.split(":").map(Number);
-      } else {
-        // Nếu ISSUE_TIME không hợp lệ, bỏ qua hóa đơn này
-        console.error(`Invalid ISSUE_TIME: ${invoice.ISSUE_TIME}`);
-        return;
-      }
+    invoices.forEach((invoice) => {
+      let hour = null;
+
+   
+ 
+      // Chuyển đổi ISSUE_TIME thành chuỗi ISO và lấy giờ
+      const timeString = invoice.ISSUE_TIME.toISOString().split("T")[1].substring(0, 8); // Lấy HH:mm:ss
+      hour = parseInt(timeString.split(":")[0], 10); // Lấy giờ (HH)
+ 
+
+      // Phân loại giờ vào các khoảng thời gian
       const index = Math.floor(hour / 3); // Xác định khoảng thời gian
       if (index < hourlyTotals.length) {
         hourlyTotals[index] += invoice.FINAL_AMOUNT; // Cộng dồn FINAL_AMOUNT vào khoảng tương ứng
@@ -87,10 +84,10 @@ export const getBranchRevenueByDate = async (req, res) => {
       branchId,
       invoices,
       type: "date-revenue",
-      hourlyTotals: hourlyTotals,
-      dailyTotals: [],
-      monthlyTotals: [],
-      quarter: "",
+      hourlyTotals,
+      dailyTotals: [], // Để trống vì không dùng
+      monthlyTotals: [], // Để trống vì không dùng
+      quarter: "", // Để trống vì không dùng
       sumAmount,
     });
   } catch (error) {
@@ -98,6 +95,7 @@ export const getBranchRevenueByDate = async (req, res) => {
     res.status(500).send("Error fetching branch revenue by date");
   }
 };
+
 
 export const getBranchRevenueByMonth = async (req, res) => {
   try {

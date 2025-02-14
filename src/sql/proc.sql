@@ -523,11 +523,11 @@ AS
 BEGIN
     BEGIN TRANSACTION;
     BEGIN TRY
-        -- Xoá các b?n ghi trong ORDER_DISH
+        -- Xoá các bản ghi trong ORDER_DISH
         DELETE FROM ORDER_DISH 
         WHERE ORDER_ID = @ORDER_ID;
 
-        -- Ki?m tra lo?i don hàng và th?c hi?n xoá
+        -- Kiểm tra lỗi đơn hàng và thực hiện xoá
         IF @ORDER_TYPE = 'Delivery'
         BEGIN
             DELETE FROM DELIVERY_ORDER
@@ -539,16 +539,16 @@ BEGIN
             DELETE FROM OFFLINE_ORDER
             WHERE OFORDER_ID = @ORDER_ID;
 
-            -- C?p nh?t tr?ng thái bàn TABLE_
+            -- Cập nhật trạng thái bàn TABLE_
             UPDATE TABLE_
-            SET TABLE_STATUS = N'Còn tr?ng'
+            SET TABLE_STATUS = N'Còn trống'
             FROM TABLE_ T
             JOIN OFFLINE_ORDER O ON T.TABLE_NUM = O.TABLE_NUMBER
             WHERE O.OFORDER_ID = @ORDER_ID AND T.BRANCH_ID = @BRANCH_ID;
         END
         ELSE IF @ORDER_TYPE = 'Online'
         BEGIN
-            -- Xoá t? b?ng ONLINE_ORDER
+            -- Xoá bảng ONLINE_ORDER
             DELETE FROM ONLINE_ORDER
             WHERE OORDER_ID = @ORDER_ID;
         END
@@ -560,7 +560,7 @@ BEGIN
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
-        -- Rollback khi có l?i
+        -- Rollback khi có lỗi
         ROLLBACK TRANSACTION;
         THROW;
     END CATCH
@@ -1011,8 +1011,6 @@ END;
 
 
 
-
-
 GO
 CREATE PROCEDURE updateMembershipCardByYear
 AS
@@ -1081,58 +1079,93 @@ BEGIN
     DROP TABLE #TempMembershipCard;
 END;
 
-EXEC updateMembershipCardByYear
 
+GO
+CREATE PROCEDURE addResource
+    @branchId CHAR(7),
+    @fullName NVARCHAR(255),
+    @gender NVARCHAR(3),
+    @dob DATE,
+    @startDayWork DATE,
+    @departmentId CHAR(4),
+    @hashedPassword NVARCHAR(255) -- Mật khẩu đã băm từ phía ứng dụng
+AS
+BEGIN
+    SET NOCOUNT ON;
 
+    BEGIN TRY
+        -- Biến để lưu giá trị
+        DECLARE @currentDate DATE = CONVERT(DATE, GETDATE());
+        DECLARE @salary INT = 20000;
+        DECLARE @employeeId CHAR(7);
+        DECLARE @accountId CHAR(4);
+        DECLARE @username NVARCHAR(255);
+        DECLARE @role NVARCHAR(50);
 
+        -- Lấy salary của department (nếu có)
+        SELECT TOP 1 @salary = SALARY
+        FROM EMPLOYEE
+        WHERE DEPARTMENT_ID = @departmentId;
 
+        -- Lấy EMPLOYEE_ID cao nhất và cộng thêm 1
+        SELECT @employeeId = 'E' + RIGHT('000000' + CAST(ISNULL(MAX(CAST(SUBSTRING(EMPLOYEE_ID, 2, 6) AS INT)), 0) + 1 AS VARCHAR), 6)
+        FROM EMPLOYEE;
 
-SELECT * FROM RESTAURANT_BRANCH
-SELECT * FROM TABLE_
-SELECT * FROM CUSTOMER JOIN MEMBERSHIP_CARD ON MEMBERSHIP_CARD.CUSTOMER_ID = CUSTOMER.CUSTOMER_ID
-SELECT * FROM MEMBERSHIP_CARD where CARD_ID = 'C099891'
-SELECT * FROM INVOICE
-JOIN ORDER_ O ON O.ORDER_ID = INVOICE.ORDER_ID AND O.BRANCH_ID = 'B003'
-SELECT * FROM DISH WHERE DISH_ID = 'D015'
-select * from ORDER_DISH WHERE ORDER_ID = 'O012016'
-select * from DELIVERY_ORDER
-SELECT * FROM INVOICE
-select * from ACCOUNT A
-select * from RESTAURANT_BRANCH
-select * from invoice WHERE YEAR(ISSUE_DATE) = '1997'
-SELECT * FROM EMPLOYEE
-SELECT * FROM BRANCH_RATING JOIN OFFLINE_ORDER OFO ON OFO.BRANCH_ID = BRANCH_RATING.BRANCH_ID AND OFO.EMPLOYEE_ID = 'E014327' AND YEAR(BRANCH_RATING.RATING_DATE) = 2022
-SELECT * FROM OFFLINE_ORDER OFO JOIN ORDER_ O ON O.ORDER_ID = OFO.OFORDER_ID AND YEAR(O.ORDER_DATE) = '2024' ORDER BY OFO.EMPLOYEE_ID
-SELECT * FROM ONLINE_ORDER
-SELECT * FROM DELIVERY_ORDER
-SELECT * FROM OFFLINE_ORDER
-SELECT * FROM ORDER_ O
-SELECT * FROM TABLE_ WHERE BRANCH_ID = 'B012' AND TABLE_STATUS = N'Còn trống'
-SELECT * FROM EMPLOYEE WHERE FULL_NAME = N'Bác Hưng Lêê'
-SELECT * FROM ORDER_DISH
-SELECT * FROM DEPARTMENT
-select * from DISH
-SELECT * FROM WORK_HISTORY WHERE EMPLOYEE_ID = 'E000002'
-SELECT * FROM EMPLOYEE WHERE EMPLOYEE_ID ='E000003'
-SELECT * FROM ONLINE_ACCESS_HISTORY WHERE CUSTOMER_ID = '100001C'
-select * from OFFLINE_ORDER OO JOIN ORDER_ O ON O.ORDER_ID = OO.OFORDER_ID AND EMPLOYEE_ID = 'E015020'
-SELECT * FROM ACCOUNT
-SELECT E.EMPLOYEE_ID, E.FULL_NAME,  AVG(CAST(OFO.EMPLYEE_RATING AS FLOAT)) AS AVERAGE_RATE 
-	FROM EMPLOYEE E
-	JOIN OFFLINE_ORDER OFO ON OFO.EMPLOYEE_ID = E.EMPLOYEE_ID
-	JOIN ORDER_ O ON O.ORDER_ID = OFO.OFORDER_ID AND YEAR(O.ORDER_DATE) = 2024
-	JOIN DEPARTMENT D ON D.DEPARTMENT_ID = E.DEPARTMENT_ID AND D.BRANCH_ID = 'B012'
-	WHERE E.EMPLOYEE_ID = 'E000012'
-	GROUP BY E.EMPLOYEE_ID, E.FULL_NAME
+        -- Lấy ACCOUNT_ID cao nhất và cộng thêm 1
+        SELECT @accountId = 'A' + RIGHT('000000' + CAST(ISNULL(MAX(CAST(SUBSTRING(ACCOUNT_ID, 2, 3) AS INT)), 0) + 1 AS VARCHAR), 6)
+        FROM ACCOUNT;
 
+        -- Tạo username từ họ tên và ngày sinh
+        DECLARE @dobString NVARCHAR(50) = FORMAT(@dob, 'ddMMyyyy');
+        DECLARE @nameParts TABLE (NamePart NVARCHAR(50));
+        INSERT INTO @nameParts (NamePart)
+        SELECT value
+        FROM STRING_SPLIT(@fullName, ' ');
 
-	SELECT DISTINCT
-              D.DEPARTMENT_ID,
-              D.DEPARTMENT_NAME,
-              E.SALARY
-            FROM DEPARTMENT D
-            JOIN RESTAURANT_BRANCH RB ON RB.BRANCH_ID = D.BRANCH_ID
-            JOIN EMPLOYEE E ON E.DEPARTMENT_ID = D.DEPARTMENT_ID
-            WHERE RB.BRANCH_ID = 'B001'
-            GROUP BY D.DEPARTMENT_ID, D.DEPARTMENT_NAME,E.SALARY
-select * from customer
+        DECLARE @initials NVARCHAR(50) = '';
+        DECLARE @part NVARCHAR(50);
+
+        DECLARE nameCursor CURSOR FOR SELECT NamePart FROM @nameParts;
+        OPEN nameCursor;
+        FETCH NEXT FROM nameCursor INTO @part;
+
+        WHILE @@FETCH_STATUS = 0
+        BEGIN
+            SET @initials = @initials + LOWER(LEFT(@part, 1));
+            FETCH NEXT FROM nameCursor INTO @part;
+        END;
+
+        CLOSE nameCursor;
+        DEALLOCATE nameCursor;
+
+        SET @username = @initials + @dobString;
+
+        -- Xác định role
+        SELECT @role = CASE
+                          WHEN DEPARTMENT_NAME = N'Quản lý chi nhánh' THEN N'Quản lý chi nhánh'
+                          ELSE N'Nhân viên'
+                       END
+        FROM DEPARTMENT
+        WHERE DEPARTMENT_ID = @departmentId;
+
+        -- Insert vào bảng EMPLOYEE
+        INSERT INTO EMPLOYEE (EMPLOYEE_ID, FULL_NAME, DATE_OF_BIRTH, GENDER, SALARY, START_DATE_WORK, DEPARTMENT_ID)
+        VALUES (@employeeId, @fullName, @dob, @gender, @salary, @startDayWork, @departmentId);
+
+        -- Insert vào bảng ACCOUNT
+        INSERT INTO ACCOUNT (ACCOUNT_ID, USERNAME, PASSWORD, ROLE, EMPLOYEE_ID)
+        VALUES (@accountId, @username, @hashedPassword, @role, @employeeId);
+
+        -- Insert vào bảng WORK_HISTORY
+        INSERT INTO WORK_HISTORY (BRANCH_START_DATE, EMPLOYEE_ID, BRANCH_ID)
+        VALUES (@startDayWork, @employeeId, @branchId);
+
+        -- Trả về kết quả thành công
+        SELECT 1 AS Success, 'Resource added successfully' AS Message;
+
+    END TRY
+    BEGIN CATCH
+        -- Trả về lỗi
+        SELECT 0 AS Success, ERROR_MESSAGE() AS ErrorMessage;
+    END CATCH
+END;

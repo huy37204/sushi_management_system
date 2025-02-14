@@ -4,12 +4,11 @@ const bcryptRegex = /^\$2[ab]\$.{56}$/;
 
 export const hashAllPasswords = async () => {
   const pool = await connect();
-  const request = new sql.Request(pool);
 
   try {
     // Lấy tất cả các tài khoản (bao gồm ID và PASSWORD chưa hash)
-    const result = await request.query(
-      `SELECT ACCOUNT_ID, PASSWORD FROM account`,
+    const result = await pool.request().query(
+      `SELECT ACCOUNT_ID, PASSWORD FROM account`
     );
     const accounts = result.recordset;
 
@@ -21,20 +20,19 @@ export const hashAllPasswords = async () => {
         // Nếu mật khẩu chưa được hash, tiến hành hash
         const hashedPassword = await bcrypt.hash(account.PASSWORD, 10);
 
-        // Đặt tên tham số duy nhất cho mỗi tài khoản
-        const accountIdParam = `accountId_${account.ACCOUNT_ID}`;
-        const hashedPasswordParam = `hashedPassword_${account.ACCOUNT_ID}`;
+        // Tạo một request mới cho mỗi tài khoản
+        const request = pool.request();
 
         // Cập nhật lại mật khẩu đã hash vào database
         await request
-          .input(accountIdParam, sql.VarChar, account.ACCOUNT_ID) // Tên tham số duy nhất
-          .input(hashedPasswordParam, sql.VarChar, hashedPassword)
+          .input("accountId", sql.VarChar, account.ACCOUNT_ID)
+          .input("hashedPassword", sql.VarChar, hashedPassword)
           .query(
-            `UPDATE ACCOUNT SET PASSWORD = @${hashedPasswordParam} WHERE ACCOUNT_ID = @${accountIdParam}`,
+            `UPDATE ACCOUNT SET PASSWORD = @hashedPassword WHERE ACCOUNT_ID = @accountId`
           );
 
         console.log(
-          `Mật khẩu cho tài khoản ${account.ACCOUNT_ID} đã được hash.`,
+          `Mật khẩu cho tài khoản ${account.ACCOUNT_ID} đã được hash.`
         );
       }
     }

@@ -23,7 +23,6 @@ export const loginController = async (req, res) => {
     }
 
     const user = result.recordset[0];
-    console.log(user);
     const passwordMatch = await bcrypt.compare(password, user.PASSWORD);
     if (!passwordMatch) {
       return res.status(401).json({ message: "Invalid username or password" });
@@ -58,6 +57,7 @@ export const loginController = async (req, res) => {
       historyRequest.input("sessionDuration", sql.Int, 0); // Gửi thời gian phiên là 0
 
       // Gọi stored procedure để ghi nhận lịch sử truy cập
+      console.log(dateAccessed)
       await historyRequest.execute("InsertOnlineAccessHistory");
     }
 
@@ -203,12 +203,12 @@ export const registerUser = async (req, res) => {
       "SELECT TOP 1 ACCOUNT_ID FROM ACCOUNT ORDER BY ACCOUNT_ID DESC",
     );
 
-    let account_id = "A001";
+    let account_id = "A000001";
 
     if (accountResult.recordset.length > 0) {
       const lastAccountId = accountResult.recordset[0].ACCOUNT_ID;
       const numberPart = parseInt(lastAccountId.substring(1)) + 1;
-      account_id = "A" + numberPart.toString().padStart(3, "0");
+      account_id = "A" + numberPart.toString().padStart(6, "0");
     }
 
     const saltRounds = 10;

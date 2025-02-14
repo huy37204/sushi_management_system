@@ -26,6 +26,7 @@ export const companyController = async (req, res) => {
         dailyTotals: [],
         monthlyTotals: [],
         quarter: "",
+        sumAmount: 0
       });
     } else {
       // Nếu không tìm thấy BranchId cho manager, trả về lỗi hoặc chuyển hướng
@@ -52,26 +53,22 @@ export const getCompanyRevenueByDate = async (req, res) => {
 
     // Khởi tạo mảng tổng FINAL_AMOUNT theo các khoảng thời gian
     const hourlyTotals = Array(8).fill(0); // 8 khoảng: 0-3, 3-6, ..., 21-24
-
+    let sumAmount = 0;
     invoices.forEach((invoice) => {
-      let hour;
+      let hour = null;
 
-      // Kiểm tra và chuyển đổi ISSUE_TIME
-      if (invoice.ISSUE_TIME instanceof Date) {
-        // Nếu ISSUE_TIME là kiểu Date, lấy giờ bằng getHours()
-        hour = invoice.ISSUE_TIME.getHours();
-      } else if (typeof invoice.ISSUE_TIME === "string") {
-        // Nếu ISSUE_TIME là chuỗi, dùng split để lấy giờ
-        [hour] = invoice.ISSUE_TIME.split(":").map(Number);
-      } else {
-        // Nếu ISSUE_TIME không hợp lệ, bỏ qua hóa đơn này
-        console.error(`Invalid ISSUE_TIME: ${invoice.ISSUE_TIME}`);
-        return;
-      }
+   
+ 
+      // Chuyển đổi ISSUE_TIME thành chuỗi ISO và lấy giờ
+      const timeString = invoice.ISSUE_TIME.toISOString().split("T")[1].substring(0, 8); // Lấy HH:mm:ss
+      hour = parseInt(timeString.split(":")[0], 10); // Lấy giờ (HH)
+ 
 
+      // Phân loại giờ vào các khoảng thời gian
       const index = Math.floor(hour / 3); // Xác định khoảng thời gian
       if (index < hourlyTotals.length) {
         hourlyTotals[index] += invoice.FINAL_AMOUNT; // Cộng dồn FINAL_AMOUNT vào khoảng tương ứng
+        sumAmount += invoice.FINAL_AMOUNT;
       }
     });
 
@@ -90,6 +87,7 @@ export const getCompanyRevenueByDate = async (req, res) => {
       dailyTotals: [],
       monthlyTotals: [],
       quarter: "",
+      sumAmount
     });
   } catch (error) {
     console.error("Error fetching branch company by date:", error);
@@ -113,7 +111,7 @@ export const getCompanyRevenueByMonth = async (req, res) => {
 
     // Khởi tạo dailyTotals với giá trị 0
     const dailyTotals = new Array(daysInMonth).fill(0);
-
+    let sumAmount = 0;
     invoices.forEach((invoice) => {
       // Chuyển đổi ISSUE_DATE thành đối tượng Date
       const invoiceDate = new Date(invoice.ISSUE_DATE);
@@ -122,6 +120,7 @@ export const getCompanyRevenueByMonth = async (req, res) => {
       if (!isNaN(invoiceDate)) {
         const day = new Date(invoice.ISSUE_DATE).getUTCDate(); // Lấy ngày (1-31)
         dailyTotals[day - 1] += parseFloat(invoice.FINAL_AMOUNT || 0); // Cộng giá trị hóa đơn vào ngày tương ứng
+        sumAmount +=  parseFloat(invoice.FINAL_AMOUNT || 0);
       } else {
         console.warn(`Invalid date found in invoice: ${invoice.ISSUE_DATE}`);
       }
@@ -142,6 +141,7 @@ export const getCompanyRevenueByMonth = async (req, res) => {
       hourlyTotals: [],
       monthlyTotals: [],
       quarter: "",
+      sumAmount
     });
   } catch (error) {
     console.error("Error fetching branch revenue by month:", error);
@@ -175,7 +175,7 @@ export const getCompanyRevenueByQuarter = async (req, res) => {
 
     // Khởi tạo monthlyTotals với giá trị 0 cho mỗi tháng trong quý
     const monthlyTotals = [0, 0, 0];
-
+    let sumAmount = 0;
     invoices.forEach((invoice) => {
       // Chuyển đổi ISSUE_DATE thành đối tượng Date
       const invoiceDate = new Date(invoice.ISSUE_DATE);
@@ -186,6 +186,7 @@ export const getCompanyRevenueByQuarter = async (req, res) => {
         if (monthsInQuarter.includes(month)) {
           const monthIndex = monthsInQuarter.indexOf(month);
           monthlyTotals[monthIndex] += parseFloat(invoice.FINAL_AMOUNT || 0);
+          sumAmount +=  parseFloat(invoice.FINAL_AMOUNT || 0);
         }
       } else {
         console.warn(`Invalid date found in invoice: ${invoice.ISSUE_DATE}`);
@@ -206,6 +207,7 @@ export const getCompanyRevenueByQuarter = async (req, res) => {
       monthlyTotals,
       dailyTotals: [],
       hourlyTotals: [],
+      sumAmount
     });
   } catch (error) {
     console.error("Error fetching branch revenue by quarter:", error);
@@ -223,7 +225,7 @@ export const getCompanyRevenueByYear = async (req, res) => {
     const invoiceResult = await request.execute("getRevenueByYear");
     const invoices = invoiceResult.recordset;
     const monthlyTotals = Array(12).fill(0);
-
+    let sumAmount = 0;
     // Lặp qua tất cả các hóa đơn và cộng tổng doanh thu vào tháng tương ứng
     invoices.forEach((invoice) => {
       // Chuyển đổi ISSUE_DATE thành đối tượng Date
@@ -234,6 +236,7 @@ export const getCompanyRevenueByYear = async (req, res) => {
         const month = invoiceDate.getMonth(); // Lấy tháng (0-11, nên không cần +1)
 
         monthlyTotals[month] += parseFloat(invoice.FINAL_AMOUNT || 0);
+        sumAmount +=  parseFloat(invoice.FINAL_AMOUNT || 0);
       }
     });
 
@@ -251,6 +254,7 @@ export const getCompanyRevenueByYear = async (req, res) => {
       monthlyTotals,
       dailyTotals: [],
       hourlyTotals: [],
+      sumAmount
     });
   } catch (error) {
     console.error("Error fetching branch revenue by year:", error);

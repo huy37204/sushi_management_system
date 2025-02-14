@@ -35,6 +35,7 @@ export const getInvoice = async (req, res) => {
     const result = await request.execute("getInvoiceByPhone");
 
     // Phân tách dữ liệu từ kết quả
+      console.log(result.recordset);
     const invoices = result.recordsets[0]; // Danh sách hóa đơn
     const dishes = result.recordsets[1]; // Danh sách món ăn
 
@@ -45,7 +46,7 @@ export const getInvoice = async (req, res) => {
         dishes: dishes.filter((dish) => dish.INVOICE_ID === invoice.INVOICE_ID),
       };
     });
-
+    
     // Trả về dữ liệu JSON
     res.render("branch/branch_invoice", {
       branchId,

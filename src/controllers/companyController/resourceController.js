@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 
 export const resourceController = async (req, res) => {
   const { branchId } = req.query;
+  const pageNum = parseInt(req.query.pageNum, 10) || 1; // Trang hiện tại, mặc định là trang 1
+  const pageSize = 30; // Số bản ghi trên mỗi trang
   const user = req.user;
   const request = new sql.Request();
 
@@ -38,6 +40,14 @@ export const resourceController = async (req, res) => {
       `);
 
     const employeeList = employeeResult.recordset;
+    const totalRecords = employeeList.length; // Tổng số bản ghi
+    const totalPages = Math.ceil(totalRecords / pageSize); // Tổng số trang
+
+    // Cắt dữ liệu dựa trên trang hiện tại
+    const paginatedEmployees = employeeList.slice(
+      (pageNum - 1) * pageSize,
+      pageNum * pageSize,
+    );
 
     // Gán giá trị input cho branchId
 
@@ -54,8 +64,10 @@ export const resourceController = async (req, res) => {
       branchId: branchId || null,
       user: user,
       branches,
-      employeeList: employeeList || null,
+      employeeList: paginatedEmployees || null,
       departmentList: departmentList || null,
+      currentPage: pageNum,
+      totalPages: totalPages,
     });
   } catch (error) {
     console.error("Error fetching company details:", error);
@@ -223,19 +235,66 @@ export const updateResource = async (req, res) => {
     // Kết nối cơ sở dữ liệu
     const request = new sql.Request();
 
-    // Thêm các tham số vào thủ tục
-    request.input("EmployeeId", sql.Char(7), employeeId);
-    request.input("FullName", sql.NVarChar(255), fullName);
-    request.input("Gender", sql.NVarChar(50), gender);
-    request.input("DepartmentId", sql.Char(7), department);
-    request.input("Dob", sql.Date, dob || null);
-    request.input("TerminationDate", sql.Date, terminationDate || null);
-    request.input("StartDateWork", sql.Date, startDateWork);
+    // Thêm các tham số vào truy vấn
+    request.input("employeeId", sql.Char(7), employeeId);
+    request.input("fullName", sql.NVarChar(255), fullName);
+    request.input("gender", sql.NVarChar(50), gender);
+    request.input("departmentId", sql.Char(7), department);
+    request.input("dob", sql.Date, dob || null);
+    request.input("terminationDate", sql.Date, terminationDate || null);
+    request.input("startDateWork", sql.Date, startDateWork);
 
-    // Gọi thủ tục
-    await request.execute("UpdateEmployeeAndWorkHistory");
+    // Cập nhật thông tin nhân viên
+    const updateQuery = `
+      UPDATE EMPLOYEE
+      SET 
+        FULL_NAME = @fullName,
+        GENDER = @gender,
+        DEPARTMENT_ID = @departmentId,
+        DATE_OF_BIRTH = @dob,
+        TERMINATION_DATE = @terminationDate,
+        START_DATE_WORK = @startDateWork
+      WHERE EMPLOYEE_ID = @employeeId
+    `;
 
-    // Chuyển hướng sau khi cập nhật thành công
+    await request.query(updateQuery);
+
+    // Kiểm tra nếu bản ghi WORK_HISTORY với startDateWork đã tồn tại
+    const workHistoryCheckQuery = `
+      SELECT * FROM WORK_HISTORY
+      WHERE EMPLOYEE_ID = @employeeId AND BRANCH_START_DATE = @startDateWork
+    `;
+    const workHistoryResult = await request.query(workHistoryCheckQuery);
+    const workHistory = workHistoryResult.recordset[0];
+
+    if (!workHistory) {
+      // Nếu không tồn tại bản ghi WORK_HISTORY với startDateWork, thêm bản ghi mới
+      const insertWorkHistoryQuery = `
+        INSERT INTO WORK_HISTORY (BRANCH_START_DATE, BRANCH_END_DATE, EMPLOYEE_ID, BRANCH_ID)
+        VALUES (@startDateWork, NULL, @employeeId, @branchId)
+      `;
+      request.input("branchId", sql.Char(7), department); // Sử dụng department làm BRANCH_ID
+      await request.query(insertWorkHistoryQuery);
+    }
+    if (terminationDate) {
+      // Nếu có terminationDate, cập nhật BRANCH_END_DATE cho bản ghi tương ứng
+      const updateWorkHistoryQuery = `
+        UPDATE WORK_HISTORY
+        SET BRANCH_END_DATE = @terminationDate
+        WHERE EMPLOYEE_ID = @employeeId AND BRANCH_START_DATE = @startDateWork
+      `;
+      await request.query(updateWorkHistoryQuery);
+    } else {
+      // Nếu không có terminationDate, đảm bảo BRANCH_END_DATE vẫn là NULL
+      const resetWorkHistoryQuery = `
+        UPDATE WORK_HISTORY
+        SET BRANCH_END_DATE = NULL
+        WHERE EMPLOYEE_ID = @employeeId AND BRANCH_START_DATE = @startDateWork
+      `;
+      await request.query(resetWorkHistoryQuery);
+    }
+
+    // Chuyển hướng hoặc gửi phản hồi sau khi cập nhật thành công
     res.redirect(`/company/resource`);
   } catch (error) {
     console.error("Error updating employee:", error);
@@ -302,91 +361,25 @@ export const addResource = async (req, res) => {
   const request = new sql.Request();
 
   try {
-    // Lấy ngày hiện tại của Việt Nam (UTC+7)
-    const vietnamDate = new Date(
-      new Date().toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }),
-    );
-    const currentDate = vietnamDate.toISOString().split("T")[0]; // yyyy-MM-dd
+    // Băm mật khẩu (mặc định là "123")
+    const hashedPassword = await bcrypt.hash("123", 10);
+    // Chạy thủ tục addResource
     request.input("branchId", sql.Char(7), branchId);
-    request.input("currentDate", sql.Date, currentDate);
     request.input("fullName", sql.NVarChar, fullName);
-    request.input("gender", sql.VarChar, gender);
+    request.input("gender", sql.NVarChar, gender.trim())
     request.input("dob", sql.Date, dob);
     request.input("startDayWork", sql.Date, startDayWork);
     request.input("departmentId", sql.Char(4), departmentId);
-    console.log(departmentId);
-    // Lấy salary của department
-    const salaryData = await request.query(`
-      SELECT TOP 1 SALARY
-      FROM EMPLOYEE
-      WHERE DEPARTMENT_ID = @departmentId
-    `);
-    const salary = salaryData.recordset[0]?.SALARY || 20000; // Default to 0 if no salary found
-    request.input("salary", sql.Int, salary);
-    // Lấy EMPLOYEE_ID cao nhất và cộng thêm 1
-    const employeeIdData = await request.query(`
-      SELECT MAX(CAST(SUBSTRING(EMPLOYEE_ID, 2, 6) AS INT)) AS MaxEmployeeId
-      FROM EMPLOYEE
-    `);
-    const maxEmployeeId = employeeIdData.recordset[0].MaxEmployeeId || 0;
-    const employeeId = `E${(maxEmployeeId + 1).toString().padStart(6, "0")}`;
-    request.input("employeeId", sql.Char(7), employeeId);
-
-    // Lấy ACCOUNT_ID cao nhất và cộng thêm 1
-    const accountIdData = await request.query(`
-      SELECT MAX(CAST(SUBSTRING(ACCOUNT_ID, 2, 3) AS INT)) AS MaxAccountId
-      FROM ACCOUNT
-    `);
-    const maxAccountId = accountIdData.recordset[0].MaxAccountId || 0;
-    const accountId = `A${(maxAccountId + 1).toString().padStart(3, "0")}`; // Đảm bảo ACCOUNT_ID có 3 chữ số
-    request.input("accountId", sql.Char(4), accountId); // Lưu vào input với định dạng A000
-
-    // Tạo username từ họ tên và ngày sinh
-    const dobString = new Date(dob)
-      .toLocaleDateString("en-GB")
-      .split("/")
-      .join("");
-    const username =
-      fullName
-        .split(" ")
-        .map((name) => name[0].toLowerCase())
-        .join("") + dobString;
-    request.input("username", sql.NVarChar, username);
-
-    // Xác định role
-    const departmentData = await request.query(`
-      SELECT DEPARTMENT_NAME
-      FROM DEPARTMENT
-      WHERE DEPARTMENT_ID = @departmentId
-    `);
-    const role =
-      departmentData.recordset[0]?.DEPARTMENT_NAME === "Quản lý chi nhánh"
-        ? "Quản lý chi nhánh"
-        : "Nhân viên";
-    request.input("role", sql.NVarChar, role);
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash("123", 10);
     request.input("hashedPassword", sql.NVarChar, hashedPassword);
 
-    // Insert vào bảng EMPLOYEE
-    await request.query(`
-      INSERT INTO EMPLOYEE (EMPLOYEE_ID, FULL_NAME, DATE_OF_BIRTH, GENDER, SALARY, START_DATE_WORK, DEPARTMENT_ID)
-      VALUES (@employeeId, @fullName, @dob, @gender, @salary, @startDayWork, @departmentId)
-    `);
+    const result = await request.execute("addResource");
 
-    // Insert vào bảng ACCOUNT
-    await request.query(`
-      INSERT INTO ACCOUNT (ACCOUNT_ID, USERNAME, PASSWORD, ROLE, EMPLOYEE_ID)
-      VALUES (@accountId, @username, @hashedPassword, @role, @employeeId)
-    `);
-
-    await request.query(`
-      INSERT INTO WORK_HISTORY (BRANCH_START_DATE, EMPLOYEE_ID, BRANCH_ID)
-      VALUES (@startDayWork, @employeeId, @branchId)
-      `);
-
-    res.redirect("/company/resource");
+    // Kiểm tra kết quả từ thủ tục
+    if (result.recordset && result.recordset[0]?.Success === 1) {
+      res.redirect("/company/resource");
+    } else {
+      throw new Error(result.recordset[0]?.ErrorMessage || "Thêm nhân viên thất bại");
+    }
   } catch (error) {
     console.error("Error adding resource:", error);
     res.status(500).send("Error adding resource");
